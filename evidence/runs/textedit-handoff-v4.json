@@ -1,0 +1,282 @@
+{
+  "exportKind": "sanitized-summary-not-replay-input",
+  "goal": "Open the owned blank Fixture.txt file using the openFile candidate. Use Codex to write one original English sentence about quiet computers that includes the exact marker JEV-NATIVE-731. Put that generated sentence into Fixture.txt and leave it visible in that target TextEdit document. Do not type in any other document. Do not save or close unrelated documents.",
+  "status": "verified_complete",
+  "steps": [
+    {
+      "index": 0,
+      "executionMS": 28.465986251831055,
+      "decision": {
+        "apiMS": 240.72706699371338,
+        "choice": "a3",
+        "confidence": 0.64,
+        "localMS": 0.48792362213134766,
+        "model": "jev-1.13.0",
+        "usage": {
+          "input_tokens": 912,
+          "output_tokens": 152
+        },
+        "serviceResponse": {
+          "model": "jev-1.13.0",
+          "answers": {
+            "next": {
+              "type": "choice",
+              "choice": "a3",
+              "confidence": 0.64,
+              "probabilities": {
+                "a13": 0.0,
+                "blocked": 0.15,
+                "done": 0.0,
+                "a14": 0.0,
+                "a15": 0.01,
+                "a3": 0.66,
+                "a11": 0.0,
+                "a4": 0.0,
+                "delegateText": 0.18000000000000002,
+                "a10": 0.0,
+                "a7": 0.0,
+                "a8": 0.0,
+                "a9": 0.0,
+                "a12": 0.0,
+                "a5": 0.0,
+                "a6": 0.0
+              }
+            }
+          },
+          "usage": {
+            "input_tokens": 912,
+            "output_tokens": 152
+          }
+        }
+      },
+      "action": {
+        "app": "com.apple.TextEdit",
+        "kind": "openFile",
+        "label": "Open the owned blank Fixture.txt validation document"
+      },
+      "observation": {
+        "elapsedMS": 793.455958366394,
+        "truncated": false,
+        "targetBundle": "com.apple.TextEdit",
+        "targetWindowOCR": [
+          "Fixture.txt"
+        ]
+      }
+    },
+    {
+      "index": 1,
+      "executionMS": 6265.000939369202,
+      "decision": {
+        "apiMS": 180.292010307312,
+        "choice": "delegateText",
+        "confidence": 0.97,
+        "localMS": 0.2690553665161133,
+        "model": "jev-1.13.0",
+        "usage": {
+          "input_tokens": 1543,
+          "output_tokens": 271
+        },
+        "serviceResponse": {
+          "model": "jev-1.13.0",
+          "answers": {
+            "next": {
+              "type": "choice",
+              "choice": "delegateText",
+              "confidence": 0.97,
+              "probabilities": {
+                "a22": 0.0,
+                "a24": 0.0,
+                "a21": 0.0,
+                "a12": 0.0,
+                "a28": 0.0,
+                "a17": 0.02,
+                "a15": 0.0,
+                "blocked": 0.0,
+                "a19": 0.0,
+                "a14": 0.0,
+                "a20": 0.0,
+                "a11": 0.0,
+                "a23": 0.0,
+                "a3": 0.0,
+                "a13": 0.0,
+                "a16": 0.01,
+                "delegateText": 0.97,
+                "a25": 0.0,
+                "a4": 0.0,
+                "a18": 0.0,
+                "a6": 0.0,
+                "done": 0.0,
+                "a8": 0.0,
+                "a10": 0.0,
+                "a26": 0.0,
+                "a7": 0.0,
+                "a9": 0.0,
+                "a5": 0.0,
+                "a27": 0.0
+              }
+            }
+          },
+          "usage": {
+            "input_tokens": 1543,
+            "output_tokens": 271
+          }
+        }
+      },
+      "observation": {
+        "elapsedMS": 213.204026222229,
+        "truncated": false,
+        "targetBundle": "com.apple.TextEdit",
+        "targetWindowOCR": [
+          "Fixture.txt"
+        ]
+      },
+      "handoff": {
+        "actions": [],
+        "observation": "",
+        "text": "Quiet computers keep their thoughts beneath the hum of the room, carrying JEV-NATIVE-731 into the stillness."
+      }
+    },
+    {
+      "index": 2,
+      "executionMS": 17.641901969909668,
+      "decision": {
+        "apiMS": 209.3290090560913,
+        "choice": "a3",
+        "confidence": 0.74,
+        "localMS": 0.5480051040649414,
+        "model": "jev-1.13.0",
+        "usage": {
+          "input_tokens": 1588,
+          "output_tokens": 267
+        },
+        "serviceResponse": {
+          "model": "jev-1.13.0",
+          "answers": {
+            "next": {
+              "type": "choice",
+              "choice": "a3",
+              "confidence": 0.74,
+              "probabilities": {
+                "a25": 0.0,
+                "a8": 0.0,
+                "a11": 0.0,
+                "a26": 0.0,
+                "a19": 0.0,
+                "a6": 0.01,
+                "a24": 0.0,
+                "a13": 0.0,
+                "a2": 0.0,
+                "a20": 0.0,
+                "a3": 0.75,
+                "a28": 0.0,
+                "a10": 0.0,
+                "a12": 0.0,
+                "a18": 0.0,
+                "a23": 0.0,
+                "a27": 0.0,
+                "a4": 0.0,
+                "done": 0.01,
+                "a21": 0.0,
+                "a5": 0.0,
+                "a15": 0.01,
+                "a7": 0.0,
+                "a22": 0.0,
+                "a16": 0.03,
+                "blocked": 0.16,
+                "a14": 0.0,
+                "a17": 0.03,
+                "a9": 0.0
+              }
+            }
+          },
+          "usage": {
+            "input_tokens": 1588,
+            "output_tokens": 267
+          }
+        }
+      },
+      "action": {
+        "kind": "type",
+        "label": "Type this provided/generated literal into CURRENT focused field: Quiet computers keep their thoughts beneath the hum of the room, carrying JEV-NATIVE-731 into the stillness.",
+        "text": "Quiet computers keep their thoughts beneath the hum of the room, carrying JEV-NATIVE-731 into the stillness."
+      },
+      "observation": {
+        "elapsedMS": 223.36804866790771,
+        "truncated": false,
+        "targetBundle": "com.apple.TextEdit",
+        "targetWindowOCR": [
+          "Fixture.txt"
+        ]
+      }
+    },
+    {
+      "index": 3,
+      "decision": {
+        "apiMS": 253.93807888031006,
+        "choice": "done",
+        "confidence": 0.98,
+        "localMS": 0.26988983154296875,
+        "model": "jev-1.13.0",
+        "usage": {
+          "input_tokens": 1759,
+          "output_tokens": 257
+        },
+        "serviceResponse": {
+          "model": "jev-1.13.0",
+          "answers": {
+            "next": {
+              "type": "choice",
+              "choice": "done",
+              "confidence": 0.98,
+              "probabilities": {
+                "a25": 0.0,
+                "a8": 0.0,
+                "a11": 0.0,
+                "a26": 0.0,
+                "a19": 0.0,
+                "a6": 0.0,
+                "a24": 0.0,
+                "a13": 0.0,
+                "a2": 0.0,
+                "a20": 0.0,
+                "a3": 0.0,
+                "a10": 0.0,
+                "a12": 0.0,
+                "a18": 0.0,
+                "a23": 0.0,
+                "a27": 0.0,
+                "a4": 0.0,
+                "done": 0.98,
+                "a21": 0.0,
+                "a5": 0.0,
+                "a15": 0.01,
+                "a7": 0.0,
+                "a22": 0.01,
+                "a16": 0.0,
+                "blocked": 0.0,
+                "a14": 0.0,
+                "a17": 0.0,
+                "a9": 0.0
+              }
+            }
+          },
+          "usage": {
+            "input_tokens": 1759,
+            "output_tokens": 257
+          }
+        }
+      },
+      "observation": {
+        "elapsedMS": 222.27191925048828,
+        "truncated": false,
+        "targetBundle": "com.apple.TextEdit",
+        "targetWindowOCR": [
+          "( ) ( )",
+          "Fi-\"ure",
+          "Quiet computers keep their thoughts beneath the hum of the room, carrying JEV-NATIVE-731 into",
+          "the stillness."
+        ]
+      }
+    }
+  ]
+}

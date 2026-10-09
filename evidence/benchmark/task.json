@@ -1,0 +1,1 @@
+{"goal":"Starting from Calculator numeric display 0, press the native 7 digit button exactly once, then finish only when the numeric display reads exactly 7. Merely observing a button labelled 7 is not completion. Do not activate another app, open a window or modify settings.","apps":["com.apple.calculator"],"maxSteps":6,"expectText":"7","expectApp":"com.apple.calculator"}

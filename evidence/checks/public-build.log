@@ -1,0 +1,25 @@
+Building for production...
+[Planning deferred tasks]
+[1 / 6]
+[3 / 8] jev-native-fixture-product
+[14 / 88]
+[24 / 88]
+[27 / 88]
+[34 / 88]
+[37 / 88]
+[45 / 88]
+[50 / 88]
+[51 / 88]
+[65 / 88]
+[66 / 88]
+[73 / 88]
+[79 / 88]
+[80 / 88]
+[83 / 88] jev-native-fixture-product
+[85 / 88] jev-native-fixture-product
+[85 / 88] jev-native-product
+[87 / 88] jev-native-product
+[88 / 88] jev-native-product
+Build complete! (9.37초)
+/path/to/jev-native/dist/JevNative.app: replacing existing signature
+/path/to/jev-native/dist/JevNative.app/Contents/MacOS/jev-native

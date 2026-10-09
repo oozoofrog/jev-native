@@ -1,0 +1,637 @@
+{
+  "exportKind": "sanitized-summary-not-replay-input",
+  "goal": "In Calculator first clear previous input, then calculate 6 multiplied by 7. Leave the resulting 42 visible in the target window.",
+  "status": "verified_complete",
+  "steps": [
+    {
+      "index": 0,
+      "error": "JEV confidence 0.32 below configured 0.35",
+      "decision": {
+        "apiMS": 213.88399600982666,
+        "choice": "a20",
+        "confidence": 0.32,
+        "localMS": 0.5400180816650391,
+        "model": "jev-1.13.0",
+        "usage": {
+          "input_tokens": 1987,
+          "output_tokens": 448
+        },
+        "serviceResponse": {
+          "model": "jev-1.13.0",
+          "answers": {
+            "next": {
+              "type": "choice",
+              "choice": "a20",
+              "confidence": 0.32,
+              "probabilities": {
+                "a11": 0.0,
+                "a24": 0.0,
+                "a37": 0.0,
+                "a3": 0.01,
+                "a26": 0.02,
+                "a20": 0.33,
+                "a2": 0.01,
+                "a19": 0.06999999999999999,
+                "a18": 0.08,
+                "a5": 0.0,
+                "a7": 0.0,
+                "a9": 0.01,
+                "a16": 0.0,
+                "a48": 0.0,
+                "a42": 0.0,
+                "done": 0.11,
+                "a28": 0.0,
+                "a31": 0.0,
+                "a38": 0.23,
+                "a33": 0.0,
+                "a30": 0.0,
+                "a8": 0.0,
+                "a12": 0.0,
+                "a40": 0.0,
+                "a17": 0.01,
+                "a4": 0.01,
+                "a32": 0.01,
+                "a25": 0.0,
+                "a39": 0.0,
+                "a46": 0.0,
+                "a10": 0.0,
+                "a34": 0.0,
+                "a47": 0.0,
+                "a45": 0.0,
+                "a43": 0.0,
+                "a22": 0.0,
+                "a44": 0.0,
+                "a13": 0.0,
+                "a21": 0.0,
+                "a23": 0.01,
+                "a27": 0.0,
+                "a35": 0.0,
+                "a36": 0.0,
+                "a15": 0.0,
+                "a6": 0.0,
+                "a14": 0.0,
+                "a29": 0.01,
+                "a41": 0.0,
+                "blocked": 0.06999999999999999
+              }
+            }
+          },
+          "usage": {
+            "input_tokens": 1987,
+            "output_tokens": 448
+          }
+        }
+      },
+      "observation": {
+        "elapsedMS": 465.1479721069336,
+        "truncated": false,
+        "targetBundle": "com.apple.calculator",
+        "targetWindowOCR": [
+          "6x7"
+        ]
+      }
+    },
+    {
+      "index": 1,
+      "executionMS": 20.066022872924805,
+      "decision": {
+        "apiMS": 197.23403453826904,
+        "choice": "a20",
+        "confidence": 0.59,
+        "localMS": 0.841975212097168,
+        "model": "jev-1.13.0",
+        "usage": {
+          "input_tokens": 2026,
+          "output_tokens": 448
+        },
+        "serviceResponse": {
+          "model": "jev-1.13.0",
+          "answers": {
+            "next": {
+              "type": "choice",
+              "choice": "a20",
+              "confidence": 0.59,
+              "probabilities": {
+                "a25": 0.0,
+                "a45": 0.0,
+                "a40": 0.0,
+                "a18": 0.01,
+                "a31": 0.0,
+                "a16": 0.0,
+                "a32": 0.0,
+                "a28": 0.0,
+                "a48": 0.0,
+                "a13": 0.0,
+                "a29": 0.0,
+                "a4": 0.01,
+                "a23": 0.01,
+                "a8": 0.0,
+                "a37": 0.0,
+                "a27": 0.0,
+                "blocked": 0.060000000000000005,
+                "a7": 0.01,
+                "a2": 0.02,
+                "done": 0.03,
+                "a43": 0.0,
+                "a26": 0.04,
+                "a6": 0.0,
+                "a36": 0.0,
+                "a30": 0.0,
+                "a15": 0.0,
+                "a42": 0.0,
+                "a5": 0.01,
+                "a21": 0.0,
+                "a34": 0.0,
+                "a12": 0.0,
+                "a22": 0.0,
+                "a38": 0.06999999999999999,
+                "a3": 0.0,
+                "a17": 0.01,
+                "a9": 0.0,
+                "a39": 0.0,
+                "a24": 0.0,
+                "a11": 0.0,
+                "a20": 0.6,
+                "a47": 0.0,
+                "a14": 0.0,
+                "a19": 0.12,
+                "a41": 0.0,
+                "a46": 0.0,
+                "a33": 0.0,
+                "a35": 0.0,
+                "a44": 0.0,
+                "a10": 0.0
+              }
+            }
+          },
+          "usage": {
+            "input_tokens": 2026,
+            "output_tokens": 448
+          }
+        }
+      },
+      "action": {
+        "kind": "press",
+        "label": "Press w.0.0.1.0.2 AXButton \uc9c0\uc6b0\uae30 value="
+      },
+      "observation": {
+        "elapsedMS": 258.63194465637207,
+        "truncated": false,
+        "targetBundle": "com.apple.calculator",
+        "targetWindowOCR": [
+          "6x7"
+        ]
+      }
+    },
+    {
+      "index": 2,
+      "executionMS": 8.189082145690918,
+      "decision": {
+        "apiMS": 173.80201816558838,
+        "choice": "a23",
+        "confidence": 0.58,
+        "localMS": 0.24187564849853516,
+        "model": "jev-1.13.0",
+        "usage": {
+          "input_tokens": 2125,
+          "output_tokens": 448
+        },
+        "serviceResponse": {
+          "model": "jev-1.13.0",
+          "answers": {
+            "next": {
+              "type": "choice",
+              "choice": "a23",
+              "confidence": 0.58,
+              "probabilities": {
+                "a25": 0.0,
+                "a45": 0.0,
+                "a40": 0.0,
+                "a18": 0.0,
+                "a31": 0.0,
+                "a16": 0.0,
+                "a32": 0.0,
+                "a28": 0.0,
+                "a48": 0.0,
+                "a13": 0.0,
+                "a29": 0.29000000000000004,
+                "a4": 0.0,
+                "a23": 0.59,
+                "a8": 0.0,
+                "a37": 0.0,
+                "a27": 0.0,
+                "blocked": 0.01,
+                "a7": 0.0,
+                "a2": 0.01,
+                "done": 0.0,
+                "a43": 0.0,
+                "a26": 0.04,
+                "a6": 0.0,
+                "a36": 0.0,
+                "a15": 0.0,
+                "a30": 0.0,
+                "a5": 0.0,
+                "a21": 0.0,
+                "a42": 0.0,
+                "a34": 0.0,
+                "a12": 0.0,
+                "a22": 0.0,
+                "a38": 0.03,
+                "a17": 0.01,
+                "a3": 0.01,
+                "a9": 0.0,
+                "a39": 0.0,
+                "a24": 0.0,
+                "a20": 0.01,
+                "a11": 0.0,
+                "a47": 0.0,
+                "a14": 0.0,
+                "a19": 0.0,
+                "a41": 0.0,
+                "a46": 0.0,
+                "a33": 0.0,
+                "a35": 0.0,
+                "a44": 0.0,
+                "a10": 0.0
+              }
+            }
+          },
+          "usage": {
+            "input_tokens": 2125,
+            "output_tokens": 448
+          }
+        }
+      },
+      "action": {
+        "kind": "press",
+        "label": "Press w.0.0.1.0.5 AXButton 7 value="
+      },
+      "observation": {
+        "elapsedMS": 181.72001838684082,
+        "truncated": false,
+        "targetBundle": "com.apple.calculator",
+        "targetWindowOCR": []
+      }
+    },
+    {
+      "index": 3,
+      "error": "JEV confidence 0.34 below configured 0.35",
+      "decision": {
+        "apiMS": 201.5169858932495,
+        "choice": "a26",
+        "confidence": 0.34,
+        "localMS": 0.247955322265625,
+        "model": "jev-1.13.0",
+        "usage": {
+          "input_tokens": 2225,
+          "output_tokens": 448
+        },
+        "serviceResponse": {
+          "model": "jev-1.13.0",
+          "answers": {
+            "next": {
+              "type": "choice",
+              "choice": "a26",
+              "confidence": 0.34,
+              "probabilities": {
+                "a25": 0.0,
+                "a45": 0.0,
+                "a40": 0.0,
+                "a18": 0.0,
+                "a31": 0.0,
+                "a16": 0.0,
+                "a32": 0.01,
+                "a28": 0.0,
+                "a48": 0.0,
+                "a13": 0.0,
+                "a29": 0.3,
+                "a4": 0.0,
+                "a23": 0.01,
+                "a8": 0.01,
+                "a37": 0.0,
+                "a27": 0.0,
+                "blocked": 0.02,
+                "a7": 0.0,
+                "a2": 0.01,
+                "done": 0.03,
+                "a43": 0.0,
+                "a26": 0.35000000000000003,
+                "a6": 0.0,
+                "a36": 0.0,
+                "a15": 0.0,
+                "a30": 0.0,
+                "a5": 0.01,
+                "a21": 0.0,
+                "a42": 0.0,
+                "a34": 0.0,
+                "a12": 0.0,
+                "a22": 0.0,
+                "a38": 0.19,
+                "a17": 0.01,
+                "a3": 0.01,
+                "a9": 0.01,
+                "a39": 0.0,
+                "a24": 0.0,
+                "a20": 0.02,
+                "a11": 0.0,
+                "a47": 0.0,
+                "a14": 0.0,
+                "a19": 0.01,
+                "a41": 0.0,
+                "a46": 0.0,
+                "a33": 0.0,
+                "a35": 0.0,
+                "a44": 0.0,
+                "a10": 0.0
+              }
+            }
+          },
+          "usage": {
+            "input_tokens": 2225,
+            "output_tokens": 448
+          }
+        }
+      },
+      "observation": {
+        "elapsedMS": 188.81499767303467,
+        "truncated": false,
+        "targetBundle": "com.apple.calculator",
+        "targetWindowOCR": [
+          "6x7"
+        ]
+      }
+    },
+    {
+      "index": 4,
+      "executionMS": 2.796053886413574,
+      "decision": {
+        "apiMS": 223.44601154327393,
+        "choice": "a26",
+        "confidence": 0.48,
+        "localMS": 0.26404857635498047,
+        "model": "jev-1.13.0",
+        "usage": {
+          "input_tokens": 2265,
+          "output_tokens": 448
+        },
+        "serviceResponse": {
+          "model": "jev-1.13.0",
+          "answers": {
+            "next": {
+              "type": "choice",
+              "choice": "a26",
+              "confidence": 0.48,
+              "probabilities": {
+                "a11": 0.0,
+                "a24": 0.0,
+                "a37": 0.0,
+                "a3": 0.0,
+                "a26": 0.49,
+                "a20": 0.02,
+                "a2": 0.0,
+                "a19": 0.0,
+                "a18": 0.0,
+                "a5": 0.0,
+                "a7": 0.0,
+                "a9": 0.0,
+                "a16": 0.0,
+                "a48": 0.0,
+                "a42": 0.0,
+                "done": 0.01,
+                "a28": 0.0,
+                "a31": 0.0,
+                "a38": 0.04,
+                "a33": 0.0,
+                "a30": 0.0,
+                "a8": 0.0,
+                "a12": 0.0,
+                "a40": 0.0,
+                "a17": 0.0,
+                "a4": 0.0,
+                "a32": 0.0,
+                "a25": 0.0,
+                "a39": 0.0,
+                "a46": 0.0,
+                "a10": 0.0,
+                "a34": 0.0,
+                "a47": 0.0,
+                "a45": 0.0,
+                "a43": 0.0,
+                "a22": 0.0,
+                "a44": 0.0,
+                "a13": 0.0,
+                "a21": 0.0,
+                "a23": 0.0,
+                "a27": 0.0,
+                "a35": 0.0,
+                "a36": 0.0,
+                "a15": 0.0,
+                "a6": 0.0,
+                "a14": 0.0,
+                "a29": 0.42,
+                "a41": 0.0,
+                "blocked": 0.02
+              }
+            }
+          },
+          "usage": {
+            "input_tokens": 2265,
+            "output_tokens": 448
+          }
+        }
+      },
+      "action": {
+        "kind": "press",
+        "label": "Press w.0.0.1.0.8 AXButton \uacf1\ud558\uae30 value="
+      },
+      "observation": {
+        "elapsedMS": 194.66495513916016,
+        "truncated": false,
+        "targetBundle": "com.apple.calculator",
+        "targetWindowOCR": [
+          "6x7"
+        ]
+      }
+    },
+    {
+      "index": 5,
+      "executionMS": 36.31997108459473,
+      "decision": {
+        "apiMS": 208.4590196609497,
+        "choice": "a38",
+        "confidence": 0.6,
+        "localMS": 0.3019571304321289,
+        "model": "jev-1.13.0",
+        "usage": {
+          "input_tokens": 2369,
+          "output_tokens": 448
+        },
+        "serviceResponse": {
+          "model": "jev-1.13.0",
+          "answers": {
+            "next": {
+              "type": "choice",
+              "choice": "a38",
+              "confidence": 0.6,
+              "probabilities": {
+                "a11": 0.0,
+                "a24": 0.0,
+                "a37": 0.0,
+                "a3": 0.0,
+                "a26": 0.01,
+                "a20": 0.02,
+                "a2": 0.0,
+                "a19": 0.01,
+                "a18": 0.0,
+                "a5": 0.0,
+                "a7": 0.0,
+                "a9": 0.060000000000000005,
+                "a16": 0.0,
+                "a48": 0.0,
+                "a42": 0.0,
+                "done": 0.0,
+                "a28": 0.0,
+                "a31": 0.0,
+                "a38": 0.61,
+                "a33": 0.0,
+                "a30": 0.0,
+                "a8": 0.0,
+                "a12": 0.0,
+                "a40": 0.0,
+                "a17": 0.01,
+                "a4": 0.0,
+                "a32": 0.03,
+                "a25": 0.0,
+                "a39": 0.0,
+                "a46": 0.0,
+                "a10": 0.0,
+                "a34": 0.0,
+                "a47": 0.0,
+                "a45": 0.0,
+                "a43": 0.0,
+                "a22": 0.0,
+                "a44": 0.0,
+                "a13": 0.0,
+                "a21": 0.0,
+                "a23": 0.02,
+                "a27": 0.0,
+                "a35": 0.0,
+                "a36": 0.0,
+                "a15": 0.0,
+                "a6": 0.0,
+                "a14": 0.0,
+                "a29": 0.2,
+                "a41": 0.0,
+                "blocked": 0.03
+              }
+            }
+          },
+          "usage": {
+            "input_tokens": 2369,
+            "output_tokens": 448
+          }
+        }
+      },
+      "action": {
+        "kind": "press",
+        "label": "Press w.0.0.1.0.20 AXButton \ub4f1\ud638 value="
+      },
+      "observation": {
+        "elapsedMS": 191.6649341583252,
+        "truncated": false,
+        "targetBundle": "com.apple.calculator",
+        "targetWindowOCR": [
+          "6x7x"
+        ]
+      }
+    },
+    {
+      "index": 6,
+      "decision": {
+        "apiMS": 172.46508598327637,
+        "choice": "done",
+        "confidence": 0.39,
+        "localMS": 0.2409219741821289,
+        "model": "jev-1.13.0",
+        "usage": {
+          "input_tokens": 2515,
+          "output_tokens": 446
+        },
+        "serviceResponse": {
+          "model": "jev-1.13.0",
+          "answers": {
+            "next": {
+              "type": "choice",
+              "choice": "done",
+              "confidence": 0.39,
+              "probabilities": {
+                "a11": 0.0,
+                "a24": 0.0,
+                "a37": 0.0,
+                "a3": 0.01,
+                "a26": 0.01,
+                "a20": 0.09999999999999999,
+                "a2": 0.0,
+                "a19": 0.01,
+                "a18": 0.02,
+                "a5": 0.0,
+                "a7": 0.0,
+                "a9": 0.0,
+                "a16": 0.0,
+                "a48": 0.0,
+                "a42": 0.0,
+                "done": 0.4,
+                "a28": 0.0,
+                "a31": 0.0,
+                "a38": 0.01,
+                "a33": 0.0,
+                "a30": 0.0,
+                "a8": 0.0,
+                "a12": 0.0,
+                "a40": 0.0,
+                "a17": 0.02,
+                "a4": 0.0,
+                "a32": 0.02,
+                "a25": 0.0,
+                "a39": 0.0,
+                "a46": 0.0,
+                "a10": 0.0,
+                "a34": 0.0,
+                "a47": 0.0,
+                "a45": 0.0,
+                "a43": 0.0,
+                "a22": 0.0,
+                "a44": 0.0,
+                "a13": 0.0,
+                "a21": 0.0,
+                "a23": 0.0,
+                "a27": 0.0,
+                "a35": 0.0,
+                "a36": 0.0,
+                "a15": 0.0,
+                "a6": 0.0,
+                "a14": 0.0,
+                "a29": 0.24000000000000002,
+                "a41": 0.0,
+                "blocked": 0.15000000000000002
+              }
+            }
+          },
+          "usage": {
+            "input_tokens": 2515,
+            "output_tokens": 446
+          }
+        }
+      },
+      "observation": {
+        "elapsedMS": 182.74807929992676,
+        "truncated": false,
+        "targetBundle": "com.apple.calculator",
+        "targetWindowOCR": [
+          "6x7x",
+          "42"
+        ]
+      }
+    }
+  ]
+}

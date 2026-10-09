@@ -1,0 +1,179 @@
+{
+  "exportKind": "sanitized-summary-not-replay-input",
+  "goal": "Use Codex vision to inspect the current Calculator target-window image and report whether its numeric display is visible. Leave its contents unchanged after inspection.",
+  "status": "verified_complete",
+  "steps": [
+    {
+      "index": 0,
+      "executionMS": 6778.813004493713,
+      "decision": {
+        "apiMS": 247.8010654449463,
+        "choice": "delegateVision",
+        "confidence": 0.94,
+        "localMS": 0.48792362213134766,
+        "model": "jev-1.13.0",
+        "usage": {
+          "input_tokens": 2014,
+          "output_tokens": 418
+        },
+        "serviceResponse": {
+          "model": "jev-1.13.0",
+          "answers": {
+            "next": {
+              "type": "choice",
+              "choice": "delegateVision",
+              "confidence": 0.94,
+              "probabilities": {
+                "a32": 0.0,
+                "a42": 0.0,
+                "a31": 0.0,
+                "a22": 0.0,
+                "a30": 0.0,
+                "a23": 0.0,
+                "a19": 0.0,
+                "a18": 0.0,
+                "a40": 0.0,
+                "a12": 0.0,
+                "a44": 0.0,
+                "a2": 0.0,
+                "a20": 0.0,
+                "a33": 0.0,
+                "a13": 0.0,
+                "a29": 0.0,
+                "a27": 0.0,
+                "blocked": 0.01,
+                "a24": 0.0,
+                "a37": 0.0,
+                "a34": 0.0,
+                "a35": 0.0,
+                "a17": 0.0,
+                "a9": 0.0,
+                "a36": 0.0,
+                "delegateVision": 0.9400000000000001,
+                "a11": 0.0,
+                "a25": 0.0,
+                "a21": 0.0,
+                "a4": 0.0,
+                "a26": 0.0,
+                "a39": 0.0,
+                "a41": 0.0,
+                "a6": 0.0,
+                "a10": 0.0,
+                "a43": 0.0,
+                "a38": 0.0,
+                "a28": 0.0,
+                "a14": 0.04,
+                "a15": 0.0,
+                "a16": 0.0,
+                "a7": 0.0,
+                "a5": 0.0,
+                "a8": 0.0,
+                "a3": 0.0
+              }
+            }
+          },
+          "usage": {
+            "input_tokens": 2014,
+            "output_tokens": 418
+          }
+        }
+      },
+      "observation": {
+        "elapsedMS": 393.2509422302246,
+        "truncated": false,
+        "targetBundle": "com.apple.calculator",
+        "targetWindowOCR": [
+          "42/"
+        ]
+      },
+      "handoff": {
+        "actions": [],
+        "observation": "\uacc4\uc0b0\uae30 \ucc3d\uc758 \uc22b\uc790 \ud45c\uc2dc\uac00 \uc120\uba85\ud558\uac8c \ubcf4\uc774\uba70, \ud604\uc7ac \ud45c\uc2dc \ub0b4\uc6a9\uc740 \u201842%\u2019\uc785\ub2c8\ub2e4.",
+        "text": ""
+      }
+    },
+    {
+      "index": 1,
+      "decision": {
+        "apiMS": 197.40700721740723,
+        "choice": "done",
+        "confidence": 0.95,
+        "localMS": 0.2079010009765625,
+        "model": "jev-1.13.0",
+        "usage": {
+          "input_tokens": 2181,
+          "output_tokens": 410
+        },
+        "serviceResponse": {
+          "model": "jev-1.13.0",
+          "answers": {
+            "next": {
+              "type": "choice",
+              "choice": "done",
+              "confidence": 0.95,
+              "probabilities": {
+                "a32": 0.0,
+                "a42": 0.0,
+                "a31": 0.0,
+                "a22": 0.0,
+                "a30": 0.0,
+                "a23": 0.0,
+                "a19": 0.0,
+                "a18": 0.0,
+                "a40": 0.0,
+                "a12": 0.0,
+                "done": 0.95,
+                "a44": 0.0,
+                "a2": 0.0,
+                "a20": 0.0,
+                "a33": 0.0,
+                "a13": 0.0,
+                "a29": 0.0,
+                "a27": 0.0,
+                "blocked": 0.04,
+                "a24": 0.0,
+                "a37": 0.0,
+                "a34": 0.0,
+                "a35": 0.0,
+                "a17": 0.0,
+                "a9": 0.0,
+                "a36": 0.0,
+                "a41": 0.0,
+                "a11": 0.0,
+                "a25": 0.0,
+                "a21": 0.0,
+                "a4": 0.0,
+                "a26": 0.0,
+                "a39": 0.0,
+                "a43": 0.0,
+                "a6": 0.0,
+                "a10": 0.0,
+                "a38": 0.0,
+                "a28": 0.0,
+                "a14": 0.01,
+                "a16": 0.0,
+                "a15": 0.0,
+                "a7": 0.0,
+                "a3": 0.0,
+                "a5": 0.0,
+                "a8": 0.0
+              }
+            }
+          },
+          "usage": {
+            "input_tokens": 2181,
+            "output_tokens": 410
+          }
+        }
+      },
+      "observation": {
+        "elapsedMS": 200.81794261932373,
+        "truncated": false,
+        "targetBundle": "com.apple.calculator",
+        "targetWindowOCR": [
+          "42/"
+        ]
+      }
+    }
+  ]
+}

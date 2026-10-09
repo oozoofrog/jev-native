@@ -1,0 +1,89 @@
+{
+  "credentialBytesUnchanged": true,
+  "checks": [
+    {
+      "command": "help",
+      "exitCode": 0
+    },
+    {
+      "command": "doctor",
+      "exitCode": 0,
+      "result": {
+        "automationBackend": "Apple AppKit/AX/ScreenCaptureKit/CGEvent/Vision; no external automation backend",
+        "credentialAvailable": true,
+        "credentialSource": "~/.typesafeai",
+        "osVersion": "Version 27.0.1 (Build 26A434)",
+        "permissions": {
+          "accessibility": true,
+          "inputPosting": true,
+          "screenRecording": true
+        },
+        "privateWindowEventAnnotation": true
+      }
+    },
+    {
+      "command": "setup",
+      "exitCode": 0,
+      "skippedExistingCredential": true
+    },
+    {
+      "command": "install-skill bundled template",
+      "iteration": 1,
+      "exitCode": 0,
+      "hosts": [
+        {
+          "host": "codex",
+          "status": "installed"
+        },
+        {
+          "host": "claude",
+          "status": "installed"
+        }
+      ]
+    },
+    {
+      "command": "install-skill bundled template",
+      "iteration": 2,
+      "exitCode": 0,
+      "hosts": [
+        {
+          "host": "codex",
+          "status": "already_installed"
+        },
+        {
+          "host": "claude",
+          "status": "already_installed"
+        }
+      ]
+    },
+    {
+      "command": "install-skill raw SwiftPM binary outside checkout cwd",
+      "exitCode": 0,
+      "hosts": [
+        {
+          "host": "codex",
+          "status": "installed"
+        },
+        {
+          "host": "claude",
+          "status": "installed"
+        }
+      ]
+    },
+    {
+      "command": "observe --app com.apple.calculator --no-image",
+      "exitCode": 0,
+      "targetBundle": "com.apple.calculator",
+      "hasSelectedWindow": true,
+      "display42Observed": true
+    },
+    {
+      "command": "codesign verify strict deep",
+      "exitCode": 0
+    },
+    {
+      "command": "ZIP CRC, extracted signature, relocated help and bundled skill installation",
+      "exitCode": 0
+    }
+  ]
+}

@@ -1,0 +1,131 @@
+{
+  "exportKind": "sanitized-summary-not-replay-input",
+  "goal": "Drag the purple point on the owned native canvas using the provided virtual drag candidate. Finish with canvas state x=300, y=128. Do not activate the app or move the user's real cursor.",
+  "status": "verified_complete",
+  "steps": [
+    {
+      "index": 0,
+      "executionMS": 223.63793849945068,
+      "decision": {
+        "apiMS": 210.6419801712036,
+        "choice": "a2",
+        "confidence": 0.79,
+        "localMS": 1.5649795532226562,
+        "model": "jev-1.13.0",
+        "usage": {
+          "input_tokens": 1053,
+          "output_tokens": 168
+        },
+        "serviceResponse": {
+          "model": "jev-1.13.0",
+          "answers": {
+            "next": {
+              "type": "choice",
+              "choice": "a2",
+              "confidence": 0.79,
+              "probabilities": {
+                "blocked": 0.16,
+                "a15": 0.01,
+                "a5": 0.02,
+                "a17": 0.0,
+                "a11": 0.0,
+                "a3": 0.0,
+                "a12": 0.0,
+                "a8": 0.0,
+                "a16": 0.0,
+                "a6": 0.0,
+                "a10": 0.0,
+                "a4": 0.0,
+                "a2": 0.8,
+                "a13": 0.0,
+                "a7": 0.0,
+                "a14": 0.0,
+                "done": 0.0,
+                "a9": 0.0
+              }
+            }
+          },
+          "usage": {
+            "input_tokens": 1053,
+            "output_tokens": 168
+          }
+        }
+      },
+      "action": {
+        "coordinateSpace": "windowPoints",
+        "kind": "drag",
+        "label": "Virtual drag the canvas point to x=300, y=128 (window point 300,200)",
+        "toX": 300,
+        "toY": 200,
+        "x": 40,
+        "y": 60
+      },
+      "observation": {
+        "elapsedMS": 281.02993965148926,
+        "truncated": false,
+        "targetBundle": "pid:83819",
+        "targetWindowOCR": [
+          "JEV Owned Native Fixture",
+          "Drag events: 11 Scroll: O"
+        ]
+      }
+    },
+    {
+      "index": 1,
+      "decision": {
+        "apiMS": 191.19703769683838,
+        "choice": "done",
+        "confidence": 0.97,
+        "localMS": 0.21898746490478516,
+        "model": "jev-1.13.0",
+        "usage": {
+          "input_tokens": 1198,
+          "output_tokens": 167
+        },
+        "serviceResponse": {
+          "model": "jev-1.13.0",
+          "answers": {
+            "next": {
+              "type": "choice",
+              "choice": "done",
+              "confidence": 0.97,
+              "probabilities": {
+                "blocked": 0.01,
+                "a15": 0.0,
+                "a5": 0.0,
+                "a17": 0.0,
+                "a11": 0.0,
+                "a3": 0.0,
+                "a12": 0.0,
+                "a8": 0.0,
+                "a16": 0.0,
+                "a6": 0.0,
+                "a10": 0.0,
+                "a4": 0.0,
+                "a2": 0.02,
+                "a13": 0.0,
+                "a7": 0.0,
+                "a14": 0.0,
+                "done": 0.97,
+                "a9": 0.0
+              }
+            }
+          },
+          "usage": {
+            "input_tokens": 1198,
+            "output_tokens": 167
+          }
+        }
+      },
+      "observation": {
+        "elapsedMS": 132.60197639465332,
+        "truncated": false,
+        "targetBundle": "pid:83819",
+        "targetWindowOCR": [
+          "JEV Owned Native Fixture",
+          "Drag events: 23 . Scroll: O"
+        ]
+      }
+    }
+  ]
+}

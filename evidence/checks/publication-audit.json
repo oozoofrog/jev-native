@@ -1,0 +1,12 @@
+{
+  "stagedFilesScanned": 61,
+  "zipMembersScannedIncludingHistory": 4,
+  "reachableCommitsScanned": 0,
+  "reachableBlobsAndCommitsScanned": 0,
+  "findings": [],
+  "exactLocalCredentialComparison": "in-memory only; values not logged",
+  "pngMetadata": "no text or EXIF chunks in selected public PNGs",
+  "dataValidation": "JSON/JSONL parsed; Python harness syntax parsed; ZIP CRC verified",
+  "limitations": "Targeted exact-secret/pattern/path audit, not a guarantee against every possible secret encoding.",
+  "snapshot": "Precommit public staged tree; no private Git history imported."
+}

@@ -1,0 +1,11 @@
+tool,trial,wall_ms,ui_verified,controller_status,initial_observe_ms,input_ms,final_observe_ms,round_trip_gap_ms,jev_api_ms,jev_local_ms,persisted_observation_ms,jev_api_calls,input_tokens,output_tokens,actual_foreground
+Codex CUA,1,6418,True,verified_ui,98,69,452,5799,,,,,,,
+Codex CUA,2,6291,True,verified_ui,95,50,425,5721,,,,,,,
+Codex CUA,3,6031,True,verified_ui,67,55,427,5482,,,,,,,
+Codex CUA,4,6664,True,verified_ui,66,56,423,6119,,,,,,,
+Codex CUA,5,5982,True,verified_ui,82,40,410,5450,,,,,,,
+JEV Native,1,2152.48675,True,verified_complete,,7.660031318664551,,,458.26709270477295,0.576019287109375,1001.2040138244629,2,4205,840,com.openai.codex
+JEV Native,2,2183.525125,True,uncertain,,7.7430009841918945,,,632.2959661483765,0.6361007690429688,912.1888875961304,3,4784,863,com.openai.codex
+JEV Native,3,1872.592125,True,verified_complete,,7.830023765563965,,,399.10292625427246,0.5990266799926758,861.8932962417603,2,4205,840,com.openai.codex
+JEV Native,4,2037.463625,True,uncertain,,6.991982460021973,,,590.89195728302,0.6200075149536133,854.1629314422607,3,4784,863,com.openai.codex
+JEV Native,5,1835.340208,True,verified_complete,,7.087111473083496,,,441.2100315093994,0.5009174346923828,814.8889541625977,2,4205,840,com.openai.codex

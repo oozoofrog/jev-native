@@ -1,0 +1,103 @@
+import AppKit
+import Foundation
+
+@main struct CLI {
+    @MainActor static func main() async {
+        // LaunchServices/AppKit bundle discovery follows argv[0]. A CLI symlink outside the app
+        // must re-exec this same Swift binary with its real path for Dock/menu identity.
+        let invoked = URL(fileURLWithPath:CommandLine.arguments[0]).standardizedFileURL
+        let canonical = invoked.resolvingSymlinksInPath()
+        if invoked.path != canonical.path, canonical.path.contains(".app/Contents/MacOS/") {
+            var args = CommandLine.arguments; args[0] = canonical.path
+            let pointers = args.map { strdup($0) } + [nil]
+            canonical.path.withCString { _ = execv($0,pointers) }
+            fputs("jev-native: self-exec failed\n",stderr); exit(1)
+        }
+        let args = Array(CommandLine.arguments.dropFirst())
+        do {
+            let mode = startupMode(args)
+            if mode != .cli { try GUIContext.current().requireAvailable() }
+            if mode == .application { runApplication(args) }
+            else { try await command(args) }
+        } catch { fputs("jev-native: \(error)\n", stderr); exit(1) }
+    }
+    @MainActor private static func runApplication(_ args: [String]) {
+        let app = NSApplication.shared; let delegate = AppDelegate(); app.delegate = delegate; app.setActivationPolicy(.accessory)
+        Task { @MainActor in
+            do { try await command(args); if !args.contains("--keep-open") { app.terminate(nil) } }
+            catch { fputs("jev-native: \(error)\n", stderr); exit(1) }
+        }
+        app.run()
+        withExtendedLifetime(delegate) {}
+    }
+    @MainActor static func command(_ args: [String]) async throws {
+        func option(_ name: String) -> String? { guard let i = args.firstIndex(of: name), args.indices.contains(i+1) else { return nil }; return args[i+1] }
+        func require(_ name: String) throws -> String { guard let value = option(name) else { throw Failure("Missing \(name)") }; return value }
+        func directory() throws -> String { let path = URL(fileURLWithPath: option("--out") ?? FileManager.default.currentDirectoryPath + "/jev-run-" + UUID().uuidString).standardizedFileURL.path; try FileManager.default.createDirectory(atPath: path, withIntermediateDirectories: true, attributes: [.posixPermissions: 0o700]); return path }
+        func configuredNative() -> Native {
+            let native = Native()
+            native.showVirtualPointer = args.contains("--show-virtual-cursor")
+            native.sessionApp = option("--app"); native.sessionWindowID = option("--window").flatMap(UInt32.init)
+            return native
+        }
+        switch args.first ?? "help" {
+        case "install-skill":
+            let install = try SkillInstallOptions(arguments: Array(args.dropFirst()))
+            let results = try SkillInstallation.local().install(hosts: install.hosts, scope: install.scope, project: install.project, skillsDirectory: install.skillsDirectory)
+            try emit(results)
+            fputs("Skill files are installed. Fresh host discovery and invocation have not been verified by this command.\n", stderr)
+        case "setup":
+            if args.contains("--open-keys") {
+                guard CredentialSetupIO.native().openKeys() else { throw Failure("Could not open https://console.typesafe.ai/keys .") }
+                fputs("TypeSafe key management opened. After copying the key, run 'jev-native setup'.\n", stderr)
+            } else { _ = try setupCredential(importPasteboard: args.contains("--import-pasteboard")) }
+        case "doctor":
+            let native = configuredNative()
+            struct Doctor: Codable { var permissions: [String: Bool]; var credentialAvailable: Bool; var credentialSource: String; var codexPath: String?; var automationBackend: String; var privateWindowEventAnnotation: Bool; var osVersion: String }
+            try emit(Doctor(permissions: native.permissions(), credentialAvailable: (try? credential()) != nil, credentialSource: ProcessInfo.processInfo.environment["TYPESAFE_API_KEY"].map { $0.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? "~/.typesafeai" : "environment" } ?? "~/.typesafeai", codexPath: try? Codex().executable, automationBackend: "Apple AppKit/AX/ScreenCaptureKit/CGEvent/Vision; no external automation backend", privateWindowEventAnnotation: native.windowEvents.available, osVersion: ProcessInfo.processInfo.operatingSystemVersionString))
+        case "observe":
+            let native = configuredNative()
+            let dir = try directory(); let obs = try await native.observe(directory: dir, images: !args.contains("--no-image")); try writeJSON(obs, dir + "/observation.json"); try emit(obs)
+        case "act":
+            let native = configuredNative()
+            let priorPath = try require("--observation"), actionPath = try require("--action"), app = try require("--app")
+            let prior = try JSONDecoder().decode(Observation.self, from: Data(contentsOf: URL(fileURLWithPath: priorPath))), action = try JSONDecoder().decode(Action.self, from: Data(contentsOf: URL(fileURLWithPath: actionPath)))
+            native.sessionApp = prior.target?.bundle ?? app; native.sessionWindowID = prior.selectedWindow?.id
+            let dir = try directory(); let fresh = try await native.observe(directory: dir)
+            try writeJSON(fresh, dir + "/before.json")
+            if !["launch", "activate"].contains(action.kind) { guard Date().timeIntervalSince(prior.timestamp) < 60, stableTargetState(prior, fresh, action: action) else { throw Failure("Observation stale (>60s) or target UI changed; reobserve") } }
+            let pointerBefore = native.pointer(); let start = Date(); try await native.execute(action, observation: fresh, allowedApps: [app]); let ms = milliseconds(start); try await Task.sleep(nanoseconds: 250_000_000); let pointerAfter = native.pointer()
+            let afterDir = dir + "/after"; try FileManager.default.createDirectory(atPath: afterDir, withIntermediateDirectories: true); let after = try await native.observe(directory: afterDir); try writeJSON(after, afterDir + "/observation.json")
+            struct Result: Codable { var executionMS: Double; var pointerBefore: Rect; var pointerAfter: Rect; var virtualPointer: VirtualPointer; var after: Observation }; try emit(Result(executionMS: ms, pointerBefore: pointerBefore, pointerAfter: pointerAfter, virtualPointer: native.virtualPointer, after: after))
+        case "run":
+            let spec: TaskSpec
+            if let path = option("--task") { spec = try JSONDecoder().decode(TaskSpec.self, from: Data(contentsOf: URL(fileURLWithPath: path))) }
+            else { spec = TaskSpec(goal: try require("--goal"), apps: try require("--apps").split(separator: ",").map(String.init), texts: option("--text").map { [$0] } ?? [], generateText: args.contains("--generate-text"), inspectImage: args.contains("--inspect-image"), maxSteps: Int(option("--max-steps") ?? "30") ?? 30, expectText: option("--expect-text"), expectApp: option("--expect-app")) }
+            if (try? credential()) == nil { _ = try setupCredential() }
+            let workflow = Workflow(); workflow.native.showVirtualPointer = args.contains("--show-virtual-cursor")
+            if !args.contains("--no-preview") { let preview = PreviewController(); workflow.native.preview = preview; AppDelegate.preview = preview }
+            let report = try await workflow.run(spec: spec, directory: directory(), model: option("--codex-model")); try emit(report)
+            if !["verified_complete", "jev_observed_complete"].contains(report.status), !(args.contains("--keep-open") && AppDelegate.preview != nil) { exit(2) }
+        case "delegate":
+            let dir = try directory(); let start = Date(); let result = try await Codex().invoke(goal: require("--prompt"), image: option("--image"), directory: dir, model: option("--codex-model")); try writeJSON(result, dir + "/handoff.json"); try emit(result); fputs("codex_total_ms=\(milliseconds(start))\n", stderr)
+        default:
+            print("""
+            jev-native — native macOS computer use (Swift / Apple frameworks)
+              doctor
+              setup [--import-pasteboard | --open-keys]
+              install-skill --host codex|claude|both [--scope user|project]
+                  [--project PATH] [--skills-dir PATH (one host only)]
+              observe [--out DIR] [--no-image]
+              act --observation JSON --action JSON --app BUNDLE [--out DIR]
+              run --goal TEXT --apps BUNDLE[,BUNDLE] [--text LITERAL]
+                  [--generate-text] [--inspect-image] [--codex-model MODEL]
+                  [--expect-text TEXT] [--expect-app BUNDLE] [--max-steps N] [--out DIR]
+              run --task JSON [--codex-model MODEL] [--out DIR]
+              delegate --prompt TEXT [--image PNG] [--codex-model MODEL] [--out DIR]
+            Run writes screenshots, AX snapshots, decisions, usage and measured timings.
+            run exits 2 if blocked, recovery exhausted, or step limit reached.
+            Use explicit app allowlists and authorized goals. No shell action is supported.
+            """)
+        }
+    }
+}

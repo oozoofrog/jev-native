@@ -1,0 +1,90 @@
+{
+  "exportKind": "sanitized-summary-not-replay-input",
+  "goal": "The Calculator numeric display is already 42 %. Confirm the current display and finish. Do not perform any input.",
+  "status": "verified_complete",
+  "steps": [
+    {
+      "index": 0,
+      "decision": {
+        "apiMS": 209.1890573501587,
+        "choice": "done",
+        "confidence": 0.98,
+        "localMS": 0.3069639205932617,
+        "model": "jev-1.13.0",
+        "usage": {
+          "input_tokens": 1991,
+          "output_tokens": 410
+        },
+        "serviceResponse": {
+          "model": "jev-1.13.0",
+          "answers": {
+            "next": {
+              "type": "choice",
+              "choice": "done",
+              "confidence": 0.98,
+              "probabilities": {
+                "a6": 0.0,
+                "a17": 0.0,
+                "a15": 0.0,
+                "a36": 0.0,
+                "a39": 0.0,
+                "a31": 0.0,
+                "a32": 0.0,
+                "a13": 0.0,
+                "a40": 0.0,
+                "a44": 0.0,
+                "a28": 0.0,
+                "a37": 0.0,
+                "a4": 0.0,
+                "a10": 0.0,
+                "a8": 0.0,
+                "a11": 0.0,
+                "blocked": 0.01,
+                "a38": 0.0,
+                "a30": 0.0,
+                "a21": 0.0,
+                "a20": 0.0,
+                "a3": 0.0,
+                "a24": 0.0,
+                "a23": 0.0,
+                "done": 0.98,
+                "a22": 0.0,
+                "a29": 0.0,
+                "a42": 0.0,
+                "a14": 0.01,
+                "a16": 0.0,
+                "a35": 0.0,
+                "a2": 0.0,
+                "a12": 0.0,
+                "a27": 0.0,
+                "a7": 0.0,
+                "a19": 0.0,
+                "a25": 0.0,
+                "a26": 0.0,
+                "a33": 0.0,
+                "a34": 0.0,
+                "a5": 0.0,
+                "a9": 0.0,
+                "a18": 0.0,
+                "a41": 0.0,
+                "a43": 0.0
+              }
+            }
+          },
+          "usage": {
+            "input_tokens": 1991,
+            "output_tokens": 410
+          }
+        }
+      },
+      "observation": {
+        "elapsedMS": 615.7180070877075,
+        "truncated": false,
+        "targetBundle": "com.apple.calculator",
+        "targetWindowOCR": [
+          "42/"
+        ]
+      }
+    }
+  ]
+}

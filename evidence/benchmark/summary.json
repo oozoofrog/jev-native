@@ -1,0 +1,37 @@
+{
+  "Codex CUA": {
+    "count": 5,
+    "median_ms": 6291,
+    "min_ms": 5982,
+    "max_ms": 6664,
+    "ui_target_reached": 5,
+    "controller_reported_complete": 5
+  },
+  "JEV Native": {
+    "count": 5,
+    "median_ms": 2037.463625,
+    "min_ms": 1835.340208,
+    "max_ms": 2183.525125,
+    "ui_target_reached": 5,
+    "controller_reported_complete": 3
+  },
+  "JEV_successful_only": {
+    "count": 3,
+    "median_ms": 1872.592125,
+    "min_ms": 1835.340208,
+    "max_ms": 2152.48675
+  },
+  "all_trial_stop_time_ratio_codex_over_jev": 3.0876624852627734,
+  "codex_component_medians_ms": {
+    "initial_observe_ms": 82,
+    "input_ms": 55,
+    "final_observe_ms": 425,
+    "round_trip_gap_ms": 5721
+  },
+  "jev_component_medians_ms": {
+    "input_ms": 7.660031318664551,
+    "jev_api_ms": 458.26709270477295,
+    "jev_local_ms": 0.5990266799926758,
+    "persisted_observation_ms": 861.8932962417603
+  }
+}
