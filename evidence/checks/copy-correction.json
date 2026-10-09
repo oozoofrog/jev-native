@@ -1,0 +1,26 @@
+{
+  "checks": [
+    {
+      "project": "JevComputerUse",
+      "swiftFilesUnchanged": 16,
+      "bundledSkillMatches": true,
+      "version": "0.1.2",
+      "build": "3"
+    },
+    {
+      "project": "jev-native-public",
+      "swiftFilesUnchanged": 16,
+      "bundledSkillMatches": true,
+      "version": "0.1.2",
+      "build": "3"
+    }
+  ],
+  "installedSkillSymlinkMatches": true,
+  "runtimeAndTestsUnchanged": true,
+  "swiftTestsReused": {
+    "original": 27,
+    "public": 29
+  },
+  "skillStructure": "both valid",
+  "buildWarnings": 0
+}

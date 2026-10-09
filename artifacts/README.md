@@ -1,6 +1,6 @@
 # App artifact
 
-`JevNative-0.1.1-arm64.zip` contains the native app bundle built from this repository, version 0.1.1 (2), for Apple Silicon. `checksums.json` records its SHA-256 and the executable digest.
+`JevNative-0.1.2-arm64.zip` contains the native app bundle built from this repository, version 0.1.2 (3), for Apple Silicon. `checksums.json` records its SHA-256 and the executable digest.
 
 This is a development artifact with an ad-hoc signature. It is not Developer ID signed or notarized. Runtime validation covers macOS 27.0.1 arm64 in the existing Codex launch context; macOS 14 is only the deployment target. Fresh Terminal/Finder/Gatekeeper behavior and TCC identity remain unverified. No system protection bypass is included or recommended.
 

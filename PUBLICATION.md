@@ -1,6 +1,6 @@
 # Public export manifest
 
-This repository exports the completed JEV Native 0.1.1 (2) project, including Swift native automation, JEV closed-loop decisions, Codex text/vision handoff, virtual cursor/preview, clipboard credential setup, Codex/Claude Code skill installers and startup crash mitigation.
+This repository exports the completed JEV Native project (current package: 0.1.2 (3)), including Swift native automation, JEV closed-loop decisions, Codex text/vision handoff, virtual cursor/preview, clipboard credential setup, Codex/Claude Code skill installers and startup crash mitigation.
 
 ## Included
 
@@ -30,3 +30,8 @@ No historical Git repository existed in the owning project. Publication uses a n
 - No existing Git history is imported. Commit identity uses the account's public GitHub noreply address. No Git tag or GitHub Release is created; the development app archive is tracked in the repository.
 
 The packaging process initially found a compiled local source path. Runtime template lookup removed it. The first added test run failed only because URL equality distinguished a trailing directory slash; path equality corrected the test. Final tests pass. The earlier path-mapping build attempt emitted debug-module reference warnings; the final artifact build removes that approach and passes without those warnings. Full intermediate logs remain local; final sanitized logs are in evidence/checks/.
+
+
+## Copy correction, 0.1.2 (3)
+
+The companion skill and README no longer include explanatory guarantees about the user's mouse or focus. App UI/help had no such copy. Swift source and tests are unchanged. Technical action constraints and historical verification reports remain intact. Both local and public bundles include the revised skill; the current archive/checksum metadata is updated. The earlier archive remains in Git history. Existing Swift test results are reused; affected bundle/skill/archive checks passed again.
