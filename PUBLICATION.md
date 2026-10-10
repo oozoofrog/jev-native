@@ -1,6 +1,6 @@
 # Public export manifest
 
-This repository exports the JEV Native project (current package: 0.5.0 (7)), including Swift native automation, JEV closed-loop decisions, Codex text/vision handoff, virtual cursor/preview, clipboard credential setup, Codex/Claude Code skill installers and startup crash mitigation.
+This repository exports the JEV Native project (current source: 0.6.3 (11); published app archive: 0.5.0 (7)), including Swift native automation, JEV closed-loop decisions, Codex text/vision handoff, virtual cursor/preview, clipboard credential setup, Codex/Claude Code skill installers and startup crash mitigation.
 
 ## Included
 
@@ -59,3 +59,14 @@ The Korean single-request AppKit UI, typed request intent, original UTF-16 text 
 Final Swift suite: 89 passed, zero failures. Generation/native input, selected-document summary without source mutation, and image interpretation/UI delivery have actual owned-fixture evidence. Ordinary-button no-delegate routing is verified, but the final action stopped `uncertain` before input and is not a successful button workflow. Earlier model stops and harness failures are retained in sanitized summaries. No general reliability improvement is claimed.
 
 The 0.5.0 installed/public/relocated package checks, archive hashes and targeted staged/history/ZIP audit are refreshed. Raw app catalogues, private source text, unrelated windows, credentials, local paths and conversation records are excluded. Host loader/Composer and fresh Terminal/Finder/Gatekeeper exposure remain unverified.
+
+
+## Spatial workshop and readable cartoon rendering, 0.6.3 (11)
+
+The native task window now uses one SceneKit world for source, request, execution core, result and actual event history. Framed document modules, cartoon shading and connected motion retain their shared depth and hit regions. The AppKit goal editor and full-text sheets remain native. TextKit supplies high-resolution glyph planes and matching pagination, with projection-aware sizing, stronger theme contrast, clearer document titles and resize anchoring. The app bundle includes the original vector-rendered JEV icon and its generator.
+
+Typed presentation events reject stale run/sequence updates. Cooperative pause freezes the shared scene clock and waits at execution boundaries; resume retains the same run. Stop releases paused waiters and cancels the active task. Native action preconditions are refreshed after pause, including a pause during fresh observation. History selection inspects recorded events and does not replay actions. Provenance describes the whole source document supplied to the delegate, without sentence-level mapping claims.
+
+Final source verification: **98 Swift tests passed**, zero failures; public release and original debug builds passed without compiler warnings/errors. Readability verification includes **24 native checks**: 18 with synthetic documents rendered by the actual workspace source in light/dark appearances, and six in the development app. These cover full Unicode sheets, native pointer paging, focus movement, idle stability and 760×700 minimum-window bounds. Earlier workshop verification separately exercised a real source-to-summary delegate run. The readability update did not rerun natural-language generation or claim a general reliability improvement. Runtime evidence covers macOS 27.0.1 arm64.
+
+This commit publishes source, tests, icon assets and documentation. It does not update the tracked 0.5.0 app archive, checksum metadata, installed app, Git tags or GitHub Releases. Raw local observations, synthetic fixture captures and verification logs remain outside this public checkout.

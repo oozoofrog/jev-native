@@ -30,7 +30,8 @@ import ScreenCaptureKit
         let menu = NSMenu(); let toggle = NSMenuItem(title: "작업 미리보기 표시 / 숨기기", action: #selector(togglePreview), keyEquivalent: ""); toggle.target = self; menu.addItem(toggle)
         let stop = NSMenuItem(title: "작업 중지", action: #selector(stopRequested), keyEquivalent: ""); stop.target = self; menu.addItem(stop)
         menu.addItem(.separator()); let quit = NSMenuItem(title: "작업 도우미 종료", action: #selector(quitController), keyEquivalent: "q"); quit.target = self; menu.addItem(quit); statusItem.menu = menu
-        NSApp.setActivationPolicy(.regular); NSApp.applicationIconImage = NSImage(systemSymbolName: "cursorarrow.rays", accessibilityDescription: "작업 도우미")
+        NSApp.setActivationPolicy(.regular)
+        if let icon = Bundle.main.url(forResource:"JevNative",withExtension:"icns").flatMap({ NSImage(contentsOf:$0) }) { NSApp.applicationIconImage = icon }
         show()
     }
     func beginRun() { cancelRequested = false; imageView.image = nil; pointerDot.isHidden = true; caption.stringValue = "작업할 창을 기다리고 있어요"; phase("Starting"); show() }

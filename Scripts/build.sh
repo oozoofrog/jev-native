@@ -16,6 +16,7 @@ if [ "${JEV_REDACT_BUILD_PATHS:-0}" = "1" ]; then
 fi
 mkdir -p "$app_dir/Contents/Resources/skills/jev-native"
 cp "$project_dir/skill/jev-native/SKILL.md" "$app_dir/Contents/Resources/skills/jev-native/SKILL.md"
+cp "$project_dir/Assets/JevNative.icns" "$app_dir/Contents/Resources/JevNative.icns"
 cat > "$app_dir/Contents/Info.plist" <<'PLIST'
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
@@ -24,9 +25,10 @@ cat > "$app_dir/Contents/Info.plist" <<'PLIST'
 <key>CFBundleName</key><string>JEV Native</string>
 <key>CFBundleDisplayName</key><string>JEV Native</string>
 <key>CFBundleExecutable</key><string>jev-native</string>
+<key>CFBundleIconFile</key><string>JevNative.icns</string>
 <key>CFBundlePackageType</key><string>APPL</string>
-<key>CFBundleVersion</key><string>7</string>
-<key>CFBundleShortVersionString</key><string>0.5.0</string>
+<key>CFBundleVersion</key><string>11</string>
+<key>CFBundleShortVersionString</key><string>0.6.3</string>
 <key>LSMinimumSystemVersion</key><string>14.0</string>
 <key>NSPrincipalClass</key><string>NSApplication</string>
 </dict></plist>

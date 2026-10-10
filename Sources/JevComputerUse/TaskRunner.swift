@@ -2,10 +2,42 @@ import Foundation
 
 @MainActor final class RunControl {
     private(set) var isCancelled = false
+    private(set) var pauseRequested = false
+    private(set) var isPaused = false
+    private var pauseWaiter: CheckedContinuation<Void, Error>?
+    private let runID = UUID()
+    private var sequence = 0
     var onStatus: (String) -> Void = { _ in }
-    func stop() { isCancelled = true; onStatus("Stopping after current operation") }
+    var onPresentation: (RunPresentationEvent) -> Void = { _ in }
+    var onPauseChange: () -> Void = {}
+    func emit(_ fact: RunPresentationEvent.Fact) {
+        onPresentation(RunPresentationEvent(runID:runID,sequence:sequence,fact:fact)); sequence += 1
+    }
+    func requestPause() { guard !isCancelled else { return }; pauseRequested = true; onPauseChange() }
+    func resume() {
+        pauseRequested = false; isPaused = false; emit(.pause(false))
+        let waiter = pauseWaiter; pauseWaiter = nil; waiter?.resume(); onPauseChange()
+    }
+    func stop() {
+        isCancelled = true; pauseRequested = false; isPaused = false
+        let waiter = pauseWaiter; pauseWaiter = nil; waiter?.resume(throwing:CancellationError())
+        onStatus("Stopping after current operation"); onPauseChange()
+    }
     func check() throws { if isCancelled || Task.isCancelled { throw CancellationError() } }
-    func status(_ text: String) { if !isCancelled { onStatus(text) } }
+    func checkpoint() async throws {
+        try check()
+        guard pauseRequested else { return }
+        isPaused = true; emit(.pause(true)); onPauseChange()
+        try await withTaskCancellationHandler(operation: {
+            try await withCheckedThrowingContinuation { (waiter: CheckedContinuation<Void, Error>) in
+                if isCancelled || Task.isCancelled { waiter.resume(throwing:CancellationError()) }
+                else if !pauseRequested { waiter.resume() }
+                else { precondition(pauseWaiter == nil); pauseWaiter = waiter }
+            }
+        }, onCancel: { Task { @MainActor in self.stop() } })
+        try check()
+    }
+    func status(_ text: String) { if !isCancelled { onStatus(text); emit(.phase(text)) } }
 }
 
 @MainActor final class TaskRunner {
@@ -36,13 +68,13 @@ import Foundation
         var resolution: AppResolution?
         var workflowStarted = false
         do {
-            try control.check()
+            try await control.checkpoint()
             if request.spec.apps.isEmpty && !request.chooseApps { try requireCredential() }
             control.status(request.chooseApps ? "Choose target apps" : "Selecting target apps")
             if let knownResolution { resolution = knownResolution }
             else { resolution = await resolve(request.spec, request.chooseApps, request.allowInteractiveFallback, directory, control, selection) }
             try writeJSON(resolution, directory + "/app-selection.json")
-            try control.check()
+            try await control.checkpoint()
             guard let resolved = resolution, resolved.status == "resolved" else {
                 let result = RunReport(status: "app_selection_" + (resolution?.status ?? "error"), goal: request.spec.goal,
                     steps: [], finalObservation: "", directory: directory, apps: [], appSelection: resolution)
@@ -50,6 +82,7 @@ import Foundation
             }
             try requireCredential(); try control.check()
             var spec = request.spec; spec.apps = resolved.apps
+            control.emit(.target(resolved.apps.joined(separator:", ")))
             control.status("Running in " + resolved.apps.joined(separator: ", "))
             let runPreview = preview ?? makePreview?()
             try control.check()
@@ -77,14 +110,21 @@ import Foundation
     private var task: Task<Void, Never>?
 
     @discardableResult func start(status: @escaping (String) -> Void,
+        presentation: @escaping (RunPresentationEvent) -> Void = { _ in }, request: String = "",
         operation: @escaping @MainActor (RunControl) async throws -> RunReport) throws -> Task<Void, Never> {
         guard !active else { throw Failure("A run is already active. Stop it or wait for completion.") }
-        let control = RunControl(); control.onStatus = status
+        let control = RunControl(); control.onStatus = status; control.onPresentation = presentation
+        control.onPauseChange = { [weak self] in self?.onChange() }
+        control.emit(.request(request))
         self.control = control; active = true; report = nil; error = nil; onChange()
         let task = Task { @MainActor in
             defer { self.active = false; self.control = nil; self.task = nil; self.onChange() }
-            do { self.report = try await operation(control) }
-            catch { self.error = String(describing: error) }
+            do {
+                let report = try await operation(control); self.report = report
+                if let response = report.response { control.emit(.result(response)) }
+                control.emit(.outcome(report.status))
+            }
+            catch { self.error = String(describing: error); control.emit(.outcome(control.isCancelled ? "cancelled" : "error")) }
         }
         self.task = task
         return task

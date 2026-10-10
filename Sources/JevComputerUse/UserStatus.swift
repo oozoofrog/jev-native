@@ -25,7 +25,7 @@ enum UserStatus {
         switch status {
         case "verified_complete": return "지정한 완료 조건을 확인했어요"
         case "jev_observed_complete": return "관찰한 상태를 기준으로 작업을 마쳤어요. 결과를 확인해 주세요."
-        case "content_delivered": return "요청한 결과를 아래에 표시했어요"
+        case "content_delivered": return "요청한 결과가 준비됐어요"
         case "cancelled", "request_cancelled": return "작업을 중지했어요"
         case "request_visual_destination_unresolved": return "화면 설명을 다른 앱에 쓰는 경로는 아직 지원하지 않아요. 작업 창에 설명해 달라고 요청해 주세요."
         case "request_unsupported": return "현재 도우미가 실행할 수 없는 요청이에요. 앱에서 할 동작이나 작성할 내용을 구체적으로 적어 주세요."
