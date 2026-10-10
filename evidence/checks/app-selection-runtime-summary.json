@@ -1,0 +1,448 @@
+[
+  {
+    "case": "auto-calculator",
+    "status": "app_selection_uncertain",
+    "selectionSource": "goal",
+    "selectionStatus": "uncertain",
+    "apps": [
+      "com.apple.calculator"
+    ],
+    "candidateCount": 183,
+    "discoveryMS": 328.46200466156006,
+    "selectionAPIMS": 1006.0828924179077,
+    "selectionCalls": [
+      {
+        "stage": "next_app",
+        "apiMS": 377.44390964508057,
+        "model": "jev-1.13.0",
+        "usage": {
+          "input_tokens": 26218,
+          "output_tokens": 1949
+        },
+        "confidence": 0.94,
+        "scopeProbability": null
+      },
+      {
+        "stage": "next_app",
+        "apiMS": 368.59893798828125,
+        "model": "jev-1.13.0",
+        "usage": {
+          "input_tokens": 26200,
+          "output_tokens": 1936
+        },
+        "confidence": 0.96,
+        "scopeProbability": null
+      },
+      {
+        "stage": "scope_verification",
+        "apiMS": 260.0400447845459,
+        "model": "jev-1.13.0",
+        "usage": {
+          "input_tokens": 11740,
+          "output_tokens": 20
+        },
+        "confidence": null,
+        "scopeProbability": 0.82
+      }
+    ],
+    "actionKinds": [],
+    "steps": 0
+  },
+  {
+    "case": "default-calculator",
+    "status": "app_selection_uncertain",
+    "selectionSource": "goal",
+    "selectionStatus": "uncertain",
+    "apps": [
+      "com.apple.calculator"
+    ],
+    "candidateCount": 183,
+    "discoveryMS": 131.59596920013428,
+    "selectionAPIMS": 1065.896987915039,
+    "selectionCalls": [
+      {
+        "stage": "next_app",
+        "apiMS": 382.6490640640259,
+        "model": "jev-1.13.0",
+        "usage": {
+          "input_tokens": 26203,
+          "output_tokens": 1949
+        },
+        "confidence": 0.92,
+        "scopeProbability": null
+      },
+      {
+        "stage": "next_app",
+        "apiMS": 385.92398166656494,
+        "model": "jev-1.13.0",
+        "usage": {
+          "input_tokens": 26185,
+          "output_tokens": 1936
+        },
+        "confidence": 0.87,
+        "scopeProbability": null
+      },
+      {
+        "stage": "scope_verification",
+        "apiMS": 297.32394218444824,
+        "model": "jev-1.13.0",
+        "usage": {
+          "input_tokens": 11725,
+          "output_tokens": 20
+        },
+        "confidence": null,
+        "scopeProbability": 0.83
+      }
+    ],
+    "actionKinds": [],
+    "steps": 0
+  },
+  {
+    "case": "calculate72",
+    "status": "uncertain",
+    "selectionSource": "goal",
+    "selectionStatus": "resolved",
+    "apps": [
+      "com.apple.calculator"
+    ],
+    "candidateCount": 183,
+    "discoveryMS": 148.01299571990967,
+    "selectionAPIMS": 1226.3410091400146,
+    "selectionCalls": [
+      {
+        "stage": "next_app",
+        "apiMS": 499.60196018218994,
+        "model": "jev-1.13.0",
+        "usage": {
+          "input_tokens": 26204,
+          "output_tokens": 1949
+        },
+        "confidence": 0.9,
+        "scopeProbability": null
+      },
+      {
+        "stage": "next_app",
+        "apiMS": 450.5230188369751,
+        "model": "jev-1.13.0",
+        "usage": {
+          "input_tokens": 26186,
+          "output_tokens": 1936
+        },
+        "confidence": 0.98,
+        "scopeProbability": null
+      },
+      {
+        "stage": "scope_verification",
+        "apiMS": 276.2160301208496,
+        "model": "jev-1.13.0",
+        "usage": {
+          "input_tokens": 11746,
+          "output_tokens": 20
+        },
+        "confidence": null,
+        "scopeProbability": 0.95
+      }
+    ],
+    "actionKinds": [
+      null
+    ],
+    "steps": 1
+  },
+  {
+    "case": "default-read-final",
+    "status": "uncertain",
+    "selectionSource": "goal",
+    "selectionStatus": "resolved",
+    "apps": [
+      "com.apple.calculator"
+    ],
+    "candidateCount": 183,
+    "discoveryMS": 143.9359188079834,
+    "selectionAPIMS": 1000.7390975952148,
+    "selectionCalls": [
+      {
+        "stage": "next_app",
+        "apiMS": 369.0180778503418,
+        "model": "jev-1.13.0",
+        "usage": {
+          "input_tokens": 26203,
+          "output_tokens": 1949
+        },
+        "confidence": 0.91,
+        "scopeProbability": null
+      },
+      {
+        "stage": "next_app",
+        "apiMS": 367.4980401992798,
+        "model": "jev-1.13.0",
+        "usage": {
+          "input_tokens": 26185,
+          "output_tokens": 1936
+        },
+        "confidence": 0.97,
+        "scopeProbability": null
+      },
+      {
+        "stage": "scope_verification",
+        "apiMS": 264.22297954559326,
+        "model": "jev-1.13.0",
+        "usage": {
+          "input_tokens": 11745,
+          "output_tokens": 20
+        },
+        "confidence": null,
+        "scopeProbability": 0.93
+      }
+    ],
+    "actionKinds": [
+      null
+    ],
+    "steps": 1
+  },
+  {
+    "case": "explicit-calculator",
+    "status": "verified_complete",
+    "selectionSource": "explicit",
+    "selectionStatus": "resolved",
+    "apps": [
+      "com.apple.calculator"
+    ],
+    "candidateCount": 0,
+    "discoveryMS": 0,
+    "selectionAPIMS": 0,
+    "selectionCalls": [],
+    "actionKinds": [
+      null
+    ],
+    "steps": 1
+  },
+  {
+    "case": "installed-fixture",
+    "status": "verified_complete",
+    "selectionSource": "goal",
+    "selectionStatus": "resolved",
+    "apps": [
+      "com.oozoofrog.JevSelectionFixture"
+    ],
+    "candidateCount": 184,
+    "discoveryMS": 155.16996383666992,
+    "selectionAPIMS": 1047.4618673324585,
+    "selectionCalls": [
+      {
+        "stage": "next_app",
+        "apiMS": 397.5679874420166,
+        "model": "jev-1.13.0",
+        "usage": {
+          "input_tokens": 26350,
+          "output_tokens": 1961
+        },
+        "confidence": 0.99,
+        "scopeProbability": null
+      },
+      {
+        "stage": "next_app",
+        "apiMS": 387.60197162628174,
+        "model": "jev-1.13.0",
+        "usage": {
+          "input_tokens": 26331,
+          "output_tokens": 1946
+        },
+        "confidence": 0.95,
+        "scopeProbability": null
+      },
+      {
+        "stage": "scope_verification",
+        "apiMS": 262.29190826416016,
+        "model": "jev-1.13.0",
+        "usage": {
+          "input_tokens": 11836,
+          "output_tokens": 20
+        },
+        "confidence": null,
+        "scopeProbability": 0.85
+      }
+    ],
+    "actionKinds": [
+      "launch",
+      "scroll",
+      null
+    ],
+    "steps": 3
+  },
+  {
+    "case": "default-task",
+    "status": "verified_complete",
+    "selectionSource": "goal",
+    "selectionStatus": "resolved",
+    "apps": [
+      "com.oozoofrog.JevSelectionFixture"
+    ],
+    "candidateCount": 184,
+    "discoveryMS": 162.60802745819092,
+    "selectionAPIMS": 1070.884108543396,
+    "selectionCalls": [
+      {
+        "stage": "next_app",
+        "apiMS": 378.48401069641113,
+        "model": "jev-1.13.0",
+        "usage": {
+          "input_tokens": 26349,
+          "output_tokens": 1961
+        },
+        "confidence": 1,
+        "scopeProbability": null
+      },
+      {
+        "stage": "next_app",
+        "apiMS": 388.7300491333008,
+        "model": "jev-1.13.0",
+        "usage": {
+          "input_tokens": 26330,
+          "output_tokens": 1946
+        },
+        "confidence": 0.9,
+        "scopeProbability": null
+      },
+      {
+        "stage": "scope_verification",
+        "apiMS": 303.6700487136841,
+        "model": "jev-1.13.0",
+        "usage": {
+          "input_tokens": 11835,
+          "output_tokens": 20
+        },
+        "confidence": null,
+        "scopeProbability": 0.86
+      }
+    ],
+    "actionKinds": [
+      null
+    ],
+    "steps": 1
+  },
+  {
+    "case": "unavailable",
+    "status": "app_selection_unavailable",
+    "selectionSource": "goal",
+    "selectionStatus": "unavailable",
+    "apps": [],
+    "candidateCount": 184,
+    "discoveryMS": 123.38793277740479,
+    "selectionAPIMS": 417.03999042510986,
+    "selectionCalls": [
+      {
+        "stage": "next_app",
+        "apiMS": 417.03999042510986,
+        "model": "jev-1.13.0",
+        "usage": {
+          "input_tokens": 26329,
+          "output_tokens": 1960
+        },
+        "confidence": 0.97,
+        "scopeProbability": null
+      }
+    ],
+    "actionKinds": [],
+    "steps": 0
+  },
+  {
+    "case": "installed-default-task",
+    "status": "app_selection_uncertain",
+    "selectionSource": "goal",
+    "selectionStatus": "uncertain",
+    "apps": [
+      "com.oozoofrog.JevSelectionFixture"
+    ],
+    "candidateCount": 184,
+    "discoveryMS": 145.19500732421875,
+    "selectionAPIMS": 1193.7609910964966,
+    "selectionCalls": [
+      {
+        "stage": "next_app",
+        "apiMS": 379.1940212249756,
+        "model": "jev-1.13.0",
+        "usage": {
+          "input_tokens": 26349,
+          "output_tokens": 1961
+        },
+        "confidence": 0.98,
+        "scopeProbability": null
+      },
+      {
+        "stage": "next_app",
+        "apiMS": 412.4419689178467,
+        "model": "jev-1.13.0",
+        "usage": {
+          "input_tokens": 26330,
+          "output_tokens": 1946
+        },
+        "confidence": 0.81,
+        "scopeProbability": null
+      },
+      {
+        "stage": "scope_verification",
+        "apiMS": 402.1250009536743,
+        "model": "jev-1.13.0",
+        "usage": {
+          "input_tokens": 11835,
+          "output_tokens": 20
+        },
+        "confidence": null,
+        "scopeProbability": 0.79
+      }
+    ],
+    "actionKinds": [],
+    "steps": 0
+  },
+  {
+    "case": "installed-calculator",
+    "status": "verified_complete",
+    "selectionSource": "goal",
+    "selectionStatus": "resolved",
+    "apps": [
+      "com.apple.calculator"
+    ],
+    "candidateCount": 184,
+    "discoveryMS": 148.02193641662598,
+    "selectionAPIMS": 1039.7471189498901,
+    "selectionCalls": [
+      {
+        "stage": "next_app",
+        "apiMS": 390.28406143188477,
+        "model": "jev-1.13.0",
+        "usage": {
+          "input_tokens": 26333,
+          "output_tokens": 1960
+        },
+        "confidence": 0.82,
+        "scopeProbability": null
+      },
+      {
+        "stage": "next_app",
+        "apiMS": 383.4350109100342,
+        "model": "jev-1.13.0",
+        "usage": {
+          "input_tokens": 26315,
+          "output_tokens": 1947
+        },
+        "confidence": 0.85,
+        "scopeProbability": null
+      },
+      {
+        "stage": "scope_verification",
+        "apiMS": 266.0280466079712,
+        "model": "jev-1.13.0",
+        "usage": {
+          "input_tokens": 11804,
+          "output_tokens": 20
+        },
+        "confidence": null,
+        "scopeProbability": 0.89
+      }
+    ],
+    "actionKinds": [
+      null
+    ],
+    "steps": 1
+  }
+]

@@ -36,7 +36,7 @@ struct Action: Codable, Equatable {
 struct VirtualPointer: Codable { var x: Double = 0; var y: Double = 0; var buttons: [String] = []; var targetPID: Int32? = nil }
 struct TaskSpec: Codable {
     var goal: String
-    var apps: [String]
+    var apps: [String] = []
     var texts: [String] = []
     var actions: [Action] = []
     var generateText: Bool = false
@@ -52,7 +52,7 @@ struct TaskSpec: Codable {
 struct Candidate: Codable { var id: String; var description: String; var action: Action? }
 struct Decision: Codable { var choice: String; var confidence: Double; var apiMS: Double; var localMS: Double; var model: String; var usage: [String: Int]; var response: String; var progressProbability: Double? = nil; var verificationApiMS: Double? = nil }
 struct Step: Codable { var index: Int; var observation: String; var decision: Decision?; var action: Action?; var executionMS: Double?; var error: String?; var afterObservation: String? }
-struct RunReport: Codable { var status: String; var goal: String; var steps: [Step]; var finalObservation: String; var directory: String }
+struct RunReport: Codable { var status: String; var goal: String; var steps: [Step]; var finalObservation: String; var directory: String; var apps: [String]? = nil; var appSelection: AppResolution? = nil }
 
 func stableTargetState(_ a: Observation, _ b: Observation, action: Action? = nil) -> Bool {
     guard a.target?.pid == b.target?.pid, a.selectedWindow == b.selectedWindow else { return false }
@@ -94,9 +94,23 @@ func validateAction(_ a: Action, apps: [String]) throws {
 
 extension TaskSpec {
     private enum Keys: String, CodingKey { case goal, apps, texts, actions, generateText, inspectImage, maxSteps, settleMS, maxRecovery, confidence, expectText, expectApp }
+    func encode(to encoder: Encoder) throws {
+        var c = encoder.container(keyedBy: Keys.self)
+        try c.encode(goal, forKey: .goal)
+        if !apps.isEmpty { try c.encode(apps, forKey: .apps) }
+        try c.encode(texts, forKey: .texts); try c.encode(actions, forKey: .actions)
+        try c.encode(generateText, forKey: .generateText); try c.encode(inspectImage, forKey: .inspectImage)
+        try c.encode(maxSteps, forKey: .maxSteps); try c.encode(settleMS, forKey: .settleMS)
+        try c.encode(maxRecovery, forKey: .maxRecovery); try c.encode(confidence, forKey: .confidence)
+        try c.encodeIfPresent(expectText, forKey: .expectText); try c.encodeIfPresent(expectApp, forKey: .expectApp)
+    }
     init(from decoder: Decoder) throws {
         let c = try decoder.container(keyedBy: Keys.self)
-        goal = try c.decode(String.self, forKey: .goal); apps = try c.decode([String].self, forKey: .apps)
+        goal = try c.decode(String.self, forKey: .goal)
+        if c.contains(.apps) {
+            apps = try c.decode([String].self, forKey: .apps)
+            guard !apps.isEmpty else { throw Failure("Task apps must not be empty; omit apps for automatic selection.") }
+        } else { apps = [] }
         texts = try c.decodeIfPresent([String].self, forKey: .texts) ?? []
         actions = try c.decodeIfPresent([Action].self, forKey: .actions) ?? []
         generateText = try c.decodeIfPresent(Bool.self, forKey: .generateText) ?? false

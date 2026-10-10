@@ -28,7 +28,7 @@ import Foundation
         }
         return Array(result.prefix(255))
     }
-    func run(spec: TaskSpec, directory: String, model: String?) async throws -> RunReport {
+    func run(spec: TaskSpec, directory: String, model: String?, appSelection: AppResolution? = nil) async throws -> RunReport {
         guard !spec.apps.isEmpty, spec.maxSteps > 0, (0...1).contains(spec.confidence), spec.maxRecovery >= 0 else { throw Failure("Invalid task bounds/empty app allowlist") }
         try FileManager.default.createDirectory(atPath: directory, withIntermediateDirectories: true, attributes: [.posixPermissions: 0o700]); try writeJSON(spec, directory + "/task.json")
         native.sessionApp = spec.apps.first
@@ -97,6 +97,6 @@ import Foundation
             if recovery > spec.maxRecovery { status = "recovery_exhausted"; break }
         }
         native.preview?.phase("Finished: \(status)")
-        let report = RunReport(status: status, goal: spec.goal, steps: history, finalObservation: finalPath, directory: directory); try writeJSON(report, directory + "/report.json"); return report
+        let report = RunReport(status: status, goal: spec.goal, steps: history, finalObservation: finalPath, directory: directory, apps: spec.apps, appSelection: appSelection); try writeJSON(report, directory + "/report.json"); return report
     }
 }

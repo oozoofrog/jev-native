@@ -70,13 +70,24 @@ import Foundation
             let afterDir = dir + "/after"; try FileManager.default.createDirectory(atPath: afterDir, withIntermediateDirectories: true); let after = try await native.observe(directory: afterDir); try writeJSON(after, afterDir + "/observation.json")
             struct Result: Codable { var executionMS: Double; var pointerBefore: Rect; var pointerAfter: Rect; var virtualPointer: VirtualPointer; var after: Observation }; try emit(Result(executionMS: ms, pointerBefore: pointerBefore, pointerAfter: pointerAfter, virtualPointer: native.virtualPointer, after: after))
         case "run":
-            let spec: TaskSpec
-            if let path = option("--task") { spec = try JSONDecoder().decode(TaskSpec.self, from: Data(contentsOf: URL(fileURLWithPath: path))) }
-            else { spec = TaskSpec(goal: try require("--goal"), apps: try require("--apps").split(separator: ",").map(String.init), texts: option("--text").map { [$0] } ?? [], generateText: args.contains("--generate-text"), inspectImage: args.contains("--inspect-image"), maxSteps: Int(option("--max-steps") ?? "30") ?? 30, expectText: option("--expect-text"), expectApp: option("--expect-app")) }
+            let request = try RunRequest(arguments: Array(args.dropFirst()))
+            let dir = try directory()
+            try writeJSON(request.spec, dir + "/requested-task.json")
+            if request.spec.apps.isEmpty && !request.chooseApps, (try? credential()) == nil { _ = try setupCredential() }
+            let resolution = await AppResolver().resolve(spec: request.spec, simple: request.chooseApps,
+                allowFallback: request.allowInteractiveFallback, directory: dir)
+            try writeJSON(resolution, dir + "/app-selection.json")
+            guard resolution.status == "resolved" else {
+                let report = RunReport(status: "app_selection_" + resolution.status, goal: request.spec.goal,
+                    steps: [], finalObservation: "", directory: dir, apps: [], appSelection: resolution)
+                try writeJSON(report, dir + "/report.json"); try emit(report)
+                fputs((resolution.diagnostic ?? "App selection was not resolved.") + "\n", stderr); exit(2)
+            }
+            var spec = request.spec; spec.apps = resolution.apps
             if (try? credential()) == nil { _ = try setupCredential() }
             let workflow = Workflow(); workflow.native.showVirtualPointer = args.contains("--show-virtual-cursor")
             if !args.contains("--no-preview") { let preview = PreviewController(); workflow.native.preview = preview; AppDelegate.preview = preview }
-            let report = try await workflow.run(spec: spec, directory: directory(), model: option("--codex-model")); try emit(report)
+            let report = try await workflow.run(spec: spec, directory: dir, model: option("--codex-model"), appSelection: resolution); try emit(report)
             if !["verified_complete", "jev_observed_complete"].contains(report.status), !(args.contains("--keep-open") && AppDelegate.preview != nil) { exit(2) }
         case "delegate":
             let dir = try directory(); let start = Date(); let result = try await Codex().invoke(goal: require("--prompt"), image: option("--image"), directory: dir, model: option("--codex-model")); try writeJSON(result, dir + "/handoff.json"); try emit(result); fputs("codex_total_ms=\(milliseconds(start))\n", stderr)
@@ -89,14 +100,16 @@ import Foundation
                   [--project PATH] [--skills-dir PATH (one host only)]
               observe [--out DIR] [--no-image]
               act --observation JSON --action JSON --app BUNDLE [--out DIR]
-              run --goal TEXT --apps BUNDLE[,BUNDLE] [--text LITERAL]
+              run --goal TEXT [--apps BUNDLE[,BUNDLE] | --auto | --simple] [--text LITERAL]
                   [--generate-text] [--inspect-image] [--codex-model MODEL]
                   [--expect-text TEXT] [--expect-app BUNDLE] [--max-steps N] [--out DIR]
-              run --task JSON [--codex-model MODEL] [--out DIR]
+              run --task JSON [--auto | --simple (when apps omitted)] [--codex-model MODEL] [--out DIR]
               delegate --prompt TEXT [--image PNG] [--codex-model MODEL] [--out DIR]
             Run writes screenshots, AX snapshots, decisions, usage and measured timings.
             run exits 2 if blocked, recovery exhausted, or step limit reached.
-            Use explicit app allowlists and authorized goals. No shell action is supported.
+            Without --apps, select apps from goal; ambiguous interactive runs offer a list.
+            --auto never prompts for app selection. --simple chooses from a terminal list.
+            Resolved app scopes constrain execution. No shell action is supported.
             """)
         }
     }

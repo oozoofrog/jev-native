@@ -1,0 +1,8 @@
+Building for production...
+[2 / 4] jev-native-product
+[3 / 5] jev-native-product
+[5 / 5] jev-native-product
+[7 / 8] jev-native-product
+Build complete! (7.79초)
+<PROJECT>/dist/JevNative.app: replacing existing signature
+<PROJECT>/dist/JevNative.app/Contents/MacOS/jev-native

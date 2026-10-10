@@ -2,7 +2,7 @@
 
 A standalone SwiftPM native macOS controller. Apple AppKit, Accessibility, ScreenCaptureKit, CoreGraphics, Vision, URLSession and CryptoKit implement automation directly. No browser tool, Python/Node bridge, AppleScript or external automation binary is used. Codex CLI is the sole external runtime exception for original text and image interpretation.
 
-Current version: **0.1.2 (3)**. Build with Xcode command-line tools and Swift 6 on macOS. Runtime validation covers macOS 27.0.1 arm64; the macOS 14 deployment target is not a tested compatibility guarantee.
+Current version: **0.2.0 (4)**. Build with Xcode command-line tools and Swift 6 on macOS. Runtime validation covers macOS 27.0.1 arm64; the macOS 14 deployment target is not a tested compatibility guarantee.
 
 ```sh
 git clone https://github.com/oozoofrog/jev-native.git
@@ -25,7 +25,10 @@ jev-native doctor
 jev-native setup
 jev-native install-skill --host both
 jev-native observe --app com.apple.TextEdit --out /tmp/jev-observation
-jev-native run --goal 'Calculate 6 times 7 in Calculator' --apps com.apple.calculator --expect-text 42
+jev-native run --goal 'Calculate 6 times 7 in Calculator' --expect-text 42
+jev-native run --auto --goal 'Calculate 6 times 7 in Calculator' --expect-text 42
+jev-native run --simple --goal 'Perform the requested task in my selected apps'
+jev-native run --goal 'Calculate 6 times 7' --apps com.apple.calculator --expect-text 42
 jev-native run --task task.json --out /tmp/jev-task
 jev-native act --observation observation.json --action action.json --app com.apple.TextEdit --out /tmp/jev-action
 jev-native delegate --prompt 'Describe this image' --image image.png --out /tmp/jev-vision
@@ -104,3 +107,18 @@ The private Apple `SLEventSetWindowLocation` symbol and AppKit's undocumented CG
 Real evidence includes Calculator AX/JEV execution, Calculator virtual click, TextEdit Codex generation followed by JEV-selected native text input and observed marker, Codex image interpretation and resumed JEV completion, native canvas background drag/scroll events, and preview hide/reopen. TextEdit background drag did not select text in tested runs. Input acceptance is app-specific; no Codex parity is claimed. AX depth/node and Choice candidate limits can omit controls in large interfaces; inspect snapshots and supply explicit candidates or use `act` where required. Automatic JEV mode currently declines consequential send/purchase/delete/account/security actions; direct control remains governed by caller authorization.
 
 Accessibility, Screen Recording and input posting passed for the Codex-launched installed binary. A fresh Terminal/Finder launch has not been certified and must use `doctor` for its actual TCC identity. No Automation/Apple Events permission is required by this backend. Validation used owned fixture data and made no purchases, messages, deletions of user data, or account/security changes. Owned fixture binaries are developer tests, not runtime dependencies.
+
+## App selection
+
+`run --goal` and task JSON may omit `apps`. JEV selects the necessary native apps from the installed and running app catalogue, in workflow order. Explicit `--apps` and task JSON `apps` retain their previous target order and execution scope. The first app is the initial target; the remaining apps become switch candidates.
+
+- With neither mode flag, selection uses the goal. An ambiguous, unavailable or low-confidence result offers an app list when stdin and stderr are terminals. Noninteractive runs stop with an actionable diagnostic.
+- `--auto` uses the goal and never opens an app-selection prompt.
+- `--simple` lists actual apps and reads one or more comma-separated list numbers in workflow order. This skips JEV app selection; JEV still selects actions during execution. `cancel`, `q`, or EOF stops before automation. Invalid input stops with an error.
+- `--apps`, `--auto`, and `--simple` are mutually exclusive. Task JSON that includes `apps` already uses explicit mode. Omit the field to infer or choose apps; an explicit empty array is rejected.
+
+Discovery includes launchable foreground app bundles in `/Applications`, `/System/Applications`, `/System/Library/CoreServices`, `~/Applications`, and the running native app list. It excludes background helpers and the controller, deduplicates bundle IDs, and validates installation and LaunchServices resolution before execution. Apps outside these roots can be supplied with `--apps`. Installed apps need not already be running. App discovery does not search every filesystem volume.
+
+Selection uses typed Choice judgments, followed by a Noul scope check of at least 0.85. Choice confidence must meet the task's confidence threshold. Catalogues above the Choice option limit use grouped selection without dropping candidates. These checks reduce uncertainty; semantic app selection can still be wrong. The resolved bundle IDs feed the existing execution scope and freshness checks.
+
+`app-selection.json` and `report.json.appSelection` record source (`explicit`, `goal`, or `interactive`), status, selected identities, candidate count, API timings and usage. `app-candidates.json` contains local installation paths; request/call files retain the selection evidence. Treat these local outputs as private. Unresolved selection writes a report with no automation steps and exits 2.
