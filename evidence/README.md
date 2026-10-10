@@ -24,3 +24,5 @@ Only independent app/fixture windows were selected. PNG ancillary metadata was s
 The full private validation corpus remains local. Omitted material includes raw desktop/app inventories, unrelated UI text, account/session identifiers, original crash attachments, Codex conversation/tool transcripts, credential/authentication files, temporary process files, caches and intermediate duplicate screenshots. Sanitized report references to those originals are historical evidence references, not public download promises.
 
 See [app-selection validation](APP-SELECTION.md) for version 0.2.0, including automatic selection, the terminal picker and known semantic-action limits.
+
+See [native task-window validation](GUI.md) for version 0.3.0.

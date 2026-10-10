@@ -2,7 +2,7 @@
 
 A standalone SwiftPM native macOS controller. Apple AppKit, Accessibility, ScreenCaptureKit, CoreGraphics, Vision, URLSession and CryptoKit implement automation directly. No browser tool, Python/Node bridge, AppleScript or external automation binary is used. Codex CLI is the sole external runtime exception for original text and image interpretation.
 
-Current version: **0.2.0 (4)**. Build with Xcode command-line tools and Swift 6 on macOS. Runtime validation covers macOS 27.0.1 arm64; the macOS 14 deployment target is not a tested compatibility guarantee.
+Current version: **0.3.0 (5)**. Build with Xcode command-line tools and Swift 6 on macOS. Runtime validation covers macOS 27.0.1 arm64; the macOS 14 deployment target is not a tested compatibility guarantee.
 
 ```sh
 git clone https://github.com/oozoofrog/jev-native.git
@@ -21,6 +21,7 @@ JEV decisions require a TypeSafe API credential and network access. Original tex
 A path-sanitized, ad-hoc signed Apple Silicon app archive is included under [artifacts](artifacts/README.md). It is not Developer ID signed or notarized. Building from source is the verified development path.
 
 ```sh
+jev-native --gui
 jev-native doctor
 jev-native setup
 jev-native install-skill --host both
@@ -122,3 +123,15 @@ Discovery includes launchable foreground app bundles in `/Applications`, `/Syste
 Selection uses typed Choice judgments, followed by a Noul scope check of at least 0.85. Choice confidence must meet the task's confidence threshold. Catalogues above the Choice option limit use grouped selection without dropping candidates. These checks reduce uncertainty; semantic app selection can still be wrong. The resolved bundle IDs feed the existing execution scope and freshness checks.
 
 `app-selection.json` and `report.json.appSelection` record source (`explicit`, `goal`, or `interactive`), status, selected identities, candidate count, API timings and usage. `app-candidates.json` contains local installation paths; request/call files retain the selection evidence. Treat these local outputs as private. Unresolved selection writes a report with no automation steps and exits 2.
+
+## Native task window
+
+Run `jev-native --gui` to open a native goal-entry and execution window. CLI invocation without arguments still prints help. `--gui --goal TEXT` pre-fills the goal without starting it. `--simple` initially selects the app-list mode; automatic app selection is the default. `--no-preview` starts with the target preview disabled. `--codex-model MODEL` retains an explicitly chosen delegate model. GUI launch rejects unsupported flags instead of silently ignoring an explicit app scope.
+
+The window has a multiline goal, optional literal text to type, automatic/native-list app selection, target preview, Codex text/vision options, Run/Stop, status and a report location. It supports standard Edit menu shortcuts. In app-list mode, search names or bundle IDs, add one or more apps, and use Move Up/Move Down to set workflow order. The first selected app is the initial target. No terminal input is used by the GUI.
+
+Only one run can be active in the window. Run and editable inputs are disabled until completion or cancellation. Stop waits for the current operation/API call, then prevents subsequent native input. Closing the task window requests a stop if needed and hides the window. Quitting during a run waits for a cancellation report before terminating. Completion and cancellation allow another run. Reopening the running application restores the goal window; Window > Show Task Window does the same. The existing target preview remains separate and can be hidden/reopened.
+
+Reports are saved under `~/Library/Application Support/JEV Native/Runs/<UUID>/`. Each run folder is created with mode 0700. Show Report reveals its `report.json` in Finder. Reports distinguish `jev_observed_complete`, uncertain/blocked results, cancellation and errors; GUI semantic completion is not a deterministic postcondition guarantee. CLI task JSON and `--expect-text`/`--expect-app` remain available for explicit postconditions. Raw reports, screenshots and app inventories can contain private data.
+
+Credentials use the existing environment/file resolver. If missing, the window offers Open Key Management and an explicit Import Key from Clipboard button. Key contents are never shown. The import preserves an existing key and uses the existing atomic 0600 writer. Opening the window does not read the clipboard, import a key or start automation.

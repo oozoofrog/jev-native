@@ -1,0 +1,42 @@
+[
+  {
+    "case": "valid",
+    "exitCode": 0,
+    "status": "verified_complete",
+    "source": "interactive",
+    "selectionCalls": 0,
+    "steps": 1
+  },
+  {
+    "case": "cancel",
+    "exitCode": 2,
+    "status": "app_selection_cancelled",
+    "source": "interactive",
+    "selectionCalls": 0,
+    "steps": 0
+  },
+  {
+    "case": "invalid",
+    "exitCode": 2,
+    "status": "app_selection_error",
+    "source": "interactive",
+    "selectionCalls": 0,
+    "steps": 0
+  },
+  {
+    "case": "eof",
+    "exitCode": 2,
+    "status": "app_selection_cancelled",
+    "source": "interactive",
+    "selectionCalls": 0,
+    "steps": 0
+  },
+  {
+    "case": "no-tty",
+    "exitCode": 2,
+    "status": "app_selection_requires_tty",
+    "source": "interactive",
+    "selectionCalls": 0,
+    "steps": 0
+  }
+]

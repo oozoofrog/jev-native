@@ -50,3 +50,11 @@ When the user supplies a goal without app IDs, omit `--apps`: JEV selects the re
 Keep explicit app scopes when provided. `--apps`, `--auto` and `--simple` cannot be combined. Task JSON may omit `apps` for automatic selection; an explicit empty array is invalid. The resolved bundle IDs constrain native actions exactly as explicit IDs do. Do not interpret inferred apps as permission for unrelated side effects.
 
 Inspect `app-selection.json` and `report.json.appSelection` for provenance, selected apps, timing and usage. Discovery covers standard Applications folders and running native apps, excludes helpers, and validates selected installations. Apps outside discovery may require explicit `--apps`. Unresolved selection exits 2 before automation; report the diagnostic instead of retrying the same evidence. `--simple` requires terminal input and stderr; cancel or EOF stops before automation. App catalogues and selection request files can contain private local app metadata; do not publish them.
+
+## Native goal-entry window
+
+Use `jev-native --gui` when the user asks for a task input/run window. It opens native AppKit controls and does not start a task until Run. `--gui --goal TEXT` pre-fills a goal. `--simple` preselects the native app list; automatic selection is the default. `--no-preview` and `--codex-model MODEL` preserve those choices. CLI without arguments still shows help.
+
+The GUI supports multiline goals, optional literal text, ordered app selection with search/add/remove/reorder, Codex text/vision options, one active run, Stop, status and Show Report. GUI app selection and missing-key handling never read terminal input. Key import is an explicit clipboard action; never fill a key into the goal or literal-text field.
+
+Stop prevents the next native action after the current operation/API call. Closing the goal window requests a stop when running; reopening the app restores the goal window. The preview remains separate. Reports are under `~/Library/Application Support/JEV Native/Runs/<UUID>/`; inspect the result and final observed target state before claiming completion. `jev_observed_complete` remains semantic evidence. Use CLI explicit postconditions when required. Uncertain selection can be retried with revised evidence or the native app list; do not repeatedly submit the same unresolved state.

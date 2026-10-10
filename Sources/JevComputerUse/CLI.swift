@@ -17,16 +17,19 @@ import Foundation
         do {
             let mode = startupMode(args)
             if mode != .cli { try GUIContext.current().requireAvailable() }
-            if mode == .application { runApplication(args) }
+            if mode == .application { try runApplication(args) }
             else { try await command(args) }
         } catch { fputs("jev-native: \(error)\n", stderr); exit(1) }
     }
-    @MainActor private static func runApplication(_ args: [String]) {
+    @MainActor private static func runApplication(_ args: [String]) throws {
+        let guiOptions = args.first == "--gui" ? try GUIOptions(arguments: args) : nil
         let app = NSApplication.shared; let delegate = AppDelegate(); app.delegate = delegate; app.setActivationPolicy(.accessory)
-        Task { @MainActor in
+        if let guiOptions {
+            let goal = GoalWindowController(options: guiOptions); AppDelegate.goal = goal; goal.show()
+        } else { Task { @MainActor in
             do { try await command(args); if !args.contains("--keep-open") { app.terminate(nil) } }
             catch { fputs("jev-native: \(error)\n", stderr); exit(1) }
-        }
+        } }
         app.run()
         withExtendedLifetime(delegate) {}
     }
@@ -72,28 +75,20 @@ import Foundation
         case "run":
             let request = try RunRequest(arguments: Array(args.dropFirst()))
             let dir = try directory()
-            try writeJSON(request.spec, dir + "/requested-task.json")
-            if request.spec.apps.isEmpty && !request.chooseApps, (try? credential()) == nil { _ = try setupCredential() }
-            let resolution = await AppResolver().resolve(spec: request.spec, simple: request.chooseApps,
-                allowFallback: request.allowInteractiveFallback, directory: dir)
-            try writeJSON(resolution, dir + "/app-selection.json")
-            guard resolution.status == "resolved" else {
-                let report = RunReport(status: "app_selection_" + resolution.status, goal: request.spec.goal,
-                    steps: [], finalObservation: "", directory: dir, apps: [], appSelection: resolution)
-                try writeJSON(report, dir + "/report.json"); try emit(report)
-                fputs((resolution.diagnostic ?? "App selection was not resolved.") + "\n", stderr); exit(2)
-            }
-            var spec = request.spec; spec.apps = resolution.apps
-            if (try? credential()) == nil { _ = try setupCredential() }
-            let workflow = Workflow(); workflow.native.showVirtualPointer = args.contains("--show-virtual-cursor")
-            if !args.contains("--no-preview") { let preview = PreviewController(); workflow.native.preview = preview; AppDelegate.preview = preview }
-            let report = try await workflow.run(spec: spec, directory: dir, model: option("--codex-model"), appSelection: resolution); try emit(report)
+            let runner = TaskRunner(requireCredential: { if (try? credential()) == nil { _ = try setupCredential() } },
+                showVirtualPointer: args.contains("--show-virtual-cursor"))
+            let report = try await runner.run(request: request, directory: dir, model: option("--codex-model"), control: RunControl(),
+                makePreview: { if args.contains("--no-preview") { return nil }; let preview = PreviewController(); AppDelegate.preview = preview; return preview })
+            try emit(report)
+            if report.status == "error" { throw Failure(report.error ?? "Run failed; see report.json") }
+            if let diagnostic = report.error ?? report.appSelection?.diagnostic { fputs(diagnostic + "\n", stderr) }
             if !["verified_complete", "jev_observed_complete"].contains(report.status), !(args.contains("--keep-open") && AppDelegate.preview != nil) { exit(2) }
         case "delegate":
             let dir = try directory(); let start = Date(); let result = try await Codex().invoke(goal: require("--prompt"), image: option("--image"), directory: dir, model: option("--codex-model")); try writeJSON(result, dir + "/handoff.json"); try emit(result); fputs("codex_total_ms=\(milliseconds(start))\n", stderr)
         default:
             print("""
             jev-native — native macOS computer use (Swift / Apple frameworks)
+              --gui [--goal TEXT] [--simple] [--no-preview] [--codex-model MODEL]
               doctor
               setup [--import-pasteboard | --open-keys]
               install-skill --host codex|claude|both [--scope user|project]

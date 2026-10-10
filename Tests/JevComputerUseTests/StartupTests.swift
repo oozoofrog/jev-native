@@ -8,6 +8,8 @@ final class StartupTests: XCTestCase {
         }
     }
     func testPreviewAndVirtualMarkerRequireApplicationLoop() {
+        XCTAssertEqual(startupMode(["--gui"]), .application)
+        XCTAssertEqual(startupMode(["--gui", "--no-preview"]), .application)
         XCTAssertEqual(startupMode(["run"]), .application)
         XCTAssertEqual(startupMode(["run", "--no-preview"]), .nativeServices)
         XCTAssertEqual(startupMode(["run", "--no-preview", "--show-virtual-cursor"]), .application)

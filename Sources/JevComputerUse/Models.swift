@@ -52,7 +52,7 @@ struct TaskSpec: Codable {
 struct Candidate: Codable { var id: String; var description: String; var action: Action? }
 struct Decision: Codable { var choice: String; var confidence: Double; var apiMS: Double; var localMS: Double; var model: String; var usage: [String: Int]; var response: String; var progressProbability: Double? = nil; var verificationApiMS: Double? = nil }
 struct Step: Codable { var index: Int; var observation: String; var decision: Decision?; var action: Action?; var executionMS: Double?; var error: String?; var afterObservation: String? }
-struct RunReport: Codable { var status: String; var goal: String; var steps: [Step]; var finalObservation: String; var directory: String; var apps: [String]? = nil; var appSelection: AppResolution? = nil }
+struct RunReport: Codable { var status: String; var goal: String; var steps: [Step]; var finalObservation: String; var directory: String; var apps: [String]? = nil; var appSelection: AppResolution? = nil; var error: String? = nil }
 
 func stableTargetState(_ a: Observation, _ b: Observation, action: Action? = nil) -> Bool {
     guard a.target?.pid == b.target?.pid, a.selectedWindow == b.selectedWindow else { return false }

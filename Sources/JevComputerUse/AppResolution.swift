@@ -91,7 +91,8 @@ extension Jev {
         self.picker = picker ?? .native()
     }
 
-    func resolve(spec: TaskSpec, simple: Bool, allowFallback: Bool, directory: String) async -> AppResolution {
+    func resolve(spec: TaskSpec, simple: Bool, allowFallback: Bool, directory: String, control: RunControl? = nil, selection: TaskRunner.AppSelection? = nil) async -> AppResolution {
+        if control?.isCancelled == true { return AppResolution(source: "goal", status: "cancelled") }
         if !spec.apps.isEmpty {
             // Explicit scopes preserve order, PID addressing, and the previous validation behavior.
             return AppResolution(source: "explicit", status: "resolved", apps: spec.apps)
@@ -103,18 +104,25 @@ extension Jev {
             try writeJSON(result, directory + "/app-selection.json")
             try writeJSON(discovery, directory + "/app-candidates.json")
             guard !discovery.apps.isEmpty else { throw Failure("No launchable apps were discovered in the standard Applications folders or running app list. Pass --apps for an app outside these locations.") }
-            if simple { result = try pick(discovery.apps, result: result) }
+            if simple, let selection {
+                try control?.check()
+                if let ids = try await selection(discovery.apps) {
+                    result.apps = ids; result.selected = ids.compactMap { id in discovery.apps.first { $0.bundle == id }?.label }
+                    result.status = "resolved"
+                } else { result.status = "cancelled"; result.diagnostic = "App selection cancelled before automation." }
+            } else if simple { result = try pick(discovery.apps, result: result) }
             else {
-                result = try await infer(spec: spec, candidates: discovery.apps, result: result, directory: directory)
+                result = try await infer(spec: spec, candidates: discovery.apps, result: result, directory: directory, control: control)
                 if result.status != "resolved", allowFallback, picker.interactive {
                     picker.write(result.diagnostic ?? "App selection needs a choice.")
                     result = try pick(discovery.apps, result: result)
                 }
             }
+            try control?.check()
             if result.status == "resolved" { try validate(result.apps, discovery.apps) }
         } catch {
             if let saved = try? JSONDecoder().decode(AppResolution.self, from: Data(contentsOf: URL(fileURLWithPath: directory + "/app-selection.json"))) { result.calls = saved.calls }
-            result.status = "error"; result.apps = []; result.selected = []; result.diagnostic = String(describing: error)
+            result.status = control?.isCancelled == true || error is CancellationError ? "cancelled" : "error"; result.apps = []; result.selected = []; result.diagnostic = String(describing: error)
         }
         if result.status != "resolved" {
             result.diagnostic = (result.diagnostic ?? "App selection was not resolved.") + " Candidates: \(directory)/app-candidates.json. Pass --apps BUNDLE[,BUNDLE], or run --simple in an interactive terminal."
@@ -159,7 +167,7 @@ extension Jev {
         return result
     }
 
-    private func infer(spec: TaskSpec, candidates: [AppCandidate], result: AppResolution, directory: String) async throws -> AppResolution {
+    private func infer(spec: TaskSpec, candidates: [AppCandidate], result: AppResolution, directory: String, control: RunControl?) async throws -> AppResolution {
         var result = result
         let keyed = Dictionary(uniqueKeysWithValues: candidates.enumerated().map { ("app_\($0.offset)", $0.element.label) })
         var selectedKeys: [String] = []
@@ -172,6 +180,7 @@ extension Jev {
             Dictionary(uniqueKeysWithValues: keys.map { ($0, String(decoding: (try? jsonData(keyed[$0]!)) ?? Data(), as: UTF8.self)) })
         }
         func ask(_ questions: [String: AppSelectionQuestion], stage: String) async throws -> AppSelectionReply {
+            try control?.check()
             let request = AppSelectionRequest(state: state(), questions: questions)
             let index = result.calls.count
             try writeJSON(request, directory + "/app-selection-request-\(index).json")
@@ -180,6 +189,7 @@ extension Jev {
             result.calls.append(call); try writeJSON(call, directory + "/app-selection-call-\(index).json")
             // Persist intermediate provenance even if a later service/parse failure stops inference.
             try writeJSON(result, directory + "/app-selection.json")
+            try control?.check()
             return reply
         }
         func choice(_ reply: AppSelectionReply, question: String, allowed: Set<String>) throws -> (String, Double) {

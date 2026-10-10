@@ -1,0 +1,126 @@
+Building for debugging...
+[1 / 13]
+[3 / 13] jev-native-product
+[9 / 19] JevComputerUse
+[22 / 33] JevComputerUse
+[22 / 33] jev-native-product
+[26 / 35] jev-native-product
+[29 / 34] JevComputerUseTests-product
+[32 / 35] JevComputerUseTests-product
+[34 / 38] JevComputerUseTests-product
+Build complete! (2.82초)
+Test Suite 'All tests' started at 2026-10-10 10:38:30.217.
+Test Suite 'JevComputerUseTests.xctest' started at 2026-10-10 10:38:30.219.
+Test Suite 'AppSelectionTests' started at 2026-10-10 10:38:30.219.
+Test Case '-[JevComputerUseTests.AppSelectionTests testCandidateValidityAndDeduplication]' started.
+Test Case '-[JevComputerUseTests.AppSelectionTests testCandidateValidityAndDeduplication]' passed (0.006 seconds).
+Test Case '-[JevComputerUseTests.AppSelectionTests testExplicitBypassAndInteractiveFallback]' started.
+Test Case '-[JevComputerUseTests.AppSelectionTests testExplicitBypassAndInteractiveFallback]' passed (0.005 seconds).
+Test Case '-[JevComputerUseTests.AppSelectionTests testInferenceBoundariesAndProvenance]' started.
+Test Case '-[JevComputerUseTests.AppSelectionTests testInferenceBoundariesAndProvenance]' passed (0.016 seconds).
+Test Case '-[JevComputerUseTests.AppSelectionTests testLargeCatalogueDoesNotDropCandidates]' started.
+Test Case '-[JevComputerUseTests.AppSelectionTests testLargeCatalogueDoesNotDropCandidates]' passed (0.022 seconds).
+Test Case '-[JevComputerUseTests.AppSelectionTests testPickerParsing]' started.
+Test Case '-[JevComputerUseTests.AppSelectionTests testPickerParsing]' passed (0.000 seconds).
+Test Case '-[JevComputerUseTests.AppSelectionTests testRequestModesAndTaskOmission]' started.
+Test Case '-[JevComputerUseTests.AppSelectionTests testRequestModesAndTaskOmission]' passed (0.000 seconds).
+Test Suite 'AppSelectionTests' passed at 2026-10-10 10:38:30.269.
+	 Executed 6 tests, with 0 failures (0 unexpected) in 0.049 (0.050) seconds
+Test Suite 'CoreTests' started at 2026-10-10 10:38:30.269.
+Test Case '-[JevComputerUseTests.CoreTests testCandidateCoverageWithUnrelatedForeground]' started.
+Test Case '-[JevComputerUseTests.CoreTests testCandidateCoverageWithUnrelatedForeground]' passed (0.004 seconds).
+Test Case '-[JevComputerUseTests.CoreTests testCredentialPrecedenceAndRuntimeReload]' started.
+Test Case '-[JevComputerUseTests.CoreTests testCredentialPrecedenceAndRuntimeReload]' passed (0.001 seconds).
+Test Case '-[JevComputerUseTests.CoreTests testRejectsOutOfScopeAndUnusableActions]' started.
+Test Case '-[JevComputerUseTests.CoreTests testRejectsOutOfScopeAndUnusableActions]' passed (0.000 seconds).
+Test Suite 'CoreTests' passed at 2026-10-10 10:38:30.274.
+	 Executed 3 tests, with 0 failures (0 unexpected) in 0.005 (0.005) seconds
+Test Suite 'CredentialSetupTests' started at 2026-10-10 10:38:30.274.
+Test Case '-[JevComputerUseTests.CredentialSetupTests testAtomicPublicationNeverReplacesExistingOrSymlinkAndCleansStaging]' started.
+Test Case '-[JevComputerUseTests.CredentialSetupTests testAtomicPublicationNeverReplacesExistingOrSymlinkAndCleansStaging]' passed (0.002 seconds).
+Test Case '-[JevComputerUseTests.CredentialSetupTests testCancelledAndEOFNeverReadPasteboard]' started.
+Test Case '-[JevComputerUseTests.CredentialSetupTests testCancelledAndEOFNeverReadPasteboard]' passed (0.001 seconds).
+Test Case '-[JevComputerUseTests.CredentialSetupTests testCredentialAppearingDuringPromptSkipsPasteboard]' started.
+Test Case '-[JevComputerUseTests.CredentialSetupTests testCredentialAppearingDuringPromptSkipsPasteboard]' passed (0.000 seconds).
+Test Case '-[JevComputerUseTests.CredentialSetupTests testEmptyExistingFileIsPreservedRatherThanReplaced]' started.
+Test Case '-[JevComputerUseTests.CredentialSetupTests testEmptyExistingFileIsPreservedRatherThanReplaced]' passed (0.001 seconds).
+Test Case '-[JevComputerUseTests.CredentialSetupTests testEmptyMalformedClipboardIsRejectedWithoutEchoOrFiles]' started.
+Test Case '-[JevComputerUseTests.CredentialSetupTests testEmptyMalformedClipboardIsRejectedWithoutEchoOrFiles]' passed (0.002 seconds).
+Test Case '-[JevComputerUseTests.CredentialSetupTests testExistingEnvironmentAndFilePrecedenceSkipAllSetup]' started.
+Test Case '-[JevComputerUseTests.CredentialSetupTests testExistingEnvironmentAndFilePrecedenceSkipAllSetup]' passed (0.001 seconds).
+Test Case '-[JevComputerUseTests.CredentialSetupTests testExplicitImportWorksNoninteractivelyWithoutReadingStdin]' started.
+Test Case '-[JevComputerUseTests.CredentialSetupTests testExplicitImportWorksNoninteractivelyWithoutReadingStdin]' passed (0.001 seconds).
+Test Case '-[JevComputerUseTests.CredentialSetupTests testImportFromPrivateNativePasteboardHas0600AndNoSecretMessages]' started.
+Test Case '-[JevComputerUseTests.CredentialSetupTests testImportFromPrivateNativePasteboardHas0600AndNoSecretMessages]' passed (0.005 seconds).
+Test Case '-[JevComputerUseTests.CredentialSetupTests testNoninteractiveMissingKeyNeverReadsInputOrPasteboardOrOpensURL]' started.
+Test Case '-[JevComputerUseTests.CredentialSetupTests testNoninteractiveMissingKeyNeverReadsInputOrPasteboardOrOpensURL]' passed (0.000 seconds).
+Test Case '-[JevComputerUseTests.CredentialSetupTests testOpeningRequiresChoiceAndDoesNotReadPasteboardBeforeImport]' started.
+Test Case '-[JevComputerUseTests.CredentialSetupTests testOpeningRequiresChoiceAndDoesNotReadPasteboardBeforeImport]' passed (0.000 seconds).
+Test Suite 'CredentialSetupTests' passed at 2026-10-10 10:38:30.289.
+	 Executed 10 tests, with 0 failures (0 unexpected) in 0.014 (0.014) seconds
+Test Suite 'SkillInstallationTests' started at 2026-10-10 10:38:30.289.
+Test Case '-[JevComputerUseTests.SkillInstallationTests testAllHostConflictPreflightPreservesUserModificationAndUnrelatedSkills]' started.
+Test Case '-[JevComputerUseTests.SkillInstallationTests testAllHostConflictPreflightPreservesUserModificationAndUnrelatedSkills]' passed (0.003 seconds).
+Test Case '-[JevComputerUseTests.SkillInstallationTests testBothUserHostsAndRepeatedInstallPreserveExtraFiles]' started.
+Test Case '-[JevComputerUseTests.SkillInstallationTests testBothUserHostsAndRepeatedInstallPreserveExtraFiles]' passed (0.004 seconds).
+Test Case '-[JevComputerUseTests.SkillInstallationTests testConflictingLegacyInstallIsPreserved]' started.
+Test Case '-[JevComputerUseTests.SkillInstallationTests testConflictingLegacyInstallIsPreserved]' passed (0.002 seconds).
+Test Case '-[JevComputerUseTests.SkillInstallationTests testDanglingSymlinkAndEmptyDirectoryAreConflicts]' started.
+Test Case '-[JevComputerUseTests.SkillInstallationTests testDanglingSymlinkAndEmptyDirectoryAreConflicts]' passed (0.005 seconds).
+Test Case '-[JevComputerUseTests.SkillInstallationTests testExistingCodexSourceSymlinkIsReusedAndNotDuplicated]' started.
+Test Case '-[JevComputerUseTests.SkillInstallationTests testExistingCodexSourceSymlinkIsReusedAndNotDuplicated]' passed (0.002 seconds).
+Test Case '-[JevComputerUseTests.SkillInstallationTests testInvalidOptionsNeverInstall]' started.
+Test Case '-[JevComputerUseTests.SkillInstallationTests testInvalidOptionsNeverInstall]' passed (0.001 seconds).
+Test Case '-[JevComputerUseTests.SkillInstallationTests testModifiedInstalledDocumentIsNotUpdated]' started.
+Test Case '-[JevComputerUseTests.SkillInstallationTests testModifiedInstalledDocumentIsNotUpdated]' passed (0.002 seconds).
+Test Case '-[JevComputerUseTests.SkillInstallationTests testProjectScopesAndExplicitDirectory]' started.
+Test Case '-[JevComputerUseTests.SkillInstallationTests testProjectScopesAndExplicitDirectory]' passed (0.003 seconds).
+Test Case '-[JevComputerUseTests.SkillInstallationTests testTemplateLookupFallsBackToExplicitWorkingDirectory]' started.
+Test Case '-[JevComputerUseTests.SkillInstallationTests testTemplateLookupFallsBackToExplicitWorkingDirectory]' passed (0.002 seconds).
+Test Case '-[JevComputerUseTests.SkillInstallationTests testTemplateLookupPrefersBundledResourcesThenExecutableAncestors]' started.
+Test Case '-[JevComputerUseTests.SkillInstallationTests testTemplateLookupPrefersBundledResourcesThenExecutableAncestors]' passed (0.002 seconds).
+Test Suite 'SkillInstallationTests' passed at 2026-10-10 10:38:30.316.
+	 Executed 10 tests, with 0 failures (0 unexpected) in 0.027 (0.028) seconds
+Test Suite 'StartupTests' started at 2026-10-10 10:38:30.316.
+Test Case '-[JevComputerUseTests.StartupTests testMissingDesktopAndLaunchServicesErrorsAreActionable]' started.
+Test Case '-[JevComputerUseTests.StartupTests testMissingDesktopAndLaunchServicesErrorsAreActionable]' passed (0.000 seconds).
+Test Case '-[JevComputerUseTests.StartupTests testPreviewAndVirtualMarkerRequireApplicationLoop]' started.
+Test Case '-[JevComputerUseTests.StartupTests testPreviewAndVirtualMarkerRequireApplicationLoop]' passed (0.000 seconds).
+Test Case '-[JevComputerUseTests.StartupTests testPureCommandsDoNotRequestApplicationRegistration]' started.
+Test Case '-[JevComputerUseTests.StartupTests testPureCommandsDoNotRequestApplicationRegistration]' passed (0.000 seconds).
+Test Suite 'StartupTests' passed at 2026-10-10 10:38:30.317.
+	 Executed 3 tests, with 0 failures (0 unexpected) in 0.000 (0.000) seconds
+Test Suite 'StateTests' started at 2026-10-10 10:38:30.317.
+Test Case '-[JevComputerUseTests.StateTests testMinimalTaskDefaults]' started.
+Test Case '-[JevComputerUseTests.StateTests testMinimalTaskDefaults]' passed (0.000 seconds).
+Test Case '-[JevComputerUseTests.StateTests testRequiredDelegateCannotBeSkipped]' started.
+Test Case '-[JevComputerUseTests.StateTests testRequiredDelegateCannotBeSkipped]' passed (0.000 seconds).
+Test Case '-[JevComputerUseTests.StateTests testStateGuardIgnoresDecorationButRejectsValueChange]' started.
+Test Case '-[JevComputerUseTests.StateTests testStateGuardIgnoresDecorationButRejectsValueChange]' passed (0.000 seconds).
+Test Suite 'StateTests' passed at 2026-10-10 10:38:30.317.
+	 Executed 3 tests, with 0 failures (0 unexpected) in 0.000 (0.001) seconds
+Test Suite 'TaskRunnerTests' started at 2026-10-10 10:38:30.317.
+Test Case '-[JevComputerUseTests.TaskRunnerTests testCancellationAfterSelectionNeverStartsWorkflowAndWritesReport]' started.
+Test Case '-[JevComputerUseTests.TaskRunnerTests testCancellationAfterSelectionNeverStartsWorkflowAndWritesReport]' passed (0.002 seconds).
+Test Case '-[JevComputerUseTests.TaskRunnerTests testCancellationDuringAppAPIPreservesCallAndDoesNotRepeat]' started.
+Test Case '-[JevComputerUseTests.TaskRunnerTests testCancellationDuringAppAPIPreservesCallAndDoesNotRepeat]' passed (0.002 seconds).
+Test Case '-[JevComputerUseTests.TaskRunnerTests testCredentialFailureDoesNotPromptOrSelect]' started.
+Test Case '-[JevComputerUseTests.TaskRunnerTests testCredentialFailureDoesNotPromptOrSelect]' passed (0.001 seconds).
+Test Case '-[JevComputerUseTests.TaskRunnerTests testDuplicateRunStopAndSubsequentRun]' started.
+Test Case '-[JevComputerUseTests.TaskRunnerTests testDuplicateRunStopAndSubsequentRun]' passed (0.000 seconds).
+Test Case '-[JevComputerUseTests.TaskRunnerTests testGUIOptionsKeepExplicitSettingsAndRejectIgnoredScopes]' started.
+Test Case '-[JevComputerUseTests.TaskRunnerTests testGUIOptionsKeepExplicitSettingsAndRejectIgnoredScopes]' passed (0.000 seconds).
+Test Case '-[JevComputerUseTests.TaskRunnerTests testNativeGUISelectionWorksWithoutTTYAndRevalidatesOrder]' started.
+Test Case '-[JevComputerUseTests.TaskRunnerTests testNativeGUISelectionWorksWithoutTTYAndRevalidatesOrder]' passed (0.001 seconds).
+Test Case '-[JevComputerUseTests.TaskRunnerTests testWorkflowStopsAfterDecisionOrFreshObservationBeforeInput]' started.
+Test Case '-[JevComputerUseTests.TaskRunnerTests testWorkflowStopsAfterDecisionOrFreshObservationBeforeInput]' passed (0.004 seconds).
+Test Suite 'TaskRunnerTests' passed at 2026-10-10 10:38:30.327.
+	 Executed 7 tests, with 0 failures (0 unexpected) in 0.010 (0.010) seconds
+Test Suite 'JevComputerUseTests.xctest' passed at 2026-10-10 10:38:30.327.
+	 Executed 42 tests, with 0 failures (0 unexpected) in 0.106 (0.108) seconds
+Test Suite 'All tests' passed at 2026-10-10 10:38:30.327.
+	 Executed 42 tests, with 0 failures (0 unexpected) in 0.106 (0.110) seconds
+􀟈  Test run started.
+􀄵  Testing Library Version: 2084
+􀄵  Target Platform: arm64e-apple-macos14.0
+􁁛  Test run with 0 tests in 0 suites passed after 0.001 seconds.

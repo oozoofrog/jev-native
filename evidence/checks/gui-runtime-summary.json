@@ -1,0 +1,156 @@
+[
+  {
+    "case": "gui_auto_uncertain",
+    "status": "app_selection_uncertain",
+    "selectionSource": "goal",
+    "selectionStatus": "uncertain",
+    "apps": [],
+    "candidateCount": 185,
+    "selectionCalls": 3,
+    "selectionAPIMS": 1095.4089164733887,
+    "steps": []
+  },
+  {
+    "case": "gui_list_fixture",
+    "status": "jev_observed_complete",
+    "selectionSource": "interactive",
+    "selectionStatus": "resolved",
+    "apps": [
+      "com.oozoofrog.JevGUIFixture"
+    ],
+    "candidateCount": 185,
+    "selectionCalls": 0,
+    "selectionAPIMS": 0,
+    "steps": [
+      {
+        "kind": "launch",
+        "decision": "a2",
+        "executionMS": 443.23599338531494,
+        "error": null
+      },
+      {
+        "kind": "scroll",
+        "decision": "a11",
+        "executionMS": null,
+        "error": "Target UI changed during decision; selection discarded"
+      },
+      {
+        "kind": "scroll",
+        "decision": "a11",
+        "executionMS": 22.95994758605957,
+        "error": null
+      },
+      {
+        "kind": null,
+        "decision": "done",
+        "executionMS": null,
+        "error": null
+      }
+    ],
+    "finalTarget": "com.oozoofrog.JevGUIFixture",
+    "controlledFinalValues": [
+      "drags=0, scroll=-5.0, x=40, y=40"
+    ]
+  },
+  {
+    "case": "gui_stop",
+    "status": "cancelled",
+    "selectionSource": "interactive",
+    "selectionStatus": "resolved",
+    "apps": [
+      "com.oozoofrog.JevGUIFixture"
+    ],
+    "candidateCount": 186,
+    "selectionCalls": 0,
+    "selectionAPIMS": 0,
+    "steps": [
+      {
+        "kind": "scroll",
+        "decision": "a12",
+        "executionMS": 0.5890130996704102,
+        "error": null
+      },
+      {
+        "kind": "scroll",
+        "decision": "a12",
+        "executionMS": 0.1379251480102539,
+        "error": null
+      },
+      {
+        "kind": "scroll",
+        "decision": "a12",
+        "executionMS": 0.10406970977783203,
+        "error": null
+      },
+      {
+        "kind": null,
+        "decision": "a12",
+        "executionMS": null,
+        "error": null
+      }
+    ],
+    "finalTarget": "com.oozoofrog.JevGUIFixture",
+    "controlledFinalValues": [
+      "drags=0, scroll=-20.0, x=40, y=40"
+    ]
+  },
+  {
+    "case": "gui_auto_after_stop",
+    "status": "jev_observed_complete",
+    "selectionSource": "goal",
+    "selectionStatus": "resolved",
+    "apps": [
+      "com.apple.calculator"
+    ],
+    "candidateCount": 185,
+    "selectionCalls": 3,
+    "selectionAPIMS": 1024.5651006698608,
+    "steps": [
+      {
+        "kind": null,
+        "decision": "done",
+        "executionMS": null,
+        "error": null
+      }
+    ],
+    "finalTarget": "com.apple.calculator",
+    "controlledFinalValues": [
+      "42 %"
+    ]
+  },
+  {
+    "case": "installed_gui_unavailable",
+    "status": "app_selection_unavailable",
+    "selectionSource": "goal",
+    "selectionStatus": "unavailable",
+    "apps": [],
+    "candidateCount": 185,
+    "selectionCalls": 1,
+    "selectionAPIMS": 380.0179958343506,
+    "steps": []
+  },
+  {
+    "case": "installed_gui_auto_complete",
+    "status": "jev_observed_complete",
+    "selectionSource": "goal",
+    "selectionStatus": "resolved",
+    "apps": [
+      "com.apple.calculator"
+    ],
+    "candidateCount": 185,
+    "selectionCalls": 3,
+    "selectionAPIMS": 1036.7790460586548,
+    "steps": [
+      {
+        "kind": null,
+        "decision": "done",
+        "executionMS": null,
+        "error": null
+      }
+    ],
+    "finalTarget": "com.apple.calculator",
+    "controlledFinalValues": [
+      "42 %"
+    ]
+  }
+]

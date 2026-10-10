@@ -2,6 +2,21 @@ import Foundation
 
 @MainActor final class Workflow {
     let native = Native(); let jev = Jev()
+    var observeOverride: (@MainActor (String?, Bool) async throws -> Observation)?
+    var decideOverride: (@MainActor (String, Observation, [Candidate], [Step], [String:String]?) async throws -> Decision)?
+    var performOverride: (@MainActor (Action, Observation, [String]) async throws -> Void)?
+    private func observe(directory: String?, images: Bool = true) async throws -> Observation {
+        if let observeOverride { return try await observeOverride(directory, images) }
+        return try await native.observe(directory:directory, images:images)
+    }
+    private func decide(goal: String, observation: Observation, candidates: [Candidate], history: [Step], advisory: [String:String]?) async throws -> Decision {
+        if let decideOverride { return try await decideOverride(goal,observation,candidates,history,advisory) }
+        return try await jev.decide(goal:goal,observation:observation,candidates:candidates,history:history,advisory:advisory)
+    }
+    private func perform(_ action: Action, observation: Observation, allowedApps: [String]) async throws {
+        if let performOverride { return try await performOverride(action,observation,allowedApps) }
+        try await native.execute(action,observation:observation,allowedApps:allowedApps)
+    }
     func candidates(_ spec: TaskSpec, _ obs: Observation, texts: [String], generated: Bool, inspected: Bool, extra: [Action]) -> [Candidate] {
         var result: [Candidate] = []
         if (!spec.generateText || generated) && (!spec.inspectImage || inspected) { result.append(Candidate(id: "done", description: "All goal requirements are observed complete now", action: nil)) }
@@ -28,16 +43,19 @@ import Foundation
         }
         return Array(result.prefix(255))
     }
-    func run(spec: TaskSpec, directory: String, model: String?, appSelection: AppResolution? = nil) async throws -> RunReport {
+    func run(spec: TaskSpec, directory: String, model: String?, appSelection: AppResolution? = nil, control: RunControl? = nil) async throws -> RunReport {
         guard !spec.apps.isEmpty, spec.maxSteps > 0, (0...1).contains(spec.confidence), spec.maxRecovery >= 0 else { throw Failure("Invalid task bounds/empty app allowlist") }
-        try FileManager.default.createDirectory(atPath: directory, withIntermediateDirectories: true, attributes: [.posixPermissions: 0o700]); try writeJSON(spec, directory + "/task.json")
+        try FileManager.default.createDirectory(atPath: directory, withIntermediateDirectories: true, attributes: [.posixPermissions: 0o700]); try writeJSON(spec, directory + "/task.json"); try writeJSON([Step](), directory + "/steps.json")
         native.sessionApp = spec.apps.first
         var history: [Step] = [], texts = spec.texts, generated = false, inspected = false, extra: [Action] = [], recovery = 0, status = "step_limit", finalPath = ""
         var visionSnapshot:Observation?; var advisory:[String:String]?
+        func cancelled() -> Bool { control?.isCancelled == true || native.preview?.cancelRequested == true || Task.isCancelled }
+        func phase(_ text: String) { native.preview?.phase(text); control?.status(text) }
         for index in 0..<spec.maxSteps {
-            if native.preview?.cancelRequested == true { status = "cancelled"; break }
+            if cancelled() { status = "cancelled"; break }
             let stepDir = directory + "/step-\(index)"; try FileManager.default.createDirectory(atPath: stepDir, withIntermediateDirectories: true)
-            let obs = try await native.observe(directory: stepDir); let obsPath = stepDir + "/observation.json"; try writeJSON(obs, obsPath); finalPath = obsPath
+            let obs = try await observe(directory: stepDir); let obsPath = stepDir + "/observation.json"; try writeJSON(obs, obsPath); finalPath = obsPath
+            if cancelled() { status = "cancelled"; break }
             if let previous=visionSnapshot, !stableTargetState(previous,obs) || previous.windowCapture?.imageSHA256 != obs.windowCapture?.imageSHA256 { inspected=false; extra=[]; advisory=nil; visionSnapshot=nil }
             let choices = candidates(spec, obs, texts: texts, generated: generated, inspected: inspected, extra: extra)
             try writeJSON(choices, stepDir + "/candidates.json")
@@ -45,9 +63,10 @@ import Foundation
             do {
                 var decisionObservation = obs
                 if !spec.apps.contains((obs.target ?? obs.front)?.bundle ?? "") { decisionObservation.nodes = []; decisionObservation.displays = [] }
-                native.preview?.phase("JEV deciding · step \(index + 1)")
-                var decision = try await jev.decide(goal: spec.goal, observation: decisionObservation, candidates: choices, history: history,advisory:advisory); step.decision = decision
+                phase("JEV deciding · step \(index + 1)")
+                var decision = try await decide(goal: spec.goal, observation: decisionObservation, candidates: choices, history: history,advisory:advisory); step.decision = decision
                 try writeJSON(decision, stepDir + "/decision.json")
+                if cancelled() { status = "cancelled"; history.append(step); break }
                 if decision.choice == "blocked" { status = "blocked"; history.append(step); break }
                 if decision.confidence < spec.confidence {
                     let selected = choices.first { $0.id == decision.choice }!
@@ -55,6 +74,7 @@ import Foundation
                     decision.progressProbability=probability; decision.verificationApiMS=verifyMS
                     for (key,value) in usage { decision.usage[key,default:0] += value }
                     step.decision=decision; try writeJSON(decision,stepDir+"/decision.json")
+                    if cancelled() { status = "cancelled"; history.append(step); break }
                     if probability < 0.85 { step.error="Uncertain selection: Choice confidence \(decision.confidence), progress probability \(probability). No identical-state retry."; status="uncertain"; history.append(step); break }
                 }
                 if decision.choice == "done" {
@@ -68,9 +88,10 @@ import Foundation
                     let image = decision.choice == "delegateVision" ? (obs.windowCapture?.screenshot ?? obs.displays.first?.screenshot) : nil
                     if decision.choice == "delegateVision", image == nil { throw Failure("No screenshot for vision delegate") }
                     let context = "\(spec.goal)\nMode: \(decision.choice).\nTarget window mapping: \(String(decoding: try jsonData(obs.windowCapture), as: UTF8.self)).\nDisplay coordinate mapping: \(String(decoding: try jsonData(obs.displays), as: UTF8.self)).\nAllowed apps: \(spec.apps).\nTarget app: \(obs.target?.bundle ?? "unknown").\nGenerate only requested text when delegateText. For delegateVision inspect the screenshot and propose native actions only if needed; do not generate text."
-                    native.preview?.phase("Codex \(decision.choice == "delegateText" ? "writing" : "inspecting image")")
+                    phase("Codex \(decision.choice == "delegateText" ? "writing" : "inspecting image")")
                     let start = Date(); let handoff = try await Codex().invoke(goal: context, image: image, directory: stepDir, model: model); step.executionMS = milliseconds(start)
                     try writeJSON(handoff, stepDir + "/handoff.json")
+                    if cancelled() { status = "cancelled"; history.append(step); break }
                     if decision.choice == "delegateText" { if !handoff.text.isEmpty { texts.append(handoff.text) }; generated = true }
                     else { inspected = true; for action in handoff.actions { try validateAction(action, apps: spec.apps) }; extra = handoff.actions; visionSnapshot=obs; advisory=["text":handoff.observation,"sourceObservation":obs.id,"imageSHA256":obs.windowCapture?.imageSHA256 ?? "desktop capture"] }
                     // Delegate observations are advisory. Reobserve before JEV selects any proposal.
@@ -79,24 +100,28 @@ import Foundation
                     // Reobserve immediately before execution. Input coordinate proposals expire on UI changes.
                     if !["launch", "activate", "openFile", "selectWindow", "wait"].contains(action.kind) {
                         let pointerAction=["click","doubleClick","rightClick","move","drag","scroll"].contains(action.kind)
-                        let fresh = try await native.observe(directory: nil, images: pointerAction)
+                        let fresh = try await observe(directory: nil, images: pointerAction)
                         guard stableTargetState(obs, fresh, action: action) else { throw Failure("Target UI changed during decision; selection discarded") }
                         if pointerAction, obs.windowCapture?.imageSHA256 != fresh.windowCapture?.imageSHA256 { throw Failure("Target image changed during decision; coordinate action discarded") }
                     }
-                    native.preview?.phase("Executing \(action.kind) · step \(index + 1)")
-                    let start = Date(); try await native.execute(action, observation: obs, allowedApps: spec.apps); step.executionMS = milliseconds(start)
+                    if cancelled() { status = "cancelled"; step.action = nil; history.append(step); break }
+                    phase("Executing \(action.kind) · step \(index + 1)")
+                    let start = Date(); try await perform(action, observation: obs, allowedApps: spec.apps); step.executionMS = milliseconds(start)
                     if action.kind == "type" { texts.removeAll { $0 == action.text } }
                     extra = [] // never retain screenshot-coordinate proposals after an action
                 }
                 try await Task.sleep(nanoseconds: UInt64(max(0, min(spec.settleMS, 5000))) * 1_000_000)
                 let afterDir = stepDir + "/after"; try FileManager.default.createDirectory(atPath: afterDir, withIntermediateDirectories: true)
-                let after = try await native.observe(directory: afterDir); let afterPath = afterDir + "/observation.json"; try writeJSON(after, afterPath); step.afterObservation = afterPath; finalPath = afterPath
+                let after = try await observe(directory: afterDir); let afterPath = afterDir + "/observation.json"; try writeJSON(after, afterPath); step.afterObservation = afterPath; finalPath = afterPath
                 if !["wait", "selectWindow"].contains(step.action?.kind ?? ""), step.action != nil, after.target?.pid == obs.target?.pid, after.nodes == obs.nodes { recovery += 1; step.error = "No AX change observed; result is not proven (screenshot may differ)" } else { recovery = 0 }
-            } catch { recovery += 1; step.error = String(describing: error) }
+            } catch {
+                if cancelled() || error is CancellationError { status = "cancelled"; history.append(step); break }
+                recovery += 1; step.error = String(describing: error)
+            }
             history.append(step); try writeJSON(history, directory + "/steps.json")
             if recovery > spec.maxRecovery { status = "recovery_exhausted"; break }
         }
-        native.preview?.phase("Finished: \(status)")
+        phase("Finished: \(status)")
         let report = RunReport(status: status, goal: spec.goal, steps: history, finalObservation: finalPath, directory: directory, apps: spec.apps, appSelection: appSelection); try writeJSON(report, directory + "/report.json"); return report
     }
 }

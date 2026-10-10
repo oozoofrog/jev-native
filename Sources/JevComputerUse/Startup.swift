@@ -6,6 +6,7 @@ enum StartupMode: Equatable { case cli, nativeServices, application }
 
 func startupMode(_ arguments: [String]) -> StartupMode {
     switch arguments.first ?? "help" {
+    case "--gui": return .application
     case "run": return arguments.contains("--no-preview") && !arguments.contains("--show-virtual-cursor") ? .nativeServices : .application
     case "act": return arguments.contains("--show-virtual-cursor") ? .application : .nativeServices
     case "observe": return .nativeServices

@@ -1,6 +1,6 @@
 # Public export manifest
 
-This repository exports the completed JEV Native project (current package: 0.2.0 (4)), including Swift native automation, JEV closed-loop decisions, Codex text/vision handoff, virtual cursor/preview, clipboard credential setup, Codex/Claude Code skill installers and startup crash mitigation.
+This repository exports the completed JEV Native project (current package: 0.3.0 (5)), including Swift native automation, JEV closed-loop decisions, Codex text/vision handoff, virtual cursor/preview, clipboard credential setup, Codex/Claude Code skill installers and startup crash mitigation.
 
 ## Included
 
@@ -32,10 +32,14 @@ No historical Git repository existed in the owning project. Publication uses a n
 The packaging process initially found a compiled local source path. Runtime template lookup removed it. The first added test run failed only because URL equality distinguished a trailing directory slash; path equality corrected the test. Final tests pass. The earlier path-mapping build attempt emitted debug-module reference warnings; the final artifact build removes that approach and passes without those warnings. Full intermediate logs remain local; final sanitized logs are in evidence/checks/.
 
 
-## Copy correction, 0.2.0 (4)
+## Copy correction, 0.3.0 (5)
 
 The companion skill and README no longer include explanatory guarantees about the user's mouse or focus. App UI/help had no such copy. Swift source and tests are unchanged. Technical action constraints and historical verification reports remain intact. Both local and public bundles include the revised skill; the current archive/checksum metadata is updated. The earlier archive remains in Git history. Existing Swift test results are reused; affected bundle/skill/archive checks passed again.
 
 ## Version 0.2.0 app selection
 
 Goal-driven app selection and terminal app-list selection are included, with optional task JSON apps, discovery validation, report provenance and six regression test groups (35 total tests). New public evidence is under `evidence/checks/app-selection-*` and `evidence/APP-SELECTION.md`. Raw installed-app catalogues, selection requests, AX state and fixture install paths remain private local evidence. Prior evidence remains historical; the current app archive replaces the prior archive in the working tree. Git history retains published versions.
+
+## Version 0.3.0 native task window
+
+The native goal-entry/run window, shared task runner, ordered native app picker, GUI key setup and cooperative cancellation are included. CLI help/no-argument behavior remains. New validation is in `evidence/GUI.md` and `evidence/checks/gui-*`. Raw app inventories, local report locations and unrelated Finder context are excluded. Prior evidence remains historical.

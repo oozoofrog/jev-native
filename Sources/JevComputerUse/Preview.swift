@@ -13,6 +13,7 @@ import ScreenCaptureKit
     private var liveWindow: (UInt32,CGRect)?
     private var statusItem: NSStatusItem!
     var cancelRequested = false
+    var onStop: (() -> Void)?
     private(set) var userHidden = false
     override init() {
         panel = NSPanel(contentRect: NSRect(x: 0,y: 0,width: 320,height: 250), styleMask: [.titled, .closable, .nonactivatingPanel, .utilityWindow], backing: .buffered, defer: false)
@@ -32,12 +33,14 @@ import ScreenCaptureKit
         NSApp.setActivationPolicy(.regular); NSApp.applicationIconImage = NSImage(systemSymbolName: "cursorarrow.rays", accessibilityDescription: "JEV Controller")
         show()
     }
+    func beginRun() { cancelRequested = false; imageView.image = nil; pointerDot.isHidden = true; caption.stringValue = "Waiting for target window"; phase("Starting"); show() }
+    func finish() { liveTask?.cancel(); liveTask = nil; liveWindow = nil }
     func show() { userHidden = false; panel.orderFrontRegardless() }
     @objc func togglePreview() { if panel.isVisible { hide() } else { show() } }
     func hide() { userHidden = true; panel.orderOut(nil) }
     func windowShouldClose(_ sender: NSWindow) -> Bool { hide(); return false }
-    @objc func stopRequested() { cancelRequested = true; status.stringValue = "Stopping after current operation" }
-    @objc func quitController() { cancelRequested = true; NSApp.terminate(nil) }
+    @objc func stopRequested() { cancelRequested = true; onStop?(); status.stringValue = "Stopping after current operation" }
+    @objc func quitController() { cancelRequested = true; onStop?(); NSApp.terminate(nil) }
     func update(image: CGImage?, target: String, phase: String, bounds: Rect? = nil) {
         caption.stringValue = target; status.stringValue = phase
         targetBounds = bounds
@@ -71,6 +74,15 @@ import ScreenCaptureKit
 
 @MainActor final class AppDelegate: NSObject, NSApplicationDelegate {
     static var preview: PreviewController?
-    func applicationShouldHandleReopen(_ sender: NSApplication, hasVisibleWindows flag: Bool) -> Bool { Self.preview?.dockReopen(); return false }
+    static var goal: GoalWindowController?
+    private static var terminationPending = false
+    static func completePendingTermination() {
+        if terminationPending { terminationPending = false; NSApp.reply(toApplicationShouldTerminate: true) }
+    }
+    func applicationShouldTerminate(_ sender: NSApplication) -> NSApplication.TerminateReply {
+        if Self.goal?.session.active == true { Self.terminationPending = true; Self.goal?.requestStop(); return .terminateLater }
+        return .terminateNow
+    }
+    func applicationShouldHandleReopen(_ sender: NSApplication, hasVisibleWindows flag: Bool) -> Bool { if let goal = Self.goal { goal.show() } else { Self.preview?.dockReopen() }; return false }
     func applicationShouldTerminateAfterLastWindowClosed(_ sender: NSApplication) -> Bool { false }
 }

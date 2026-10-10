@@ -1,0 +1,9 @@
+{
+  "status": "verified_complete",
+  "selectionSource": "explicit",
+  "appSelectionCalls": 0,
+  "postconditions": {
+    "app": "com.apple.calculator",
+    "text": "42 %"
+  }
+}
