@@ -9,6 +9,7 @@ import CryptoKit
 @MainActor final class Native {
     var elements: [String: AXUIElement] = [:]
     var allowedApps: [String]?
+    var protectedWindowID: UInt32?
     let legacyAX = ProcessInfo.processInfo.environment["JEV_AX_LEGACY"] == "1"
     var axStore: AXStore?
     var axSource: LiveAXSource?
@@ -240,6 +241,7 @@ import CryptoKit
             _ = try await NSWorkspace.shared.open([URL(fileURLWithPath: path)], withApplicationAt: appURL, configuration: config)
             sessionApp = app; sessionWindowID = nil; return
         }
+        try validateProtectedSourceAction(a,observedWindow:observation.selectedWindow?.id,protectedWindow:protectedWindowID)
         guard AXIsProcessTrusted() else { throw Failure("Accessibility permission missing for invoking host/binary") }
         guard let observedTarget = observation.target ?? observation.front, allowedApps.contains(observedTarget.bundle), let front = NSRunningApplication(processIdentifier: observedTarget.pid), !front.isTerminated else { throw Failure("Target app changed or outside allowlist; reobserve") }
         if a.kind == "selectWindow" {

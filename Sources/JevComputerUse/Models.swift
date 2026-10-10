@@ -42,6 +42,11 @@ struct TaskSpec: Codable {
     var actions: [Action] = []
     var generateText: Bool = false
     var inspectImage: Bool = false
+    var sourceTransform: Bool = false
+    var sourceText: String? = nil
+    var sourceEvidence: DocumentSourceEvidence? = nil
+    var protectedWindowID: UInt32? = nil
+    var initialWindowID: UInt32? = nil
     var maxSteps: Int = 30
     var settleMS: Int = 250
     var maxRecovery: Int = 3
@@ -54,8 +59,8 @@ enum AXQueryKind: String, Codable { case expand, page, read, find }
 struct AXQuery: Codable { var kind: AXQueryKind; var handle: String? = nil; var page: Int? = nil; var filter: AXFilter? = nil; var rangeUTF16: AXTextRange? = nil; var localValue: Bool? = nil }
 struct Candidate: Codable { var id: String; var description: String; var action: Action?; var query: AXQuery? = nil }
 struct Decision: Codable { var choice: String; var confidence: Double; var apiMS: Double; var localMS: Double; var model: String; var usage: [String: Int]; var response: String; var progressProbability: Double? = nil; var verificationApiMS: Double? = nil; var requestBytes: Int? = nil; var verificationRequestBytes: Int? = nil }
-struct Step: Codable { var index: Int; var observation: String; var decision: Decision?; var action: Action?; var executionMS: Double?; var error: String?; var afterObservation: String?; var query: AXQuery? = nil; var queryLabel: String? = nil }
-struct RunReport: Codable { var status: String; var goal: String; var steps: [Step]; var finalObservation: String; var directory: String; var apps: [String]? = nil; var appSelection: AppResolution? = nil; var error: String? = nil; var completionSource: String? = nil }
+struct Step: Codable { var index: Int; var observation: String; var decision: Decision?; var action: Action?; var executionMS: Double?; var error: String?; var afterObservation: String?; var query: AXQuery? = nil; var queryLabel: String? = nil; var delegate: DelegateProvenance? = nil }
+struct RunReport: Codable { var status: String; var goal: String; var steps: [Step]; var finalObservation: String; var directory: String; var apps: [String]? = nil; var appSelection: AppResolution? = nil; var error: String? = nil; var completionSource: String? = nil; var requestResolution: RequestResolution? = nil; var response: String? = nil }
 
 func explicitCompletion(_ spec:TaskSpec, observation:Observation, pendingTexts:[String], generated:Bool, inspected:Bool) -> Bool {
     guard spec.expectText != nil || spec.expectApp != nil,
@@ -106,13 +111,15 @@ func validateAction(_ a: Action, apps: [String]) throws {
 }
 
 extension TaskSpec {
-    private enum Keys: String, CodingKey { case goal, apps, texts, actions, generateText, inspectImage, maxSteps, settleMS, maxRecovery, confidence, expectText, expectApp }
+    private enum Keys: String, CodingKey { case goal, apps, texts, actions, generateText, inspectImage, sourceTransform, sourceText, sourceEvidence, protectedWindowID, initialWindowID, maxSteps, settleMS, maxRecovery, confidence, expectText, expectApp }
     func encode(to encoder: Encoder) throws {
         var c = encoder.container(keyedBy: Keys.self)
         try c.encode(goal, forKey: .goal)
         if !apps.isEmpty { try c.encode(apps, forKey: .apps) }
         try c.encode(texts, forKey: .texts); try c.encode(actions, forKey: .actions)
         try c.encode(generateText, forKey: .generateText); try c.encode(inspectImage, forKey: .inspectImage)
+        if sourceTransform { try c.encode(sourceTransform, forKey: .sourceTransform) }
+        try c.encodeIfPresent(sourceText, forKey: .sourceText); try c.encodeIfPresent(sourceEvidence,forKey:.sourceEvidence); try c.encodeIfPresent(protectedWindowID,forKey:.protectedWindowID); try c.encodeIfPresent(initialWindowID, forKey: .initialWindowID)
         try c.encode(maxSteps, forKey: .maxSteps); try c.encode(settleMS, forKey: .settleMS)
         try c.encode(maxRecovery, forKey: .maxRecovery); try c.encode(confidence, forKey: .confidence)
         try c.encodeIfPresent(expectText, forKey: .expectText); try c.encodeIfPresent(expectApp, forKey: .expectApp)
@@ -128,6 +135,11 @@ extension TaskSpec {
         actions = try c.decodeIfPresent([Action].self, forKey: .actions) ?? []
         generateText = try c.decodeIfPresent(Bool.self, forKey: .generateText) ?? false
         inspectImage = try c.decodeIfPresent(Bool.self, forKey: .inspectImage) ?? false
+        sourceTransform = try c.decodeIfPresent(Bool.self, forKey: .sourceTransform) ?? false
+        sourceText = try c.decodeIfPresent(String.self, forKey: .sourceText)
+        sourceEvidence = try c.decodeIfPresent(DocumentSourceEvidence.self, forKey:.sourceEvidence)
+        protectedWindowID = try c.decodeIfPresent(UInt32.self, forKey:.protectedWindowID)
+        initialWindowID = try c.decodeIfPresent(UInt32.self, forKey: .initialWindowID)
         maxSteps = try c.decodeIfPresent(Int.self, forKey: .maxSteps) ?? 30
         settleMS = try c.decodeIfPresent(Int.self, forKey: .settleMS) ?? 250
         maxRecovery = try c.decodeIfPresent(Int.self, forKey: .maxRecovery) ?? 3

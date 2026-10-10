@@ -22,7 +22,7 @@ final class Canvas: NSView {
     override func draw(_ rect:NSRect) { NSColor.windowBackgroundColor.setFill(); rect.fill(); NSColor.systemIndigo.setFill(); NSBezierPath(ovalIn:NSRect(x:last.x-12,y:last.y-12,width:24,height:24)).fill(); let text="Drag events: \(drags) · Scroll: \(Int(scroll))"; (text as NSString).draw(at:NSPoint(x:15,y:15),withAttributes:[.font:NSFont.systemFont(ofSize:16),.foregroundColor:NSColor.labelColor]) }
 }
 let app=NSApplication.shared
-app.setActivationPolicy(.accessory)
+app.setActivationPolicy(CommandLine.arguments.contains("--regular") ? .regular : .accessory)
 let window=NSWindow(contentRect:NSRect(x:180,y:180,width:480,height:300),styleMask:[.titled,.closable,.resizable],backing:.buffered,defer:false)
 window.title="JEV Owned Native Fixture"
 let scenarioIndex=CommandLine.arguments.firstIndex(of:"--scenario")

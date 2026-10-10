@@ -1,0 +1,55 @@
+{
+  "checks": [
+    {
+      "target": "installed source app",
+      "version": "0.5.0",
+      "build": "7",
+      "executableSHA256": "58c92722f3a0ff722fdf114e8f41194048033af4541d2b4cefe9b72e6de46b33",
+      "strictSignature": true,
+      "helpAXQuery": true,
+      "credentialAvailable": true,
+      "permissions": {
+        "accessibility": true,
+        "inputPosting": true,
+        "screenRecording": true
+      },
+      "setupExistingCredentialExitCode": 0
+    },
+    {
+      "target": "public app",
+      "version": "0.5.0",
+      "build": "7",
+      "executableSHA256": "2f5992c530fbe43f6ce9eb9995aa1f38f86368a78146a8f6d4d78c498542ea00",
+      "strictSignature": true,
+      "helpAXQuery": true,
+      "credentialAvailable": true,
+      "permissions": {
+        "accessibility": true,
+        "inputPosting": true,
+        "screenRecording": true
+      },
+      "setupExistingCredentialExitCode": 0,
+      "isolatedCodexAndClaudeInstallAndRepeat": true
+    },
+    {
+      "target": "relocated archive",
+      "version": "0.5.0",
+      "build": "7",
+      "executableSHA256": "2f5992c530fbe43f6ce9eb9995aa1f38f86368a78146a8f6d4d78c498542ea00",
+      "strictSignature": true,
+      "helpAXQuery": true,
+      "credentialAvailable": true,
+      "permissions": {
+        "accessibility": true,
+        "inputPosting": true,
+        "screenRecording": true
+      },
+      "setupExistingCredentialExitCode": 0,
+      "isolatedCodexAndClaudeInstallAndRepeat": true
+    }
+  ],
+  "credentialBytesUnchanged": true,
+  "sourceSyncMatches": true,
+  "intentionalPackagingDifferencesPreserved": true,
+  "limitations": "Same Codex launch context only; no fresh Terminal/Finder/Gatekeeper certification. Relocated skill installation checked in isolated project directories; host loader or composer exposure not tested."
+}

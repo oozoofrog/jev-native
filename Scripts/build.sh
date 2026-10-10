@@ -25,8 +25,8 @@ cat > "$app_dir/Contents/Info.plist" <<'PLIST'
 <key>CFBundleDisplayName</key><string>JEV Native</string>
 <key>CFBundleExecutable</key><string>jev-native</string>
 <key>CFBundlePackageType</key><string>APPL</string>
-<key>CFBundleVersion</key><string>6</string>
-<key>CFBundleShortVersionString</key><string>0.4.0</string>
+<key>CFBundleVersion</key><string>7</string>
+<key>CFBundleShortVersionString</key><string>0.5.0</string>
 <key>LSMinimumSystemVersion</key><string>14.0</string>
 <key>NSPrincipalClass</key><string>NSApplication</string>
 </dict></plist>

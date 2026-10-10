@@ -1,0 +1,451 @@
+{
+  "version": "0.5.0",
+  "build": "7",
+  "evidenceType": "sanitized selected summaries, not raw AX/app catalogues or all event files",
+  "cases": [
+    {
+      "name": "automatic-original",
+      "request": "Owned Writer의 입력란에 내일 회의 준비 목록을 한국어 세 줄로 새로 써줘.",
+      "scenario": "natural",
+      "status": "jev_observed_complete",
+      "actions": [
+        "type"
+      ],
+      "response": "회의 안건과 관련 자료를 정리한다.\n참석자와 회의 시간·장소를 확인한다.\n논의할 질문과 결정이 필요한 항목을 준비한다.",
+      "cohort": "gui-runtime-results.json",
+      "nativeEventCount": 66,
+      "delegates": [
+        {
+          "kind": "delegateText",
+          "status": "completed",
+          "textUTF16": 66,
+          "usage": {
+            "cache_write_input_tokens": 0,
+            "cached_input_tokens": 0,
+            "input_tokens": 16843,
+            "output_tokens": 61,
+            "reasoning_output_tokens": 0
+          }
+        }
+      ],
+      "followUpAnswers": [],
+      "nativeEditorExactlyMatchesDelegateResponse": true,
+      "resolution": {
+        "content": "generate",
+        "delivery": "app",
+        "inspectImage": false,
+        "status": "resolved"
+      },
+      "steps": [
+        {
+          "choice": "delegateText",
+          "confidence": 0.68,
+          "error": null
+        },
+        {
+          "choice": "a1",
+          "confidence": 0.95,
+          "error": null
+        },
+        {
+          "choice": "done",
+          "confidence": 0.95,
+          "error": null
+        }
+      ],
+      "intentModels": [
+        "jev-1.13.0"
+      ]
+    },
+    {
+      "name": "ordinary-action",
+      "request": "Owned Writer에서 ‘확인’ 버튼을 눌러줘.",
+      "scenario": "natural",
+      "status": "cancelled",
+      "actions": [],
+      "response": null,
+      "cohort": "gui-runtime-results.json",
+      "nativeEventCount": 0,
+      "delegates": [],
+      "followUpAnswers": [],
+      "fixtureTextsUnchanged": true,
+      "resolution": {
+        "content": "action",
+        "delivery": "app",
+        "inspectImage": false,
+        "status": "cancelled"
+      },
+      "steps": [],
+      "intentModels": [
+        "jev-1.13.0"
+      ]
+    },
+    {
+      "name": "ordinary-resume",
+      "request": "Owned Writer 앱에서 ‘확인’ 버튼을 눌러줘.",
+      "scenario": "natural",
+      "status": "harness_error",
+      "cohort": "gui-runtime-resume-results.json",
+      "nativeEventCount": 0,
+      "delegates": [],
+      "followUpAnswers": [],
+      "harnessError": "Owned harness failed to find the expected offered UI item"
+    },
+    {
+      "name": "document-summary",
+      "request": "Owned Writer에서 열린 문서를 한 문장으로 요약해줘. 원문은 바꾸지 마.",
+      "scenario": "documents",
+      "status": "harness_error",
+      "cohort": "gui-runtime-resume-results.json",
+      "nativeEventCount": 0,
+      "delegates": [],
+      "followUpAnswers": [],
+      "harnessError": "Owned harness failed to find the expected offered UI item"
+    },
+    {
+      "name": "ordinary-resume-keyboard",
+      "request": "Owned Writer에서 확인 버튼을 눌러줘. 글은 쓰지 마.",
+      "scenario": "natural",
+      "status": "harness_error",
+      "cohort": "gui-runtime-keyboard-results.json",
+      "nativeEventCount": 0,
+      "delegates": [],
+      "followUpAnswers": [],
+      "harnessError": "Owned harness failed to find the expected offered UI item"
+    },
+    {
+      "name": "document-summary-keyboard",
+      "request": "Owned Writer에서 열린 문서를 한 문장으로 요약해줘. 원문은 바꾸지 마.",
+      "scenario": "documents",
+      "status": "harness_error",
+      "cohort": "gui-runtime-keyboard-results.json",
+      "nativeEventCount": 0,
+      "delegates": [],
+      "followUpAnswers": [],
+      "harnessError": "Owned harness failed to find the expected offered UI item"
+    },
+    {
+      "name": "ordinary-followup-fixed",
+      "request": "Owned Writer에서 확인 버튼을 눌러줘. 글은 쓰지 마.",
+      "scenario": "natural",
+      "status": "blocked",
+      "binarySHA256": "b261b13821bfec9045032f6d20c5b800e454221ea912a668e94b07fdf584cb25",
+      "actions": [],
+      "response": null,
+      "cohort": "gui-runtime-followup-fixed-results.json",
+      "nativeEventCount": 0,
+      "delegates": [],
+      "followUpAnswers": [],
+      "fixtureTextsUnchanged": true,
+      "resolution": {
+        "content": "action",
+        "delivery": "app",
+        "inspectImage": false,
+        "status": "resolved"
+      },
+      "steps": [
+        {
+          "choice": "blocked",
+          "confidence": 0.36,
+          "error": null
+        }
+      ],
+      "intentModels": [
+        "jev-1.13.0"
+      ]
+    },
+    {
+      "name": "document-summary-followup-fixed",
+      "request": "Owned Writer에서 열린 문서를 한 문장으로 요약해줘. 원문은 바꾸지 마.",
+      "scenario": "documents",
+      "status": "content_delivered",
+      "binarySHA256": "b261b13821bfec9045032f6d20c5b800e454221ea912a668e94b07fdf584cb25",
+      "actions": [],
+      "response": "새 기록 앱은 오프라인 검색을 지원하며, 첫 버전은 Mac용으로 제공되고 11월에 내부 테스트를 시작합니다.",
+      "cohort": "gui-runtime-followup-fixed-results.json",
+      "nativeEventCount": 0,
+      "delegates": [
+        {
+          "kind": "reply_text",
+          "status": "completed",
+          "textUTF16": 60,
+          "usage": {
+            "cache_write_input_tokens": 0,
+            "cached_input_tokens": 0,
+            "input_tokens": 16512,
+            "output_tokens": 51,
+            "reasoning_output_tokens": 0
+          }
+        }
+      ],
+      "followUpAnswers": [
+        {
+          "field": "target",
+          "offeredTitle": "Owned Writer · 제품 제안서"
+        }
+      ],
+      "fixtureTextsUnchanged": true,
+      "resolution": {
+        "content": "transform",
+        "delivery": "ui",
+        "inspectImage": false,
+        "status": "resolved"
+      },
+      "steps": [
+        {
+          "choice": null,
+          "confidence": null,
+          "error": null
+        }
+      ],
+      "intentModels": [
+        "jev-1.13.0"
+      ],
+      "sourceEvidence": {
+        "artifact": "source-text.txt",
+        "coverage": "complete_exposed_document",
+        "origin": "selected_window_ax",
+        "selectedAXWindowIdentityVerified": true,
+        "sha256": "6df11fade507ed2ad18512626d84b1d3ff5d2beb92852301b73476e8e73fab7e",
+        "stableDoubleRead": true,
+        "utf16Length": 68
+      },
+      "sourceWindowTitle": "제품 제안서"
+    },
+    {
+      "name": "final-ordinary",
+      "request": "Owned Writer 앱에서 ‘확인’ 버튼을 눌러줘.",
+      "scenario": "natural",
+      "status": "harness_error",
+      "binarySHA256": "c15596c02fecfad8f4544eb7c6a08c04638a81623aede9479b20739c35657792",
+      "cohort": "gui-runtime-final-results.json",
+      "nativeEventCount": 0,
+      "delegates": [],
+      "followUpAnswers": [
+        {
+          "field": "app",
+          "offeredTitle": "Owned Writer"
+        }
+      ],
+      "harnessError": "Owned harness failed to find the expected offered UI item"
+    },
+    {
+      "name": "final-generation",
+      "request": "Owned Writer의 입력란에 내일 회의 준비 목록을 한국어 세 줄로 새로 써줘.",
+      "scenario": "natural",
+      "status": "jev_observed_complete",
+      "binarySHA256": "c15596c02fecfad8f4544eb7c6a08c04638a81623aede9479b20739c35657792",
+      "actions": [
+        "type"
+      ],
+      "response": "회의 안건과 주요 논의 사항 정리하기\n필요한 자료와 진행 상황 확인하기\n참석자와 회의 시간·장소 확인하기",
+      "cohort": "gui-runtime-final-results.json",
+      "nativeEventCount": 58,
+      "delegates": [
+        {
+          "kind": "delegateText",
+          "status": "completed",
+          "textUTF16": 58,
+          "usage": {
+            "cache_write_input_tokens": 0,
+            "cached_input_tokens": 0,
+            "input_tokens": 16847,
+            "output_tokens": 54,
+            "reasoning_output_tokens": 0
+          }
+        }
+      ],
+      "followUpAnswers": [],
+      "fixtureTextsUnchanged": false,
+      "nativeEditorExactlyMatchesDelegateResponse": true,
+      "resolution": {
+        "content": "generate",
+        "delivery": "app",
+        "inspectImage": false,
+        "status": "resolved"
+      },
+      "steps": [
+        {
+          "choice": "delegateText",
+          "confidence": 0.96,
+          "error": null
+        },
+        {
+          "choice": "a1",
+          "confidence": 0.95,
+          "error": null
+        },
+        {
+          "choice": "done",
+          "confidence": 0.95,
+          "error": null
+        }
+      ],
+      "intentModels": [
+        "jev-1.13.0"
+      ]
+    },
+    {
+      "name": "final-vision",
+      "request": "Owned Writer 창의 배경과 확인 버튼의 모양을 설명해줘.",
+      "scenario": "natural",
+      "status": "cancelled",
+      "binarySHA256": "c15596c02fecfad8f4544eb7c6a08c04638a81623aede9479b20739c35657792",
+      "actions": [],
+      "response": null,
+      "cohort": "gui-runtime-final-results.json",
+      "nativeEventCount": 0,
+      "delegates": [],
+      "followUpAnswers": [],
+      "fixtureTextsUnchanged": true,
+      "resolution": {
+        "delivery": "app",
+        "inspectImage": false,
+        "status": "cancelled"
+      },
+      "steps": [],
+      "intentModels": [
+        "jev-1.13.0"
+      ]
+    },
+    {
+      "name": "confirmed-ordinary",
+      "request": "Owned Writer 앱에서 ‘확인’ 버튼을 눌러줘.",
+      "scenario": "natural",
+      "status": "harness_error",
+      "binarySHA256": "42bea815a94bdd7e25f26987f8df2b7e325ec7719fb93c9c96a11cb31520a725",
+      "cohort": "gui-runtime-confirmation-results.json",
+      "nativeEventCount": 0,
+      "delegates": [],
+      "followUpAnswers": [
+        {
+          "field": "target",
+          "offeredTitle": "Owned Writer · JEV Owned AX Fixture · natural"
+        }
+      ],
+      "harnessError": "confirmed-ordinary-resume-1-act: exit 1; see stderr"
+    },
+    {
+      "name": "confirmed-vision",
+      "request": "Owned Writer 창의 화면을 보고 배경 색과 확인 버튼 모양을 설명해줘. 답변은 작업 창에 표시해줘.",
+      "scenario": "natural",
+      "status": "harness_error",
+      "binarySHA256": "42bea815a94bdd7e25f26987f8df2b7e325ec7719fb93c9c96a11cb31520a725",
+      "cohort": "gui-runtime-confirmation-results.json",
+      "nativeEventCount": 0,
+      "delegates": [],
+      "followUpAnswers": [
+        {
+          "field": "intent",
+          "offeredTitle": "화면이나 그림을 보고 설명해 주세요"
+        },
+        {
+          "field": "intent",
+          "offeredTitle": "화면이나 그림을 보고 설명해 주세요"
+        }
+      ],
+      "harnessError": "confirmed-vision-resume-2-act: exit 1; see stderr"
+    },
+    {
+      "name": "taxonomy-ordinary",
+      "request": "Owned Writer 앱에서 ‘확인’ 버튼을 눌러줘.",
+      "scenario": "natural",
+      "status": "harness_error",
+      "binarySHA256": "e9aae730430847b17023339fe527a394f37dd6bd5cb5d2ee9fb3490f8fa6c481",
+      "cohort": "gui-runtime-taxonomy-results.json",
+      "nativeEventCount": 0,
+      "delegates": [],
+      "followUpAnswers": [
+        {
+          "field": "intent",
+          "offeredTitle": "화면이나 그림을 보고 설명해 주세요"
+        }
+      ],
+      "harnessError": "taxonomy-ordinary-resume-1-act: exit 1; see stderr"
+    },
+    {
+      "name": "taxonomy-vision",
+      "request": "Owned Writer 창의 화면을 보고 배경 색과 확인 버튼 모양을 설명해줘. 답변은 작업 창에 표시해줘.",
+      "scenario": "natural",
+      "status": "content_delivered",
+      "binarySHA256": "e9aae730430847b17023339fe527a394f37dd6bd5cb5d2ee9fb3490f8fa6c481",
+      "actions": [],
+      "response": "창 배경은 밝은 회색이고, 중앙의 큰 입력 영역은 흰색입니다. 왼쪽 아래의 ‘확인’ 버튼은 가로로 긴 흰색 둥근 사각형입니다. 버튼에는 얇은 회색 테두리와 옅은 그림자가 있습니다.",
+      "cohort": "gui-runtime-taxonomy-results.json",
+      "nativeEventCount": 0,
+      "delegates": [
+        {
+          "kind": "reply_vision",
+          "status": "completed",
+          "textUTF16": 100,
+          "usage": {
+            "cache_write_input_tokens": 0,
+            "cached_input_tokens": 0,
+            "input_tokens": 18019,
+            "output_tokens": 150,
+            "reasoning_output_tokens": 0
+          }
+        }
+      ],
+      "followUpAnswers": [],
+      "fixtureTextsUnchanged": true,
+      "resolution": {
+        "content": "interpret",
+        "delivery": "ui",
+        "inspectImage": true,
+        "status": "resolved"
+      },
+      "steps": [
+        {
+          "choice": null,
+          "confidence": null,
+          "error": null
+        }
+      ],
+      "intentModels": [
+        "jev-1.13.0"
+      ]
+    },
+    {
+      "name": "ordinary-corrected",
+      "request": "Owned Writer 앱에서 ‘확인’ 버튼을 눌러줘.",
+      "scenario": "natural",
+      "status": "uncertain",
+      "binarySHA256": "e9aae730430847b17023339fe527a394f37dd6bd5cb5d2ee9fb3490f8fa6c481",
+      "actions": [],
+      "response": null,
+      "cohort": "gui-runtime-ordinary-corrected-results.json",
+      "nativeEventCount": 0,
+      "delegates": [],
+      "followUpAnswers": [
+        {
+          "field": "target",
+          "offeredTitle": "Owned Writer · JEV Owned AX Fixture · natural"
+        }
+      ],
+      "fixtureTextsUnchanged": true,
+      "resolution": {
+        "content": "action",
+        "delivery": "app",
+        "inspectImage": false,
+        "status": "resolved"
+      },
+      "steps": [
+        {
+          "choice": "a15",
+          "confidence": 0.42,
+          "error": "Uncertain selection: Choice confidence 0.42, progress probability 0.76. No identical-state retry."
+        }
+      ],
+      "intentModels": [
+        "jev-1.13.0"
+      ]
+    }
+  ],
+  "limitations": [
+    "Owned fixture workflows only; no general success-rate claim",
+    "Harness errors and genuine model stops are retained separately",
+    "Actual Codex model ID absent from events remains unknown",
+    "Earlier binaries have different hashes; final text-layout and unsupported authored-visual-destination guard changes are separately identified"
+  ]
+}

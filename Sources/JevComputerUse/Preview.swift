@@ -5,8 +5,8 @@ import ScreenCaptureKit
 @MainActor final class PreviewController: NSObject, NSWindowDelegate {
     private let panel: NSPanel
     private let imageView = NSImageView()
-    private let caption = NSTextField(labelWithString: "Waiting for target window")
-    private let status = NSTextField(labelWithString: "JEV native controller")
+    private let caption = NSTextField(labelWithString: "작업할 창을 기다리고 있어요")
+    private let status = NSTextField(labelWithString: "작업을 준비하고 있어요")
     private let pointerDot = NSView(frame: NSRect(x:0,y:0,width:10,height:10))
     private var targetBounds: Rect?
     private var liveTask: Task<Void,Never>?
@@ -18,7 +18,7 @@ import ScreenCaptureKit
     override init() {
         panel = NSPanel(contentRect: NSRect(x: 0,y: 0,width: 320,height: 250), styleMask: [.titled, .closable, .nonactivatingPanel, .utilityWindow], backing: .buffered, defer: false)
         super.init()
-        panel.title = "JEV · Target preview"; panel.level = .floating; panel.hidesOnDeactivate = false; panel.isReleasedWhenClosed = false; panel.delegate = self
+        panel.title = "작업 미리보기"; panel.level = .floating; panel.hidesOnDeactivate = false; panel.isReleasedWhenClosed = false; panel.delegate = self
         panel.collectionBehavior = [.canJoinAllSpaces, .fullScreenAuxiliary]
         let content = NSView(frame: NSRect(x: 0,y: 0,width: 320,height: 250)); panel.contentView = content
         imageView.frame = NSRect(x: 8,y: 52,width: 304,height: 190); imageView.imageScaling = .scaleProportionallyUpOrDown; imageView.autoresizingMask = [.width, .height]; content.addSubview(imageView)
@@ -26,23 +26,23 @@ import ScreenCaptureKit
         caption.frame = NSRect(x: 10,y: 29,width: 300,height: 18); caption.font = .systemFont(ofSize: 11, weight: .medium); caption.lineBreakMode = .byTruncatingMiddle; content.addSubview(caption)
         status.frame = NSRect(x: 10,y: 8,width: 300,height: 17); status.font = .monospacedSystemFont(ofSize: 10, weight: .regular); status.textColor = .secondaryLabelColor; content.addSubview(status)
         if let screen = NSScreen.main { let visible = screen.visibleFrame; panel.setFrameOrigin(NSPoint(x: visible.maxX-336,y: visible.minY+16)) }
-        statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength); statusItem.button?.title = "JEV"
-        let menu = NSMenu(); let toggle = NSMenuItem(title: "Show / Hide Target Preview", action: #selector(togglePreview), keyEquivalent: ""); toggle.target = self; menu.addItem(toggle)
-        let stop = NSMenuItem(title: "Stop After Current Operation", action: #selector(stopRequested), keyEquivalent: ""); stop.target = self; menu.addItem(stop)
-        menu.addItem(.separator()); let quit = NSMenuItem(title: "Quit Controller", action: #selector(quitController), keyEquivalent: "q"); quit.target = self; menu.addItem(quit); statusItem.menu = menu
-        NSApp.setActivationPolicy(.regular); NSApp.applicationIconImage = NSImage(systemSymbolName: "cursorarrow.rays", accessibilityDescription: "JEV Controller")
+        statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength); statusItem.button?.title = "작업"
+        let menu = NSMenu(); let toggle = NSMenuItem(title: "작업 미리보기 표시 / 숨기기", action: #selector(togglePreview), keyEquivalent: ""); toggle.target = self; menu.addItem(toggle)
+        let stop = NSMenuItem(title: "작업 중지", action: #selector(stopRequested), keyEquivalent: ""); stop.target = self; menu.addItem(stop)
+        menu.addItem(.separator()); let quit = NSMenuItem(title: "작업 도우미 종료", action: #selector(quitController), keyEquivalent: "q"); quit.target = self; menu.addItem(quit); statusItem.menu = menu
+        NSApp.setActivationPolicy(.regular); NSApp.applicationIconImage = NSImage(systemSymbolName: "cursorarrow.rays", accessibilityDescription: "작업 도우미")
         show()
     }
-    func beginRun() { cancelRequested = false; imageView.image = nil; pointerDot.isHidden = true; caption.stringValue = "Waiting for target window"; phase("Starting"); show() }
+    func beginRun() { cancelRequested = false; imageView.image = nil; pointerDot.isHidden = true; caption.stringValue = "작업할 창을 기다리고 있어요"; phase("Starting"); show() }
     func finish() { liveTask?.cancel(); liveTask = nil; liveWindow = nil }
     func show() { userHidden = false; panel.orderFrontRegardless() }
     @objc func togglePreview() { if panel.isVisible { hide() } else { show() } }
     func hide() { userHidden = true; panel.orderOut(nil) }
     func windowShouldClose(_ sender: NSWindow) -> Bool { hide(); return false }
-    @objc func stopRequested() { cancelRequested = true; onStop?(); status.stringValue = "Stopping after current operation" }
+    @objc func stopRequested() { cancelRequested = true; onStop?(); status.stringValue = "중지하고 있어요" }
     @objc func quitController() { cancelRequested = true; onStop?(); NSApp.terminate(nil) }
     func update(image: CGImage?, target: String, phase: String, bounds: Rect? = nil) {
-        caption.stringValue = target; status.stringValue = phase
+        caption.stringValue = target; status.stringValue = UserStatus.progress(phase)
         targetBounds = bounds
         if let image { imageView.image = NSImage(cgImage: image, size: .zero) }
         // Updating a hidden preview must never unhide it or activate the target app.
@@ -68,7 +68,7 @@ import ScreenCaptureKit
             }
         }
     }
-    func phase(_ text: String) { status.stringValue = text }
+    func phase(_ text: String) { status.stringValue = UserStatus.progress(text) }
     func dockReopen() { show() }
 }
 

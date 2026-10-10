@@ -1,6 +1,6 @@
 # Public export manifest
 
-This repository exports the JEV Native project (current package: 0.4.0 (6)), including Swift native automation, JEV closed-loop decisions, Codex text/vision handoff, virtual cursor/preview, clipboard credential setup, Codex/Claude Code skill installers and startup crash mitigation.
+This repository exports the JEV Native project (current package: 0.5.0 (7)), including Swift native automation, JEV closed-loop decisions, Codex text/vision handoff, virtual cursor/preview, clipboard credential setup, Codex/Claude Code skill installers and startup crash mitigation.
 
 ## Included
 
@@ -50,3 +50,12 @@ The native goal-entry/run window, shared task runner, ordered native app picker,
 The local AX query engine, progressive JEV choices and targeted freshness checks are included. Current Swift tests: **61 passed**, zero failures. Final cohort: **query 3/5, legacy 2/5**; JEV reliability remains unresolved. See [AX implementation and benchmarks](evidence/AX-QUERY.md) for current evidence and earlier failures. The separate simulated UI proposal was not installed. Native range reads are verified; notification and scope refresh are verified with the stated causality limit.
 
 Current packaging checks verify the 0.4.0 (6) installed source app, public app and relocated ZIP: strict signature, help, doctor and existing-key setup. Isolated Codex/Claude project installation and repeat installation pass for the public/relocated app. Source synchronization and deliberate packaging differences are verified. Credentials are byte-identical. See `evidence/checks/ax-query-package.json`. Fresh Terminal/Finder/Gatekeeper and host discovery remain unverified.
+
+
+## Natural-language native UI, 0.5.0 (7)
+
+The Korean single-request AppKit UI, typed request intent, original UTF-16 text spans, actual Codex generation/vision, contextual follow-up/resume, source completeness/identity guards, result-destination separation, cancellation and delegate provenance are included. The explicit CLI/task modes retain their scope and completion contracts. See [implementation and actual workflow evidence](evidence/NATURAL-LANGUAGE-UI.md).
+
+Final Swift suite: 89 passed, zero failures. Generation/native input, selected-document summary without source mutation, and image interpretation/UI delivery have actual owned-fixture evidence. Ordinary-button no-delegate routing is verified, but the final action stopped `uncertain` before input and is not a successful button workflow. Earlier model stops and harness failures are retained in sanitized summaries. No general reliability improvement is claimed.
+
+The 0.5.0 installed/public/relocated package checks, archive hashes and targeted staged/history/ZIP audit are refreshed. Raw app catalogues, private source text, unrelated windows, credentials, local paths and conversation records are excluded. Host loader/Composer and fresh Terminal/Finder/Gatekeeper exposure remain unverified.

@@ -1,0 +1,8 @@
+Another instance of SwiftPM (PID: 87656) is already running using '<project-path> waiting until that process has finished execution...Building for production...
+[2 / 4] jev-native-product
+[3 / 5] jev-native-product
+[5 / 5] jev-native-product
+[7 / 8] jev-native-product
+Build complete! (13.47초)
+<project-path>: replacing existing signature
+<project-path>

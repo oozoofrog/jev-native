@@ -3,12 +3,13 @@ import Foundation
 struct Handoff: Codable { var text: String; var observation: String; var actions: [Action] }
 final class Codex {
     let executable: String
-    init() throws {
+    init(executable override: String? = nil) throws {
         let env = ProcessInfo.processInfo.environment
         let paths = env["PATH", default: ""].split(separator: ":").map { String($0) + "/codex" } + [NSHomeDirectory() + "/.local/bin/codex"]
-        guard let path = env["JEV_CODEX_PATH"] ?? paths.first(where: { FileManager.default.isExecutableFile(atPath: $0) }), FileManager.default.isExecutableFile(atPath: path) else { throw Failure("Codex executable unavailable. Set JEV_CODEX_PATH") }; executable = path
+        guard let path = override ?? env["JEV_CODEX_PATH"] ?? paths.first(where: { FileManager.default.isExecutableFile(atPath: $0) }), FileManager.default.isExecutableFile(atPath: path) else { throw Failure("Codex executable unavailable. Set JEV_CODEX_PATH") }; executable = path
     }
-    func invoke(goal: String, image: String?, directory: String, model: String?) async throws -> Handoff {
+    @MainActor func invoke(goal: String, image: String?, directory: String, model: String?, control: RunControl? = nil) async throws -> Handoff {
+        try control?.check()
         var fields: [String:Any] = ["kind":["type":"string"],"modifiers":["type":["array","null"],"items":["type":"string"]]]
         for key in ["target","app","text","key","label","path","coordinateSpace","axAction"] { fields[key] = ["type":["string","null"]] }
         for key in ["x","y","toX","toY"] { fields[key] = ["type":["number","null"]] }
@@ -33,9 +34,10 @@ final class Codex {
         FileManager.default.createFile(atPath: stdoutPath, contents: nil); FileManager.default.createFile(atPath: stderrPath, contents: nil)
         let out = try FileHandle(forWritingTo: URL(fileURLWithPath: stdoutPath)), err = try FileHandle(forWritingTo: URL(fileURLWithPath: stderrPath)), input = try FileHandle(forReadingFrom: URL(fileURLWithPath: promptPath))
         proc.standardOutput = out; proc.standardError = err; proc.standardInput = input
+        defer { if proc.isRunning { proc.terminate() }; try? out.close(); try? err.close(); try? input.close() }
         try proc.run(); let start = Date()
-        while proc.isRunning { if Date().timeIntervalSince(start) > 180 { proc.terminate(); throw Failure("Codex timeout; native workflow stopped without applying output") }; try await Task.sleep(nanoseconds: 100_000_000) }
-        try out.close(); try err.close(); try input.close()
+        while proc.isRunning { try control?.check(); if Date().timeIntervalSince(start) > 180 { proc.terminate(); throw Failure("Codex timeout; native workflow stopped without applying output") }; try await Task.sleep(nanoseconds: 100_000_000) }
+        try control?.check()
         guard proc.terminationStatus == 0 else { throw Failure("Codex failed (\(proc.terminationStatus)); see \(stderrPath)") }
         // Detect any attempted tool invocation. Discard output even if Codex also returned text.
         let events = try String(contentsOfFile: stdoutPath, encoding: .utf8)

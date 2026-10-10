@@ -30,7 +30,7 @@ import Foundation
     }
 
     func run(request: RunRequest, directory: String, model: String?, control: RunControl,
-             selection: AppSelection? = nil, preview: PreviewController? = nil, makePreview: (() -> PreviewController?)? = nil) async throws -> RunReport {
+             selection: AppSelection? = nil, preview: PreviewController? = nil, makePreview: (() -> PreviewController?)? = nil, knownResolution: AppResolution? = nil) async throws -> RunReport {
         try FileManager.default.createDirectory(atPath: directory, withIntermediateDirectories: true, attributes: [.posixPermissions: 0o700])
         try writeJSON(request.spec, directory + "/requested-task.json")
         var resolution: AppResolution?
@@ -39,7 +39,8 @@ import Foundation
             try control.check()
             if request.spec.apps.isEmpty && !request.chooseApps { try requireCredential() }
             control.status(request.chooseApps ? "Choose target apps" : "Selecting target apps")
-            resolution = await resolve(request.spec, request.chooseApps, request.allowInteractiveFallback, directory, control, selection)
+            if let knownResolution { resolution = knownResolution }
+            else { resolution = await resolve(request.spec, request.chooseApps, request.allowInteractiveFallback, directory, control, selection) }
             try writeJSON(resolution, directory + "/app-selection.json")
             try control.check()
             guard let resolved = resolution, resolved.status == "resolved" else {
