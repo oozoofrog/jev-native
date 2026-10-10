@@ -1,0 +1,34 @@
+{
+  "binarySHA256": "2ad9222bbbcc908208c5cdaf125a7efb134ff713cb37fa2d17b90bb42701e5f6",
+  "fixtureSHA256": "69eaed1f3de9bd7bd110ccf8cc8398170a7b9b107fadb2e97d3ad9bf1fde4bef",
+  "checks": [
+    {
+      "name": "native UTF16 parameterized reads and cursor/target batch references",
+      "passed": true,
+      "prefixUTF16Units": 40,
+      "tailLocationUTF16": 60000,
+      "tailValue": "END-MARKER-731",
+      "sourceTextUTF16Units": 60014,
+      "textRangeCalls": 3
+    },
+    {
+      "name": "native AXObserver notification invalidation",
+      "passed": true,
+      "changes": {
+        "changed": [],
+        "coverage": "unknown",
+        "invalidated": true,
+        "revision": "3FE50E86-2865-4D39-9FC0-9E7A16550978",
+        "since": "0FE26A73-1560-4E00-A65C-7810FF10A08C"
+      },
+      "initialNodes": 8,
+      "finalNodes": 8,
+      "initialBatchCalls": 8,
+      "finalBatchCalls": 8,
+      "observerCalls": 19,
+      "observerHints": 2,
+      "value": "result=changed",
+      "evidenceBoundary": "Notifications received and fresh value read. Initial scope was process-level; refreshed scope selected a window. Scope change confounds notification causality. Native partial-subtree reuse is not proven."
+    }
+  ]
+}

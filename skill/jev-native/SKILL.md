@@ -31,6 +31,14 @@ Setup validates a conservative single-token shape, not service validity. It save
 - `act --observation JSON --action JSON --app BUNDLE --out DIR` applies one explicit action against a fresh target observation. Derive AX IDs from the latest observation. `act` rejects stale target state. Coordinates use global logical points unless the action declares another supported coordinate space.
 - Require `verified_complete` when exact postconditions were supplied. `jev_observed_complete` is JEV's semantic assessment, not an exact/E2E guarantee. Exit 2 means incomplete/blocked. Read `report.json`, `steps.json`, and the final screenshot/AX state before reporting success.
 
+## Progressive AX queries
+
+The native runner collects a bounded AX overview and offers typed region, candidate-page and value-read choices to JEV. Local Swift code executes these queries. A small UI uses the direct action path. `complete` covers only the exposed AX nodes in the selected scope; `partial` or `unknown`, and an empty `find` result, never prove an absent control. Virtualized content may require scrolling, opening a region, or vision.
+
+For read-only inspection, `ax-query --app BUNDLE --requests JSON --out DIR` runs a bounded request batch in one process. Requests use `kind` (`overview`, `find`, `children`, `read`, `expand`, `changes`); `find` accepts typed role/name/action/status/ancestor filters. `locator` selects a node already collected in that session. `read` accepts fields and an explicit `textRangeUTF16`. Inspect coverage and continuation in each result. See README for the request schema.
+
+AX handles expire on revision changes. Cursors bind to the operation, scope, filter and revision. Do not reuse a handle as a permanent ID. A separate `act` invocation resolves the structural locator against its fresh bounded observation and rejects missing or changed targets; use `run` for progressive discovery and action in one session. AXObserver notifications are invalidation hints, not freshness proof. The controller checks current app/window ownership, secure/enabled state, native parent context and modal sheets immediately before AX input. Pointer actions retain fresh image checks.
+
 The preview opens in a screen corner during `run`. Closing it hides it; the JEV menu-bar item and Dock icon reopen it. `--no-preview` suppresses it. `--keep-open` retains the final preview after completion or an incomplete run; inspect the report status independently. The preview is a view of the target window, not a remote-control surface.
 
 ## Input and side effects
@@ -58,3 +66,5 @@ Use `jev-native --gui` when the user asks for a task input/run window. It opens 
 The GUI supports multiline goals, optional literal text, ordered app selection with search/add/remove/reorder, Codex text/vision options, one active run, Stop, status and Show Report. GUI app selection and missing-key handling never read terminal input. Key import is an explicit clipboard action; never fill a key into the goal or literal-text field.
 
 Stop prevents the next native action after the current operation/API call. Closing the goal window requests a stop when running; reopening the app restores the goal window. The preview remains separate. Reports are under `~/Library/Application Support/JEV Native/Runs/<UUID>/`; inspect the result and final observed target state before claiming completion. `jev_observed_complete` remains semantic evidence. Use CLI explicit postconditions when required. Uncertain selection can be retried with revised evidence or the native app list; do not repeatedly submit the same unresolved state.
+
+Explicit `expectText`/`expectApp` are authoritative predicates, checked on fresh observations after required delegates and supplied texts complete. Declare every required final condition. `expectApp` alone verifies target identity; it does not establish an arbitrary free-form goal. Without explicit predicates the runner still requires JEV's semantic done decision. Inspect `completionSource` and the final observation.

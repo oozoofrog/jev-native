@@ -1,6 +1,6 @@
 # Public export manifest
 
-This repository exports the completed JEV Native project (current package: 0.3.0 (5)), including Swift native automation, JEV closed-loop decisions, Codex text/vision handoff, virtual cursor/preview, clipboard credential setup, Codex/Claude Code skill installers and startup crash mitigation.
+This repository exports the JEV Native project (current package: 0.4.0 (6)), including Swift native automation, JEV closed-loop decisions, Codex text/vision handoff, virtual cursor/preview, clipboard credential setup, Codex/Claude Code skill installers and startup crash mitigation.
 
 ## Included
 
@@ -19,10 +19,10 @@ Build caches, ignored original dist output, transient PIDs, temporary fixture in
 
 No historical Git repository existed in the owning project. Publication uses a new initial commit after auditing the export; no prior private history is imported. No open-source license is selected. NOTICE.md records provenance and dependency boundaries.
 
-## Public packaging checks
+## Initial export packaging checks (historical)
 
-- The public source preserves all completed workflows. One portability change replaces the compiled `#filePath` skill fallback with runtime lookup of bundled resources, executable ancestors and the working directory. Original local source and installed commands remain untouched. Two regression tests cover the new lookup.
-- Current public Swift tests: **29 passed**. Current production app build/signing: passed, without compiler warnings/errors. Historical logs remain labeled separately.
+- The public source preserves all completed workflows. One portability change replaces the compiled `#filePath` skill fallback with runtime lookup of bundled resources, executable ancestors and the working directory. This initial export step did not change the original local source or installed commands. Two regression tests cover the new lookup.
+- Initial export Swift tests: **29 passed**. Initial export production app build/signing: passed, without compiler warnings/errors. Historical logs remain labeled separately.
 - Nine app/artifact checks passed: help, doctor, existing-key setup, both-host installation/repeated installation in isolated destinations, raw SwiftPM installation from outside the checkout, real Calculator observation, strict signature verification, ZIP CRC and relocated bundle installation.
 - Current credentials remained unchanged. No browser or account action was performed. Native observation confirmed the existing Calculator display 42; fresh preview/input behavior was not retested because those sources are unchanged and historical runtime evidence is included.
 - The public archive contains no local home/volume path strings. Four selected PNGs were visually inspected and ancillary metadata was removed without changing pixels.
@@ -43,3 +43,10 @@ Goal-driven app selection and terminal app-list selection are included, with opt
 ## Version 0.3.0 native task window
 
 The native goal-entry/run window, shared task runner, ordered native app picker, GUI key setup and cooperative cancellation are included. CLI help/no-argument behavior remains. New validation is in `evidence/GUI.md` and `evidence/checks/gui-*`. Raw app inventories, local report locations and unrelated Finder context are excluded. Prior evidence remains historical.
+
+
+## AX query engine, 0.4.0 (6)
+
+The local AX query engine, progressive JEV choices and targeted freshness checks are included. Current Swift tests: **61 passed**, zero failures. Final cohort: **query 3/5, legacy 2/5**; JEV reliability remains unresolved. See [AX implementation and benchmarks](evidence/AX-QUERY.md) for current evidence and earlier failures. The separate simulated UI proposal was not installed. Native range reads are verified; notification and scope refresh are verified with the stated causality limit.
+
+Current packaging checks verify the 0.4.0 (6) installed source app, public app and relocated ZIP: strict signature, help, doctor and existing-key setup. Isolated Codex/Claude project installation and repeat installation pass for the public/relocated app. Source synchronization and deliberate packaging differences are verified. Credentials are byte-identical. See `evidence/checks/ax-query-package.json`. Fresh Terminal/Finder/Gatekeeper and host discovery remain unverified.

@@ -1,0 +1,695 @@
+[
+  {
+    "scenario": "small",
+    "mode": "legacy",
+    "observationSamples": [
+      {
+        "nodes": 8,
+        "truncated": false,
+        "coverage": "unreported",
+        "collectionMS": 94.69306468963623,
+        "calls": 115,
+        "metrics": {
+          "actionCalls": 8,
+          "attributeCalls": 107,
+          "batchCalls": 0,
+          "childCountCalls": 0,
+          "childPageCalls": 0,
+          "collectionMS": 94.69306468963623,
+          "textRangeCalls": 0
+        }
+      },
+      {
+        "nodes": 8,
+        "truncated": false,
+        "coverage": "unreported",
+        "collectionMS": 73.77099990844727,
+        "calls": 115,
+        "metrics": {
+          "actionCalls": 8,
+          "attributeCalls": 107,
+          "batchCalls": 0,
+          "childCountCalls": 0,
+          "childPageCalls": 0,
+          "collectionMS": 73.77099990844727,
+          "textRangeCalls": 0
+        }
+      },
+      {
+        "nodes": 9,
+        "truncated": false,
+        "coverage": "unreported",
+        "collectionMS": 81.19797706604004,
+        "calls": 128,
+        "metrics": {
+          "actionCalls": 9,
+          "attributeCalls": 119,
+          "batchCalls": 0,
+          "childCountCalls": 0,
+          "childPageCalls": 0,
+          "collectionMS": 81.19797706604004,
+          "textRangeCalls": 0
+        }
+      }
+    ],
+    "status": "verified_complete",
+    "totalMS": 1438.2362909964286,
+    "steps": 2,
+    "jevCalls": 2,
+    "apiMS": 395.0749635696411,
+    "inputTokens": 2409,
+    "requestBytes": 5767,
+    "queries": [],
+    "errors": [],
+    "events": [
+      {
+        "source": "native NSButton action",
+        "time": 1791598573.348017,
+        "result": "small"
+      }
+    ],
+    "exit": 0
+  },
+  {
+    "scenario": "small",
+    "mode": "query",
+    "observationSamples": [
+      {
+        "nodes": 8,
+        "truncated": false,
+        "coverage": "complete",
+        "collectionMS": 91.24696254730225,
+        "calls": 44,
+        "metrics": {
+          "actionCalls": 8,
+          "attributeCalls": 18,
+          "batchCalls": 8,
+          "childCountCalls": 8,
+          "childPageCalls": 2,
+          "collectionMS": 91.24696254730225,
+          "textRangeCalls": 0
+        }
+      },
+      {
+        "nodes": 8,
+        "truncated": false,
+        "coverage": "complete",
+        "collectionMS": 68.42601299285889,
+        "calls": 44,
+        "metrics": {
+          "actionCalls": 8,
+          "attributeCalls": 18,
+          "batchCalls": 8,
+          "childCountCalls": 8,
+          "childPageCalls": 2,
+          "collectionMS": 68.42601299285889,
+          "textRangeCalls": 0
+        }
+      },
+      {
+        "nodes": 9,
+        "truncated": false,
+        "coverage": "complete",
+        "collectionMS": 80.22701740264893,
+        "calls": 49,
+        "metrics": {
+          "actionCalls": 9,
+          "attributeCalls": 19,
+          "batchCalls": 9,
+          "childCountCalls": 9,
+          "childPageCalls": 3,
+          "collectionMS": 80.22701740264893,
+          "textRangeCalls": 0
+        }
+      }
+    ],
+    "status": "verified_complete",
+    "totalMS": 1509.614499984309,
+    "steps": 2,
+    "jevCalls": 2,
+    "apiMS": 459.8569869995117,
+    "inputTokens": 2637,
+    "requestBytes": 6376,
+    "queries": [],
+    "errors": [],
+    "events": [
+      {
+        "time": 1791598575.93933,
+        "result": "small",
+        "source": "native NSButton action"
+      }
+    ],
+    "exit": 0
+  },
+  {
+    "scenario": "large",
+    "mode": "legacy",
+    "observationSamples": [
+      {
+        "nodes": 600,
+        "truncated": true,
+        "coverage": "partial",
+        "collectionMS": 275.8140563964844,
+        "calls": 7811,
+        "metrics": {
+          "actionCalls": 600,
+          "attributeCalls": 7211,
+          "batchCalls": 0,
+          "childCountCalls": 0,
+          "childPageCalls": 0,
+          "collectionMS": 275.8140563964844,
+          "textRangeCalls": 0
+        }
+      },
+      {
+        "nodes": 600,
+        "truncated": true,
+        "coverage": "partial",
+        "collectionMS": 272.57299423217773,
+        "calls": 7811,
+        "metrics": {
+          "actionCalls": 600,
+          "attributeCalls": 7211,
+          "batchCalls": 0,
+          "childCountCalls": 0,
+          "childPageCalls": 0,
+          "collectionMS": 272.57299423217773,
+          "textRangeCalls": 0
+        }
+      },
+      {
+        "nodes": 600,
+        "truncated": true,
+        "coverage": "partial",
+        "collectionMS": 250.6570816040039,
+        "calls": 7811,
+        "metrics": {
+          "actionCalls": 600,
+          "attributeCalls": 7211,
+          "batchCalls": 0,
+          "childCountCalls": 0,
+          "childPageCalls": 0,
+          "collectionMS": 250.6570816040039,
+          "textRangeCalls": 0
+        }
+      }
+    ],
+    "status": "blocked",
+    "totalMS": 832.9932089836802,
+    "steps": 1,
+    "jevCalls": 1,
+    "apiMS": 248.8420009613037,
+    "inputTokens": 9108,
+    "requestBytes": 21116,
+    "queries": [],
+    "errors": [],
+    "events": [],
+    "exit": 2
+  },
+  {
+    "scenario": "large",
+    "mode": "query",
+    "observationSamples": [
+      {
+        "nodes": 160,
+        "truncated": true,
+        "coverage": "partial",
+        "collectionMS": 99.81405735015869,
+        "calls": 661,
+        "metrics": {
+          "actionCalls": 160,
+          "attributeCalls": 170,
+          "batchCalls": 160,
+          "childCountCalls": 160,
+          "childPageCalls": 11,
+          "collectionMS": 99.81405735015869,
+          "textRangeCalls": 0
+        }
+      },
+      {
+        "nodes": 160,
+        "truncated": true,
+        "coverage": "partial",
+        "collectionMS": 106.54306411743164,
+        "calls": 661,
+        "metrics": {
+          "actionCalls": 160,
+          "attributeCalls": 170,
+          "batchCalls": 160,
+          "childCountCalls": 160,
+          "childPageCalls": 11,
+          "collectionMS": 106.54306411743164,
+          "textRangeCalls": 0
+        }
+      },
+      {
+        "nodes": 160,
+        "truncated": true,
+        "coverage": "partial",
+        "collectionMS": 108.32703113555908,
+        "calls": 661,
+        "metrics": {
+          "actionCalls": 160,
+          "attributeCalls": 170,
+          "batchCalls": 160,
+          "childCountCalls": 160,
+          "childPageCalls": 11,
+          "collectionMS": 108.32703113555908,
+          "textRangeCalls": 0
+        }
+      }
+    ],
+    "status": "uncertain",
+    "totalMS": 1627.5145410036203,
+    "steps": 3,
+    "jevCalls": 4,
+    "apiMS": 875.838041305542,
+    "inputTokens": 9704,
+    "requestBytes": 21006,
+    "queries": [
+      {
+        "kind": "expand"
+      }
+    ],
+    "errors": [
+      "AX target ancestry changed; reobserve",
+      "Uncertain selection: Choice confidence 0.44, progress probability 0.44. No identical-state retry."
+    ],
+    "events": [],
+    "exit": 2
+  },
+  {
+    "scenario": "long",
+    "mode": "legacy",
+    "observationSamples": [
+      {
+        "nodes": 16,
+        "truncated": false,
+        "coverage": "unreported",
+        "collectionMS": 93.94299983978271,
+        "calls": 220,
+        "metrics": {
+          "actionCalls": 16,
+          "attributeCalls": 204,
+          "batchCalls": 0,
+          "childCountCalls": 0,
+          "childPageCalls": 0,
+          "collectionMS": 93.94299983978271,
+          "textRangeCalls": 0
+        }
+      },
+      {
+        "nodes": 16,
+        "truncated": false,
+        "coverage": "unreported",
+        "collectionMS": 79.5140266418457,
+        "calls": 220,
+        "metrics": {
+          "actionCalls": 16,
+          "attributeCalls": 204,
+          "batchCalls": 0,
+          "childCountCalls": 0,
+          "childPageCalls": 0,
+          "collectionMS": 79.5140266418457,
+          "textRangeCalls": 0
+        }
+      },
+      {
+        "nodes": 17,
+        "truncated": false,
+        "coverage": "unreported",
+        "collectionMS": 97.11706638336182,
+        "calls": 233,
+        "metrics": {
+          "actionCalls": 17,
+          "attributeCalls": 216,
+          "batchCalls": 0,
+          "childCountCalls": 0,
+          "childPageCalls": 0,
+          "collectionMS": 97.11706638336182,
+          "textRangeCalls": 0
+        }
+      }
+    ],
+    "status": "verified_complete",
+    "totalMS": 1545.9443340077996,
+    "steps": 2,
+    "jevCalls": 2,
+    "apiMS": 396.87907695770264,
+    "inputTokens": 4367,
+    "requestBytes": 11917,
+    "queries": [],
+    "errors": [],
+    "events": [
+      {
+        "time": 1791598584.030836,
+        "source": "native NSButton action",
+        "result": "confirm"
+      }
+    ],
+    "exit": 0
+  },
+  {
+    "scenario": "long",
+    "mode": "query",
+    "observationSamples": [
+      {
+        "nodes": 16,
+        "truncated": false,
+        "coverage": "complete",
+        "collectionMS": 101.00197792053223,
+        "calls": 82,
+        "metrics": {
+          "actionCalls": 16,
+          "attributeCalls": 29,
+          "batchCalls": 16,
+          "childCountCalls": 16,
+          "childPageCalls": 4,
+          "collectionMS": 101.00197792053223,
+          "textRangeCalls": 1
+        }
+      },
+      {
+        "nodes": 17,
+        "truncated": false,
+        "coverage": "complete",
+        "collectionMS": 87.73088455200195,
+        "calls": 87,
+        "metrics": {
+          "actionCalls": 17,
+          "attributeCalls": 30,
+          "batchCalls": 17,
+          "childCountCalls": 17,
+          "childPageCalls": 5,
+          "collectionMS": 87.73088455200195,
+          "textRangeCalls": 1
+        }
+      },
+      {
+        "nodes": 17,
+        "truncated": false,
+        "coverage": "complete",
+        "collectionMS": 83.27293395996094,
+        "calls": 87,
+        "metrics": {
+          "actionCalls": 17,
+          "attributeCalls": 30,
+          "batchCalls": 17,
+          "childCountCalls": 17,
+          "childPageCalls": 5,
+          "collectionMS": 83.27293395996094,
+          "textRangeCalls": 1
+        }
+      }
+    ],
+    "status": "verified_complete",
+    "totalMS": 1534.3459579744376,
+    "steps": 2,
+    "jevCalls": 2,
+    "apiMS": 448.9619731903076,
+    "inputTokens": 3977,
+    "requestBytes": 10050,
+    "queries": [],
+    "errors": [],
+    "events": [
+      {
+        "result": "confirm",
+        "source": "native NSButton action",
+        "time": 1791598586.791967
+      }
+    ],
+    "exit": 0
+  },
+  {
+    "scenario": "duplicates",
+    "mode": "legacy",
+    "observationSamples": [
+      {
+        "nodes": 13,
+        "truncated": false,
+        "coverage": "unreported",
+        "collectionMS": 148.4919786453247,
+        "calls": 180,
+        "metrics": {
+          "actionCalls": 13,
+          "attributeCalls": 167,
+          "batchCalls": 0,
+          "childCountCalls": 0,
+          "childPageCalls": 0,
+          "collectionMS": 148.4919786453247,
+          "textRangeCalls": 0
+        }
+      },
+      {
+        "nodes": 14,
+        "truncated": false,
+        "coverage": "unreported",
+        "collectionMS": 94.7270393371582,
+        "calls": 193,
+        "metrics": {
+          "actionCalls": 14,
+          "attributeCalls": 179,
+          "batchCalls": 0,
+          "childCountCalls": 0,
+          "childPageCalls": 0,
+          "collectionMS": 94.7270393371582,
+          "textRangeCalls": 0
+        }
+      },
+      {
+        "nodes": 14,
+        "truncated": false,
+        "coverage": "unreported",
+        "collectionMS": 85.42501926422119,
+        "calls": 193,
+        "metrics": {
+          "actionCalls": 14,
+          "attributeCalls": 179,
+          "batchCalls": 0,
+          "childCountCalls": 0,
+          "childPageCalls": 0,
+          "collectionMS": 85.42501926422119,
+          "textRangeCalls": 0
+        }
+      }
+    ],
+    "status": "blocked",
+    "totalMS": 600.9597079828382,
+    "steps": 1,
+    "jevCalls": 1,
+    "apiMS": 223.65999221801758,
+    "inputTokens": 1191,
+    "requestBytes": 2878,
+    "queries": [],
+    "errors": [],
+    "events": [],
+    "exit": 2
+  },
+  {
+    "scenario": "duplicates",
+    "mode": "query",
+    "observationSamples": [
+      {
+        "nodes": 13,
+        "truncated": false,
+        "coverage": "complete",
+        "collectionMS": 84.66994762420654,
+        "calls": 68,
+        "metrics": {
+          "actionCalls": 13,
+          "attributeCalls": 23,
+          "batchCalls": 13,
+          "childCountCalls": 13,
+          "childPageCalls": 6,
+          "collectionMS": 84.66994762420654,
+          "textRangeCalls": 0
+        }
+      },
+      {
+        "nodes": 13,
+        "truncated": false,
+        "coverage": "complete",
+        "collectionMS": 68.4899091720581,
+        "calls": 68,
+        "metrics": {
+          "actionCalls": 13,
+          "attributeCalls": 23,
+          "batchCalls": 13,
+          "childCountCalls": 13,
+          "childPageCalls": 6,
+          "collectionMS": 68.4899091720581,
+          "textRangeCalls": 0
+        }
+      },
+      {
+        "nodes": 14,
+        "truncated": false,
+        "coverage": "complete",
+        "collectionMS": 78.15194129943848,
+        "calls": 73,
+        "metrics": {
+          "actionCalls": 14,
+          "attributeCalls": 24,
+          "batchCalls": 14,
+          "childCountCalls": 14,
+          "childPageCalls": 7,
+          "collectionMS": 78.15194129943848,
+          "textRangeCalls": 0
+        }
+      }
+    ],
+    "status": "uncertain",
+    "totalMS": 1453.172875015298,
+    "steps": 3,
+    "jevCalls": 4,
+    "apiMS": 786.6779565811157,
+    "inputTokens": 5271,
+    "requestBytes": 10483,
+    "queries": [],
+    "errors": [
+      "AX target ancestry changed; reobserve",
+      "AX target ancestry changed; reobserve",
+      "Uncertain selection: Choice confidence 0.38, progress probability 0.54. No identical-state retry."
+    ],
+    "events": [],
+    "exit": 2
+  },
+  {
+    "scenario": "dialog",
+    "mode": "legacy",
+    "observationSamples": [
+      {
+        "nodes": 8,
+        "truncated": false,
+        "coverage": "unreported",
+        "collectionMS": 84.71190929412842,
+        "calls": 115,
+        "metrics": {
+          "actionCalls": 8,
+          "attributeCalls": 107,
+          "batchCalls": 0,
+          "childCountCalls": 0,
+          "childPageCalls": 0,
+          "collectionMS": 84.71190929412842,
+          "textRangeCalls": 0
+        }
+      },
+      {
+        "nodes": 8,
+        "truncated": false,
+        "coverage": "unreported",
+        "collectionMS": 79.59997653961182,
+        "calls": 115,
+        "metrics": {
+          "actionCalls": 8,
+          "attributeCalls": 107,
+          "batchCalls": 0,
+          "childCountCalls": 0,
+          "childPageCalls": 0,
+          "collectionMS": 79.59997653961182,
+          "textRangeCalls": 0
+        }
+      },
+      {
+        "nodes": 9,
+        "truncated": false,
+        "coverage": "unreported",
+        "collectionMS": 79.99396324157715,
+        "calls": 128,
+        "metrics": {
+          "actionCalls": 9,
+          "attributeCalls": 119,
+          "batchCalls": 0,
+          "childCountCalls": 0,
+          "childPageCalls": 0,
+          "collectionMS": 79.99396324157715,
+          "textRangeCalls": 0
+        }
+      }
+    ],
+    "status": "verified_complete",
+    "totalMS": 2673.2954169856384,
+    "steps": 3,
+    "jevCalls": 3,
+    "apiMS": 618.5309886932373,
+    "inputTokens": 3784,
+    "requestBytes": 9114,
+    "queries": [],
+    "errors": [],
+    "events": [
+      {
+        "source": "native NSButton action",
+        "result": "confirmed-dialog",
+        "time": 1791598595.1821
+      }
+    ],
+    "exit": 0
+  },
+  {
+    "scenario": "dialog",
+    "mode": "query",
+    "observationSamples": [
+      {
+        "nodes": 8,
+        "truncated": false,
+        "coverage": "complete",
+        "collectionMS": 91.88997745513916,
+        "calls": 44,
+        "metrics": {
+          "actionCalls": 8,
+          "attributeCalls": 18,
+          "batchCalls": 8,
+          "childCountCalls": 8,
+          "childPageCalls": 2,
+          "collectionMS": 91.88997745513916,
+          "textRangeCalls": 0
+        }
+      },
+      {
+        "nodes": 8,
+        "truncated": false,
+        "coverage": "complete",
+        "collectionMS": 76.17998123168945,
+        "calls": 44,
+        "metrics": {
+          "actionCalls": 8,
+          "attributeCalls": 18,
+          "batchCalls": 8,
+          "childCountCalls": 8,
+          "childPageCalls": 2,
+          "collectionMS": 76.17998123168945,
+          "textRangeCalls": 0
+        }
+      },
+      {
+        "nodes": 9,
+        "truncated": false,
+        "coverage": "complete",
+        "collectionMS": 79.85007762908936,
+        "calls": 49,
+        "metrics": {
+          "actionCalls": 9,
+          "attributeCalls": 19,
+          "batchCalls": 9,
+          "childCountCalls": 9,
+          "childPageCalls": 3,
+          "collectionMS": 79.85007762908936,
+          "textRangeCalls": 0
+        }
+      }
+    ],
+    "status": "uncertain",
+    "totalMS": 1818.82954199682,
+    "steps": 2,
+    "jevCalls": 3,
+    "apiMS": 635.9399557113647,
+    "inputTokens": 3690,
+    "requestBytes": 6485,
+    "queries": [],
+    "errors": [
+      "Uncertain selection: Choice confidence 0.53, progress probability 0.64. No identical-state retry."
+    ],
+    "events": [],
+    "exit": 2
+  }
+]

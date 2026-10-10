@@ -9,7 +9,7 @@ func startupMode(_ arguments: [String]) -> StartupMode {
     case "--gui": return .application
     case "run": return arguments.contains("--no-preview") && !arguments.contains("--show-virtual-cursor") ? .nativeServices : .application
     case "act": return arguments.contains("--show-virtual-cursor") ? .application : .nativeServices
-    case "observe": return .nativeServices
+    case "observe", "ax-query": return .nativeServices
     default: return .cli
     }
 }

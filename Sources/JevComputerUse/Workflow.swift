@@ -35,18 +35,53 @@ import Foundation
         add(Action(kind: "scroll", amount: -5), "Scroll down"); add(Action(kind: "scroll", amount: 5), "Scroll up"); add(Action(kind: "wait", amount: 500), "Wait for UI to settle")
         // Choice supports at most 255 options. Prioritize visible actionable nodes, not generic containers.
         for node in obs.nodes where node.enabled {
-            if result.count >= 245 { break }
+            if native.legacyAX && result.count >= 245 { break }
             if let frame = node.frame, frame.width <= 0 || frame.height <= 0 { continue }
-            if node.actions.contains("AXPress") { add(Action(kind: "press", target: node.id), "Press \(node.id) \(node.role) \(node.subrole) \(node.title) value=\(node.value.prefix(100))") }
-            else if ["AXTextField", "AXTextArea", "AXComboBox"].contains(node.role) { add(Action(kind: "focus", target: node.id), "Focus editable \(node.id) \(node.title)") }
+            if !native.legacyAX, obs.nodes.contains(where: { $0.parent == node.id && !$0.title.isEmpty && $0.title == node.title && $0.frame == node.frame && Set(node.actions).isSubset(of:Set($0.actions)) }) { continue }
+            if node.actions.contains("AXPress") { add(Action(kind: "press", target: node.id), "Press \(node.role) \(node.subrole) \(node.title) value=\(node.value.prefix(100)) context=\((node.ancestors ?? []).suffix(4).joined(separator: " > ")) selected=\(node.selected.map(String.init) ?? "unknown") checked=\(node.checked.map(String.init) ?? "unknown")") }
+            else if ["AXTextField", "AXTextArea", "AXComboBox"].contains(node.role) { add(Action(kind: "focus", target: node.id), "Focus editable \(node.title) context=\((node.ancestors ?? []).suffix(4).joined(separator: " > "))") }
             else if node.actions.contains("AXRaise") { add(Action(kind: "raise", target: node.id), "Raise window \(node.title)") }
         }
-        return Array(result.prefix(255))
+        if native.legacyAX { return Array(result.prefix(255)) }
+        for region in obs.axOverview?.regions ?? [] {
+            result.append(Candidate(id:"expand\(result.count)",description:"Explore unscanned exposed children in \(region.context), next index \(region.offset), exposed total \(region.total.map(String.init) ?? "unknown"), pending descendant regions \(region.descendantPending). Missing controls are not absent.",action:nil,query:AXQuery(kind:.expand,handle:region.handle)))
+        }
+        let visible=Dictionary(uniqueKeysWithValues:Jev.projectedValues(obs).map { ($0.0.id,$0.1.utf16.count) })
+        for node in obs.nodes where !node.value.isEmpty || node.valueTruncated {
+            if node.role == "AXStaticText" && node.value == obs.selectedWindow?.title { continue }
+            let base=node.valueRangeUTF16?.location ?? 0
+            let shown=visible[node.id] ?? 0
+            let start=base+shown,total=node.textLengthUTF16 ?? (base+node.value.utf16.count)
+            if shown < node.value.utf16.count || node.valueTruncated {
+                let local = !["AXTextArea","AXTextField","AXComboBox"].contains(node.role) || node.textLengthUTF16 == nil
+                let length=max(0,min(2000,total-start))
+                if length > 0 { result.append(Candidate(id:"read\(result.count)",description:"Read omitted value / next UTF-16 text range \(start)..<\(start+length) of \(node.title.isEmpty ? node.role : node.title), total \(total); context=\((node.ancestors ?? []).suffix(3).joined(separator:" > "))",action:nil,query:AXQuery(kind:.read,handle:node.id,rangeUTF16:AXTextRange(location:start,length:length),localValue:local))) }
+            }
+        }
+        // Page the complete candidate catalogue, including regions. Never silently clip a tail.
+        if result.count <= 240 { return result }
+        let fixed=result.filter { ["done","blocked","delegateText","delegateVision"].contains($0.id) }
+        let fixedIDs=Set(fixed.map(\.id))
+        let pageable=result.filter { !fixedIDs.contains($0.id) }
+        let pageSize=120, pageCount=(pageable.count+pageSize-1)/pageSize
+        let page=min(native.candidatePage,pageCount-1)
+        var choices=fixed + Array(pageable.dropFirst(page*pageSize).prefix(pageSize))
+        for next in 0..<pageCount where next != page {
+            let entries=Array(pageable.dropFirst(next*pageSize).prefix(pageSize))
+            // Only the first/last three labels are transmitted; every page remains reachable.
+            let summary=(Array(entries.prefix(3))+Array(entries.suffix(3))).map(\.description).joined(separator:"; ")
+            choices.append(Candidate(id:"page\(next)",description:"Explore candidate page \(next+1)/\(pageCount), items \(next*pageSize)..<\(min(pageable.count,(next+1)*pageSize)): \(summary)",action:nil,query:AXQuery(kind:.page,page:next)))
+        }
+        guard choices.count <= 255 else {
+            // Bounded sequential page navigation still reaches catalogues larger than 16k entries.
+            return fixed + Array(pageable.dropFirst(page*pageSize).prefix(pageSize)) + [Candidate(id:"pageNext",description:"Explore next candidate page after \(page+1) of \(pageCount)",action:nil,query:AXQuery(kind:.page,page:(page+1)%pageCount))]
+        }
+        return choices
     }
     func run(spec: TaskSpec, directory: String, model: String?, appSelection: AppResolution? = nil, control: RunControl? = nil) async throws -> RunReport {
         guard !spec.apps.isEmpty, spec.maxSteps > 0, (0...1).contains(spec.confidence), spec.maxRecovery >= 0 else { throw Failure("Invalid task bounds/empty app allowlist") }
         try FileManager.default.createDirectory(atPath: directory, withIntermediateDirectories: true, attributes: [.posixPermissions: 0o700]); try writeJSON(spec, directory + "/task.json"); try writeJSON([Step](), directory + "/steps.json")
-        native.sessionApp = spec.apps.first
+        native.sessionApp = spec.apps.first; native.allowedApps = spec.apps
         var history: [Step] = [], texts = spec.texts, generated = false, inspected = false, extra: [Action] = [], recovery = 0, status = "step_limit", finalPath = ""
         var visionSnapshot:Observation?; var advisory:[String:String]?
         func cancelled() -> Bool { control?.isCancelled == true || native.preview?.cancelRequested == true || Task.isCancelled }
@@ -57,6 +92,7 @@ import Foundation
             let obs = try await observe(directory: stepDir); let obsPath = stepDir + "/observation.json"; try writeJSON(obs, obsPath); finalPath = obsPath
             if cancelled() { status = "cancelled"; break }
             if let previous=visionSnapshot, !stableTargetState(previous,obs) || previous.windowCapture?.imageSHA256 != obs.windowCapture?.imageSHA256 { inspected=false; extra=[]; advisory=nil; visionSnapshot=nil }
+            if !native.legacyAX, explicitCompletion(spec,observation:obs,pendingTexts:texts,generated:generated,inspected:inspected) { status="verified_complete";break }
             let choices = candidates(spec, obs, texts: texts, generated: generated, inspected: inspected, extra: extra)
             try writeJSON(choices, stepDir + "/candidates.json")
             var step = Step(index: index, observation: obsPath)
@@ -70,12 +106,19 @@ import Foundation
                 if decision.choice == "blocked" { status = "blocked"; history.append(step); break }
                 if decision.confidence < spec.confidence {
                     let selected = choices.first { $0.id == decision.choice }!
-                    let (probability, verifyMS, usage) = try await jev.verifyProgress(goal:spec.goal,observation:decisionObservation,candidate:selected,history:history,directory:stepDir)
-                    decision.progressProbability=probability; decision.verificationApiMS=verifyMS
+                    let (probability, verifyMS, usage, verifyBytes) = try await jev.verifyProgress(goal:spec.goal,observation:decisionObservation,candidate:selected,history:history,directory:stepDir)
+                    decision.progressProbability=probability; decision.verificationApiMS=verifyMS; decision.verificationRequestBytes=verifyBytes
                     for (key,value) in usage { decision.usage[key,default:0] += value }
                     step.decision=decision; try writeJSON(decision,stepDir+"/decision.json")
                     if cancelled() { status = "cancelled"; history.append(step); break }
                     if probability < 0.85 { step.error="Uncertain selection: Choice confidence \(decision.confidence), progress probability \(probability). No identical-state retry."; status="uncertain"; history.append(step); break }
+                }
+                if let query = choices.first(where: { $0.id == decision.choice })?.query {
+                    if cancelled() { status="cancelled"; history.append(step); break }
+                    step.query=query; step.queryLabel=choices.first(where: { $0.id == decision.choice })?.description
+                    let start=Date(); let overview=try native.applyQuery(query); step.executionMS=milliseconds(start)
+                    try writeJSON(overview,stepDir+"/query-result.json")
+                    history.append(step); try writeJSON(history,directory+"/steps.json"); continue
                 }
                 if decision.choice == "done" {
                     let appOK = spec.expectApp.map { obs.target?.bundle == $0 } ?? true
@@ -98,7 +141,7 @@ import Foundation
                 } else {
                     guard let selected = choices.first(where: { $0.id == decision.choice }), var action = selected.action else { throw Failure("Missing selected action") }; action.label = selected.description; step.action = action
                     // Reobserve immediately before execution. Input coordinate proposals expire on UI changes.
-                    if !["launch", "activate", "openFile", "selectWindow", "wait"].contains(action.kind) {
+                    if action.target == nil && !["launch", "activate", "openFile", "selectWindow", "wait"].contains(action.kind) {
                         let pointerAction=["click","doubleClick","rightClick","move","drag","scroll"].contains(action.kind)
                         let fresh = try await observe(directory: nil, images: pointerAction)
                         guard stableTargetState(obs, fresh, action: action) else { throw Failure("Target UI changed during decision; selection discarded") }
@@ -113,7 +156,10 @@ import Foundation
                 try await Task.sleep(nanoseconds: UInt64(max(0, min(spec.settleMS, 5000))) * 1_000_000)
                 let afterDir = stepDir + "/after"; try FileManager.default.createDirectory(atPath: afterDir, withIntermediateDirectories: true)
                 let after = try await observe(directory: afterDir); let afterPath = afterDir + "/observation.json"; try writeJSON(after, afterPath); step.afterObservation = afterPath; finalPath = afterPath
-                if !["wait", "selectWindow"].contains(step.action?.kind ?? ""), step.action != nil, after.target?.pid == obs.target?.pid, after.nodes == obs.nodes { recovery += 1; step.error = "No AX change observed; result is not proven (screenshot may differ)" } else { recovery = 0 }
+                if cancelled() { status="cancelled";history.append(step);break }
+                if let previous=visionSnapshot, !stableTargetState(previous,after) || previous.windowCapture?.imageSHA256 != after.windowCapture?.imageSHA256 { inspected=false; extra=[]; advisory=nil; visionSnapshot=nil }
+                if !native.legacyAX, explicitCompletion(spec,observation:after,pendingTexts:texts,generated:generated,inspected:inspected) { status="verified_complete";history.append(step);break }
+                if !["wait", "selectWindow"].contains(step.action?.kind ?? ""), step.action != nil, after.target?.pid == obs.target?.pid, stableTargetState(obs,after,action:step.action) { recovery += 1; step.error = "No AX change observed; result is not proven (screenshot may differ)" } else { recovery = 0 }
             } catch {
                 if cancelled() || error is CancellationError { status = "cancelled"; history.append(step); break }
                 recovery += 1; step.error = String(describing: error)
@@ -122,6 +168,6 @@ import Foundation
             if recovery > spec.maxRecovery { status = "recovery_exhausted"; break }
         }
         phase("Finished: \(status)")
-        let report = RunReport(status: status, goal: spec.goal, steps: history, finalObservation: finalPath, directory: directory, apps: spec.apps, appSelection: appSelection); try writeJSON(report, directory + "/report.json"); return report
+        let report = RunReport(status: status, goal: spec.goal, steps: history, finalObservation: finalPath, directory: directory, apps: spec.apps, appSelection: appSelection, completionSource:status == "verified_complete" ? "explicit_postconditions" : (status == "jev_observed_complete" ? "jev" : nil)); try writeJSON(history,directory+"/steps.json"); try writeJSON(report, directory + "/report.json"); return report
     }
 }

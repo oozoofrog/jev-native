@@ -26,3 +26,5 @@ The full private validation corpus remains local. Omitted material includes raw 
 See [app-selection validation](APP-SELECTION.md) for version 0.2.0, including automatic selection, the terminal picker and known semantic-action limits.
 
 See [native task-window validation](GUI.md) for version 0.3.0.
+
+- [AX query engine and complete measurement cohorts](AX-QUERY.md): current 0.4.0 evidence and unresolved JEV reliability.

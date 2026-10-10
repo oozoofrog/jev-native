@@ -25,7 +25,15 @@ let app=NSApplication.shared
 app.setActivationPolicy(.accessory)
 let window=NSWindow(contentRect:NSRect(x:180,y:180,width:480,height:300),styleMask:[.titled,.closable,.resizable],backing:.buffered,defer:false)
 window.title="JEV Owned Native Fixture"
-let canvas=Canvas(frame:NSRect(x:0,y:0,width:480,height:300),logPath:CommandLine.arguments.dropFirst().first ?? "/tmp/jev-owned-fixture-events.jsonl")
-window.contentView=canvas; window.makeFirstResponder(canvas); window.orderFrontRegardless()
+let scenarioIndex=CommandLine.arguments.firstIndex(of:"--scenario")
+var queryFixture: QueryFixture?
+if let scenarioIndex, CommandLine.arguments.indices.contains(scenarioIndex+1) {
+    let scenario=CommandLine.arguments[scenarioIndex+1]
+    let log=CommandLine.arguments.firstIndex(of:"--log").flatMap { CommandLine.arguments.indices.contains($0+1) ? CommandLine.arguments[$0+1] : nil } ?? "/tmp/jev-query-fixture-events.jsonl"
+    queryFixture=MainActor.assumeIsolated { QueryFixture(window:window,scenario:scenario,logPath:log) }
+} else {
+    let canvas=Canvas(frame:NSRect(x:0,y:0,width:480,height:300),logPath:CommandLine.arguments.dropFirst().first ?? "/tmp/jev-owned-fixture-events.jsonl")
+    window.contentView=canvas; window.makeFirstResponder(canvas); window.orderFrontRegardless()
+}
 print("fixture_pid=\(ProcessInfo.processInfo.processIdentifier)"); fflush(stdout)
 app.run()

@@ -40,7 +40,7 @@ import Foundation
         func configuredNative() -> Native {
             let native = Native()
             native.showVirtualPointer = args.contains("--show-virtual-cursor")
-            native.sessionApp = option("--app"); native.sessionWindowID = option("--window").flatMap(UInt32.init)
+            native.sessionApp = option("--app"); native.allowedApps=native.sessionApp.map { [$0] }; native.sessionWindowID = option("--window").flatMap(UInt32.init)
             return native
         }
         switch args.first ?? "help" {
@@ -61,15 +61,21 @@ import Foundation
         case "observe":
             let native = configuredNative()
             let dir = try directory(); let obs = try await native.observe(directory: dir, images: !args.contains("--no-image")); try writeJSON(obs, dir + "/observation.json"); try emit(obs)
+        case "ax-query":
+            let native=configuredNative(); native.sessionApp=try require("--app"); native.allowedApps=[native.sessionApp!]
+            let commands=try JSONDecoder().decode([AXCommand].self,from:Data(contentsOf:URL(fileURLWithPath:require("--requests"))))
+            try await performAXCommands(commands,native:native,directory:directory())
         case "act":
             let native = configuredNative()
             let priorPath = try require("--observation"), actionPath = try require("--action"), app = try require("--app")
+            var actionRebind: Action?
             let prior = try JSONDecoder().decode(Observation.self, from: Data(contentsOf: URL(fileURLWithPath: priorPath))), action = try JSONDecoder().decode(Action.self, from: Data(contentsOf: URL(fileURLWithPath: actionPath)))
             native.sessionApp = prior.target?.bundle ?? app; native.sessionWindowID = prior.selectedWindow?.id
             let dir = try directory(); let fresh = try await native.observe(directory: dir)
             try writeJSON(fresh, dir + "/before.json")
             if !["launch", "activate"].contains(action.kind) { guard Date().timeIntervalSince(prior.timestamp) < 60, stableTargetState(prior, fresh, action: action) else { throw Failure("Observation stale (>60s) or target UI changed; reobserve") } }
-            let pointerBefore = native.pointer(); let start = Date(); try await native.execute(action, observation: fresh, allowedApps: [app]); let ms = milliseconds(start); try await Task.sleep(nanoseconds: 250_000_000); let pointerAfter = native.pointer()
+            if let id=action.target, let old=prior.nodes.first(where:{$0.id==id}), let current=fresh.nodes.first(where:{($0.locator ?? $0.id)==(old.locator ?? old.id)}) { var rebound=action; rebound.target=current.id; actionRebind=rebound }
+            let pointerBefore = native.pointer(); let start = Date(); try await native.execute(actionRebind ?? action, observation: fresh, allowedApps: [app]); let ms = milliseconds(start); try await Task.sleep(nanoseconds: 250_000_000); let pointerAfter = native.pointer()
             let afterDir = dir + "/after"; try FileManager.default.createDirectory(atPath: afterDir, withIntermediateDirectories: true); let after = try await native.observe(directory: afterDir); try writeJSON(after, afterDir + "/observation.json")
             struct Result: Codable { var executionMS: Double; var pointerBefore: Rect; var pointerAfter: Rect; var virtualPointer: VirtualPointer; var after: Observation }; try emit(Result(executionMS: ms, pointerBefore: pointerBefore, pointerAfter: pointerAfter, virtualPointer: native.virtualPointer, after: after))
         case "run":
@@ -94,6 +100,7 @@ import Foundation
               install-skill --host codex|claude|both [--scope user|project]
                   [--project PATH] [--skills-dir PATH (one host only)]
               observe [--out DIR] [--no-image]
+              ax-query --app BUNDLE --requests JSON [--window ID] [--out DIR]
               act --observation JSON --action JSON --app BUNDLE [--out DIR]
               run --goal TEXT [--apps BUNDLE[,BUNDLE] | --auto | --simple] [--text LITERAL]
                   [--generate-text] [--inspect-image] [--codex-model MODEL]

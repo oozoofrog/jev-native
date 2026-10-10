@@ -1,0 +1,768 @@
+[
+  {
+    "scenario": "small",
+    "mode": "legacy",
+    "observationSamples": [
+      {
+        "nodes": 8,
+        "truncated": false,
+        "coverage": "unreported",
+        "collectionMS": 91.6370153427124,
+        "calls": 115,
+        "metrics": {
+          "actionCalls": 8,
+          "attributeCalls": 107,
+          "batchCalls": 0,
+          "childCountCalls": 0,
+          "childPageCalls": 0,
+          "collectionMS": 91.6370153427124,
+          "observerCalls": 0,
+          "observerHints": 0,
+          "textRangeCalls": 0
+        }
+      },
+      {
+        "nodes": 8,
+        "truncated": false,
+        "coverage": "unreported",
+        "collectionMS": 70.23000717163086,
+        "calls": 115,
+        "metrics": {
+          "actionCalls": 8,
+          "attributeCalls": 107,
+          "batchCalls": 0,
+          "childCountCalls": 0,
+          "childPageCalls": 0,
+          "collectionMS": 70.23000717163086,
+          "observerCalls": 0,
+          "observerHints": 0,
+          "textRangeCalls": 0
+        }
+      },
+      {
+        "nodes": 9,
+        "truncated": false,
+        "coverage": "unreported",
+        "collectionMS": 75.996994972229,
+        "calls": 128,
+        "metrics": {
+          "actionCalls": 9,
+          "attributeCalls": 119,
+          "batchCalls": 0,
+          "childCountCalls": 0,
+          "childPageCalls": 0,
+          "collectionMS": 75.996994972229,
+          "observerCalls": 0,
+          "observerHints": 0,
+          "textRangeCalls": 0
+        }
+      }
+    ],
+    "status": "verified_complete",
+    "totalMS": 1509.6872079884633,
+    "steps": 2,
+    "jevCalls": 2,
+    "apiMS": 454.7029733657837,
+    "inputTokens": 2409,
+    "requestBytes": 5767,
+    "queries": [],
+    "errors": [],
+    "events": [
+      {
+        "source": "native NSButton action",
+        "time": 1791598963.973181,
+        "result": "small"
+      }
+    ],
+    "exit": 0
+  },
+  {
+    "scenario": "small",
+    "mode": "query",
+    "observationSamples": [
+      {
+        "nodes": 8,
+        "truncated": false,
+        "coverage": "complete",
+        "collectionMS": 86.3109827041626,
+        "calls": 44,
+        "metrics": {
+          "actionCalls": 8,
+          "attributeCalls": 18,
+          "batchCalls": 8,
+          "childCountCalls": 8,
+          "childPageCalls": 2,
+          "collectionMS": 86.3109827041626,
+          "observerCalls": 19,
+          "observerHints": 0,
+          "textRangeCalls": 0
+        }
+      },
+      {
+        "nodes": 8,
+        "truncated": false,
+        "coverage": "complete",
+        "collectionMS": 72.13008403778076,
+        "calls": 44,
+        "metrics": {
+          "actionCalls": 8,
+          "attributeCalls": 18,
+          "batchCalls": 8,
+          "childCountCalls": 8,
+          "childPageCalls": 2,
+          "collectionMS": 72.13008403778076,
+          "observerCalls": 19,
+          "observerHints": 0,
+          "textRangeCalls": 0
+        }
+      },
+      {
+        "nodes": 9,
+        "truncated": false,
+        "coverage": "complete",
+        "collectionMS": 79.05995845794678,
+        "calls": 49,
+        "metrics": {
+          "actionCalls": 9,
+          "attributeCalls": 19,
+          "batchCalls": 9,
+          "childCountCalls": 9,
+          "childPageCalls": 3,
+          "collectionMS": 79.05995845794678,
+          "observerCalls": 19,
+          "observerHints": 0,
+          "textRangeCalls": 0
+        }
+      }
+    ],
+    "status": "verified_complete",
+    "totalMS": 1465.5654580274131,
+    "steps": 2,
+    "jevCalls": 2,
+    "apiMS": 431.8801164627075,
+    "inputTokens": 3483,
+    "requestBytes": 7868,
+    "queries": [],
+    "errors": [],
+    "events": [
+      {
+        "time": 1791598966.5742102,
+        "result": "small",
+        "source": "native NSButton action"
+      }
+    ],
+    "exit": 0
+  },
+  {
+    "scenario": "large",
+    "mode": "legacy",
+    "observationSamples": [
+      {
+        "nodes": 600,
+        "truncated": true,
+        "coverage": "partial",
+        "collectionMS": 250.4279613494873,
+        "calls": 7811,
+        "metrics": {
+          "actionCalls": 600,
+          "attributeCalls": 7211,
+          "batchCalls": 0,
+          "childCountCalls": 0,
+          "childPageCalls": 0,
+          "collectionMS": 250.4279613494873,
+          "observerCalls": 0,
+          "observerHints": 0,
+          "textRangeCalls": 0
+        }
+      },
+      {
+        "nodes": 600,
+        "truncated": true,
+        "coverage": "partial",
+        "collectionMS": 243.4689998626709,
+        "calls": 7811,
+        "metrics": {
+          "actionCalls": 600,
+          "attributeCalls": 7211,
+          "batchCalls": 0,
+          "childCountCalls": 0,
+          "childPageCalls": 0,
+          "collectionMS": 243.4689998626709,
+          "observerCalls": 0,
+          "observerHints": 0,
+          "textRangeCalls": 0
+        }
+      },
+      {
+        "nodes": 600,
+        "truncated": true,
+        "coverage": "partial",
+        "collectionMS": 238.18707466125488,
+        "calls": 7811,
+        "metrics": {
+          "actionCalls": 600,
+          "attributeCalls": 7211,
+          "batchCalls": 0,
+          "childCountCalls": 0,
+          "childPageCalls": 0,
+          "collectionMS": 238.18707466125488,
+          "observerCalls": 0,
+          "observerHints": 0,
+          "textRangeCalls": 0
+        }
+      }
+    ],
+    "status": "blocked",
+    "totalMS": 778.8315409852657,
+    "steps": 1,
+    "jevCalls": 1,
+    "apiMS": 239.58098888397217,
+    "inputTokens": 9108,
+    "requestBytes": 21116,
+    "queries": [],
+    "errors": [],
+    "events": [],
+    "exit": 2
+  },
+  {
+    "scenario": "large",
+    "mode": "query",
+    "observationSamples": [
+      {
+        "nodes": 160,
+        "truncated": true,
+        "coverage": "partial",
+        "collectionMS": 108.25204849243164,
+        "calls": 661,
+        "metrics": {
+          "actionCalls": 160,
+          "attributeCalls": 170,
+          "batchCalls": 160,
+          "childCountCalls": 160,
+          "childPageCalls": 11,
+          "collectionMS": 108.25204849243164,
+          "observerCalls": 23,
+          "observerHints": 0,
+          "textRangeCalls": 0
+        }
+      },
+      {
+        "nodes": 160,
+        "truncated": true,
+        "coverage": "partial",
+        "collectionMS": 100.86393356323242,
+        "calls": 661,
+        "metrics": {
+          "actionCalls": 160,
+          "attributeCalls": 170,
+          "batchCalls": 160,
+          "childCountCalls": 160,
+          "childPageCalls": 11,
+          "collectionMS": 100.86393356323242,
+          "observerCalls": 23,
+          "observerHints": 0,
+          "textRangeCalls": 0
+        }
+      },
+      {
+        "nodes": 160,
+        "truncated": true,
+        "coverage": "partial",
+        "collectionMS": 105.29196262359619,
+        "calls": 661,
+        "metrics": {
+          "actionCalls": 160,
+          "attributeCalls": 170,
+          "batchCalls": 160,
+          "childCountCalls": 160,
+          "childPageCalls": 11,
+          "collectionMS": 105.29196262359619,
+          "observerCalls": 23,
+          "observerHints": 0,
+          "textRangeCalls": 0
+        }
+      }
+    ],
+    "status": "uncertain",
+    "totalMS": 2099.781625001924,
+    "steps": 3,
+    "jevCalls": 4,
+    "apiMS": 807.204008102417,
+    "inputTokens": 13980,
+    "requestBytes": 28737,
+    "queries": [
+      {
+        "kind": "expand"
+      }
+    ],
+    "errors": [
+      "Uncertain selection: Choice confidence 0.44, progress probability 0.27. No identical-state retry."
+    ],
+    "events": [
+      {
+        "result": "row-719",
+        "source": "native NSButton action",
+        "time": 1791598972.1116362
+      }
+    ],
+    "exit": 2
+  },
+  {
+    "scenario": "long",
+    "mode": "legacy",
+    "observationSamples": [
+      {
+        "nodes": 16,
+        "truncated": false,
+        "coverage": "unreported",
+        "collectionMS": 94.14899349212646,
+        "calls": 220,
+        "metrics": {
+          "actionCalls": 16,
+          "attributeCalls": 204,
+          "batchCalls": 0,
+          "childCountCalls": 0,
+          "childPageCalls": 0,
+          "collectionMS": 94.14899349212646,
+          "observerCalls": 0,
+          "observerHints": 0,
+          "textRangeCalls": 0
+        }
+      },
+      {
+        "nodes": 16,
+        "truncated": false,
+        "coverage": "unreported",
+        "collectionMS": 79.96594905853271,
+        "calls": 220,
+        "metrics": {
+          "actionCalls": 16,
+          "attributeCalls": 204,
+          "batchCalls": 0,
+          "childCountCalls": 0,
+          "childPageCalls": 0,
+          "collectionMS": 79.96594905853271,
+          "observerCalls": 0,
+          "observerHints": 0,
+          "textRangeCalls": 0
+        }
+      },
+      {
+        "nodes": 17,
+        "truncated": false,
+        "coverage": "unreported",
+        "collectionMS": 82.13698863983154,
+        "calls": 233,
+        "metrics": {
+          "actionCalls": 17,
+          "attributeCalls": 216,
+          "batchCalls": 0,
+          "childCountCalls": 0,
+          "childPageCalls": 0,
+          "collectionMS": 82.13698863983154,
+          "observerCalls": 0,
+          "observerHints": 0,
+          "textRangeCalls": 0
+        }
+      }
+    ],
+    "status": "verified_complete",
+    "totalMS": 1690.272375009954,
+    "steps": 2,
+    "jevCalls": 3,
+    "apiMS": 600.835919380188,
+    "inputTokens": 5885,
+    "requestBytes": 11917,
+    "queries": [],
+    "errors": [],
+    "events": [
+      {
+        "time": 1791598975.178324,
+        "result": "confirm",
+        "source": "native NSButton action"
+      }
+    ],
+    "exit": 0
+  },
+  {
+    "scenario": "long",
+    "mode": "query",
+    "observationSamples": [
+      {
+        "nodes": 16,
+        "truncated": false,
+        "coverage": "complete",
+        "collectionMS": 112.66398429870605,
+        "calls": 82,
+        "metrics": {
+          "actionCalls": 16,
+          "attributeCalls": 29,
+          "batchCalls": 16,
+          "childCountCalls": 16,
+          "childPageCalls": 4,
+          "collectionMS": 112.66398429870605,
+          "observerCalls": 23,
+          "observerHints": 0,
+          "textRangeCalls": 1
+        }
+      },
+      {
+        "nodes": 16,
+        "truncated": false,
+        "coverage": "complete",
+        "collectionMS": 84.43605899810791,
+        "calls": 82,
+        "metrics": {
+          "actionCalls": 16,
+          "attributeCalls": 29,
+          "batchCalls": 16,
+          "childCountCalls": 16,
+          "childPageCalls": 4,
+          "collectionMS": 84.43605899810791,
+          "observerCalls": 23,
+          "observerHints": 0,
+          "textRangeCalls": 1
+        }
+      },
+      {
+        "nodes": 17,
+        "truncated": false,
+        "coverage": "complete",
+        "collectionMS": 94.19894218444824,
+        "calls": 87,
+        "metrics": {
+          "actionCalls": 17,
+          "attributeCalls": 30,
+          "batchCalls": 17,
+          "childCountCalls": 17,
+          "childPageCalls": 5,
+          "collectionMS": 94.19894218444824,
+          "observerCalls": 23,
+          "observerHints": 0,
+          "textRangeCalls": 1
+        }
+      }
+    ],
+    "status": "verified_complete",
+    "totalMS": 1512.0409170049243,
+    "steps": 2,
+    "jevCalls": 2,
+    "apiMS": 415.5840873718262,
+    "inputTokens": 5605,
+    "requestBytes": 13026,
+    "queries": [],
+    "errors": [],
+    "events": [
+      {
+        "time": 1791598977.895889,
+        "source": "native NSButton action",
+        "result": "confirm"
+      }
+    ],
+    "exit": 0
+  },
+  {
+    "scenario": "duplicates",
+    "mode": "legacy",
+    "observationSamples": [
+      {
+        "nodes": 13,
+        "truncated": false,
+        "coverage": "unreported",
+        "collectionMS": 106.90009593963623,
+        "calls": 180,
+        "metrics": {
+          "actionCalls": 13,
+          "attributeCalls": 167,
+          "batchCalls": 0,
+          "childCountCalls": 0,
+          "childPageCalls": 0,
+          "collectionMS": 106.90009593963623,
+          "observerCalls": 0,
+          "observerHints": 0,
+          "textRangeCalls": 0
+        }
+      },
+      {
+        "nodes": 13,
+        "truncated": false,
+        "coverage": "unreported",
+        "collectionMS": 76.99799537658691,
+        "calls": 180,
+        "metrics": {
+          "actionCalls": 13,
+          "attributeCalls": 167,
+          "batchCalls": 0,
+          "childCountCalls": 0,
+          "childPageCalls": 0,
+          "collectionMS": 76.99799537658691,
+          "observerCalls": 0,
+          "observerHints": 0,
+          "textRangeCalls": 0
+        }
+      },
+      {
+        "nodes": 14,
+        "truncated": false,
+        "coverage": "unreported",
+        "collectionMS": 78.55391502380371,
+        "calls": 193,
+        "metrics": {
+          "actionCalls": 14,
+          "attributeCalls": 179,
+          "batchCalls": 0,
+          "childCountCalls": 0,
+          "childPageCalls": 0,
+          "collectionMS": 78.55391502380371,
+          "observerCalls": 0,
+          "observerHints": 0,
+          "textRangeCalls": 0
+        }
+      }
+    ],
+    "status": "blocked",
+    "totalMS": 583.5805420065299,
+    "steps": 1,
+    "jevCalls": 1,
+    "apiMS": 199.07701015472412,
+    "inputTokens": 1191,
+    "requestBytes": 2878,
+    "queries": [],
+    "errors": [],
+    "events": [],
+    "exit": 2
+  },
+  {
+    "scenario": "duplicates",
+    "mode": "query",
+    "observationSamples": [
+      {
+        "nodes": 13,
+        "truncated": false,
+        "coverage": "complete",
+        "collectionMS": 98.07205200195312,
+        "calls": 68,
+        "metrics": {
+          "actionCalls": 13,
+          "attributeCalls": 23,
+          "batchCalls": 13,
+          "childCountCalls": 13,
+          "childPageCalls": 6,
+          "collectionMS": 98.07205200195312,
+          "observerCalls": 19,
+          "observerHints": 0,
+          "textRangeCalls": 0
+        }
+      },
+      {
+        "nodes": 13,
+        "truncated": false,
+        "coverage": "complete",
+        "collectionMS": 73.65405559539795,
+        "calls": 68,
+        "metrics": {
+          "actionCalls": 13,
+          "attributeCalls": 23,
+          "batchCalls": 13,
+          "childCountCalls": 13,
+          "childPageCalls": 6,
+          "collectionMS": 73.65405559539795,
+          "observerCalls": 19,
+          "observerHints": 0,
+          "textRangeCalls": 0
+        }
+      },
+      {
+        "nodes": 14,
+        "truncated": false,
+        "coverage": "complete",
+        "collectionMS": 85.17599105834961,
+        "calls": 73,
+        "metrics": {
+          "actionCalls": 14,
+          "attributeCalls": 24,
+          "batchCalls": 14,
+          "childCountCalls": 14,
+          "childPageCalls": 7,
+          "collectionMS": 85.17599105834961,
+          "observerCalls": 19,
+          "observerHints": 0,
+          "textRangeCalls": 0
+        }
+      }
+    ],
+    "status": "uncertain",
+    "totalMS": 1651.1762080190238,
+    "steps": 2,
+    "jevCalls": 3,
+    "apiMS": 614.0609979629517,
+    "inputTokens": 4963,
+    "requestBytes": 8726,
+    "queries": [],
+    "errors": [
+      "Uncertain selection: Choice confidence 0.31, progress probability 0.16. No identical-state retry."
+    ],
+    "events": [
+      {
+        "time": 1791598982.275444,
+        "source": "native NSButton action",
+        "result": "right"
+      }
+    ],
+    "exit": 2
+  },
+  {
+    "scenario": "dialog",
+    "mode": "legacy",
+    "observationSamples": [
+      {
+        "nodes": 8,
+        "truncated": false,
+        "coverage": "unreported",
+        "collectionMS": 92.53597259521484,
+        "calls": 115,
+        "metrics": {
+          "actionCalls": 8,
+          "attributeCalls": 107,
+          "batchCalls": 0,
+          "childCountCalls": 0,
+          "childPageCalls": 0,
+          "collectionMS": 92.53597259521484,
+          "observerCalls": 0,
+          "observerHints": 0,
+          "textRangeCalls": 0
+        }
+      },
+      {
+        "nodes": 8,
+        "truncated": false,
+        "coverage": "unreported",
+        "collectionMS": 69.42999362945557,
+        "calls": 115,
+        "metrics": {
+          "actionCalls": 8,
+          "attributeCalls": 107,
+          "batchCalls": 0,
+          "childCountCalls": 0,
+          "childPageCalls": 0,
+          "collectionMS": 69.42999362945557,
+          "observerCalls": 0,
+          "observerHints": 0,
+          "textRangeCalls": 0
+        }
+      },
+      {
+        "nodes": 9,
+        "truncated": false,
+        "coverage": "unreported",
+        "collectionMS": 80.02996444702148,
+        "calls": 128,
+        "metrics": {
+          "actionCalls": 9,
+          "attributeCalls": 119,
+          "batchCalls": 0,
+          "childCountCalls": 0,
+          "childPageCalls": 0,
+          "collectionMS": 80.02996444702148,
+          "observerCalls": 0,
+          "observerHints": 0,
+          "textRangeCalls": 0
+        }
+      }
+    ],
+    "status": "verified_complete",
+    "totalMS": 2554.882500000531,
+    "steps": 3,
+    "jevCalls": 3,
+    "apiMS": 572.4999904632568,
+    "inputTokens": 3784,
+    "requestBytes": 9114,
+    "queries": [],
+    "errors": [],
+    "events": [
+      {
+        "result": "confirmed-dialog",
+        "source": "native NSButton action",
+        "time": 1791598986.272743
+      }
+    ],
+    "exit": 0
+  },
+  {
+    "scenario": "dialog",
+    "mode": "query",
+    "observationSamples": [
+      {
+        "nodes": 8,
+        "truncated": false,
+        "coverage": "complete",
+        "collectionMS": 97.26095199584961,
+        "calls": 44,
+        "metrics": {
+          "actionCalls": 8,
+          "attributeCalls": 18,
+          "batchCalls": 8,
+          "childCountCalls": 8,
+          "childPageCalls": 2,
+          "collectionMS": 97.26095199584961,
+          "observerCalls": 19,
+          "observerHints": 0,
+          "textRangeCalls": 0
+        }
+      },
+      {
+        "nodes": 8,
+        "truncated": false,
+        "coverage": "complete",
+        "collectionMS": 81.73096179962158,
+        "calls": 44,
+        "metrics": {
+          "actionCalls": 8,
+          "attributeCalls": 18,
+          "batchCalls": 8,
+          "childCountCalls": 8,
+          "childPageCalls": 2,
+          "collectionMS": 81.73096179962158,
+          "observerCalls": 19,
+          "observerHints": 0,
+          "textRangeCalls": 0
+        }
+      },
+      {
+        "nodes": 9,
+        "truncated": false,
+        "coverage": "complete",
+        "collectionMS": 86.81797981262207,
+        "calls": 49,
+        "metrics": {
+          "actionCalls": 9,
+          "attributeCalls": 19,
+          "batchCalls": 9,
+          "childCountCalls": 9,
+          "childPageCalls": 3,
+          "collectionMS": 86.81797981262207,
+          "observerCalls": 19,
+          "observerHints": 0,
+          "textRangeCalls": 0
+        }
+      }
+    ],
+    "status": "verified_complete",
+    "totalMS": 2634.7283750073984,
+    "steps": 3,
+    "jevCalls": 3,
+    "apiMS": 616.3768768310547,
+    "inputTokens": 5515,
+    "requestBytes": 12620,
+    "queries": [],
+    "errors": [],
+    "events": [
+      {
+        "time": 1791598990.069625,
+        "result": "confirmed-dialog",
+        "source": "native NSButton action"
+      }
+    ],
+    "exit": 0
+  }
+]

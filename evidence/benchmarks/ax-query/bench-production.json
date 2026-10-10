@@ -1,0 +1,772 @@
+[
+  {
+    "scenario": "small",
+    "mode": "legacy",
+    "observationSamples": [
+      {
+        "nodes": 8,
+        "truncated": false,
+        "coverage": "unreported",
+        "collectionMS": 98.42109680175781,
+        "calls": 115,
+        "metrics": {
+          "actionCalls": 8,
+          "attributeCalls": 107,
+          "batchCalls": 0,
+          "childCountCalls": 0,
+          "childPageCalls": 0,
+          "collectionMS": 98.42109680175781,
+          "observerCalls": 0,
+          "observerHints": 0,
+          "textRangeCalls": 0
+        }
+      },
+      {
+        "nodes": 8,
+        "truncated": false,
+        "coverage": "unreported",
+        "collectionMS": 71.2289810180664,
+        "calls": 115,
+        "metrics": {
+          "actionCalls": 8,
+          "attributeCalls": 107,
+          "batchCalls": 0,
+          "childCountCalls": 0,
+          "childPageCalls": 0,
+          "collectionMS": 71.2289810180664,
+          "observerCalls": 0,
+          "observerHints": 0,
+          "textRangeCalls": 0
+        }
+      },
+      {
+        "nodes": 9,
+        "truncated": false,
+        "coverage": "unreported",
+        "collectionMS": 84.56993103027344,
+        "calls": 128,
+        "metrics": {
+          "actionCalls": 9,
+          "attributeCalls": 119,
+          "batchCalls": 0,
+          "childCountCalls": 0,
+          "childPageCalls": 0,
+          "collectionMS": 84.56993103027344,
+          "observerCalls": 0,
+          "observerHints": 0,
+          "textRangeCalls": 0
+        }
+      }
+    ],
+    "status": "verified_complete",
+    "totalMS": 1474.3909589888062,
+    "steps": 2,
+    "jevCalls": 2,
+    "apiMS": 407.83798694610596,
+    "inputTokens": 2409,
+    "requestBytes": 5767,
+    "binarySHA256": "2ad9222bbbcc908208c5cdaf125a7efb134ff713cb37fa2d17b90bb42701e5f6",
+    "fixtureSHA256": "69eaed1f3de9bd7bd110ccf8cc8398170a7b9b107fadb2e97d3ad9bf1fde4bef",
+    "queries": [],
+    "errors": [],
+    "events": [
+      {
+        "source": "native NSButton action",
+        "result": "small",
+        "time": 1791600107.260931
+      }
+    ],
+    "exit": 0
+  },
+  {
+    "scenario": "small",
+    "mode": "query",
+    "observationSamples": [
+      {
+        "nodes": 8,
+        "truncated": false,
+        "coverage": "complete",
+        "collectionMS": 83.01794528961182,
+        "calls": 71,
+        "metrics": {
+          "actionCalls": 8,
+          "attributeCalls": 24,
+          "batchCalls": 8,
+          "childCountCalls": 9,
+          "childPageCalls": 3,
+          "collectionMS": 83.01794528961182,
+          "observerCalls": 19,
+          "observerHints": 0,
+          "textRangeCalls": 0
+        }
+      },
+      {
+        "nodes": 8,
+        "truncated": false,
+        "coverage": "complete",
+        "collectionMS": 77.3550271987915,
+        "calls": 71,
+        "metrics": {
+          "actionCalls": 8,
+          "attributeCalls": 24,
+          "batchCalls": 8,
+          "childCountCalls": 9,
+          "childPageCalls": 3,
+          "collectionMS": 77.3550271987915,
+          "observerCalls": 19,
+          "observerHints": 0,
+          "textRangeCalls": 0
+        }
+      },
+      {
+        "nodes": 9,
+        "truncated": false,
+        "coverage": "complete",
+        "collectionMS": 79.60999011993408,
+        "calls": 76,
+        "metrics": {
+          "actionCalls": 9,
+          "attributeCalls": 25,
+          "batchCalls": 9,
+          "childCountCalls": 10,
+          "childPageCalls": 4,
+          "collectionMS": 79.60999011993408,
+          "observerCalls": 19,
+          "observerHints": 0,
+          "textRangeCalls": 0
+        }
+      }
+    ],
+    "status": "verified_complete",
+    "totalMS": 1183.8210000132676,
+    "steps": 1,
+    "jevCalls": 1,
+    "apiMS": 204.9030065536499,
+    "inputTokens": 1101,
+    "requestBytes": 2415,
+    "binarySHA256": "2ad9222bbbcc908208c5cdaf125a7efb134ff713cb37fa2d17b90bb42701e5f6",
+    "fixtureSHA256": "69eaed1f3de9bd7bd110ccf8cc8398170a7b9b107fadb2e97d3ad9bf1fde4bef",
+    "queries": [],
+    "errors": [],
+    "events": [
+      {
+        "source": "native NSButton action",
+        "result": "small",
+        "time": 1791600109.82659
+      }
+    ],
+    "exit": 0
+  },
+  {
+    "scenario": "large",
+    "mode": "legacy",
+    "observationSamples": [
+      {
+        "nodes": 600,
+        "truncated": true,
+        "coverage": "partial",
+        "collectionMS": 292.3170328140259,
+        "calls": 7811,
+        "metrics": {
+          "actionCalls": 600,
+          "attributeCalls": 7211,
+          "batchCalls": 0,
+          "childCountCalls": 0,
+          "childPageCalls": 0,
+          "collectionMS": 292.3170328140259,
+          "observerCalls": 0,
+          "observerHints": 0,
+          "textRangeCalls": 0
+        }
+      },
+      {
+        "nodes": 600,
+        "truncated": true,
+        "coverage": "partial",
+        "collectionMS": 249.7549057006836,
+        "calls": 7811,
+        "metrics": {
+          "actionCalls": 600,
+          "attributeCalls": 7211,
+          "batchCalls": 0,
+          "childCountCalls": 0,
+          "childPageCalls": 0,
+          "collectionMS": 249.7549057006836,
+          "observerCalls": 0,
+          "observerHints": 0,
+          "textRangeCalls": 0
+        }
+      },
+      {
+        "nodes": 600,
+        "truncated": true,
+        "coverage": "partial",
+        "collectionMS": 250.86891651153564,
+        "calls": 7811,
+        "metrics": {
+          "actionCalls": 600,
+          "attributeCalls": 7211,
+          "batchCalls": 0,
+          "childCountCalls": 0,
+          "childPageCalls": 0,
+          "collectionMS": 250.86891651153564,
+          "observerCalls": 0,
+          "observerHints": 0,
+          "textRangeCalls": 0
+        }
+      }
+    ],
+    "status": "blocked",
+    "totalMS": 826.1299580044579,
+    "steps": 1,
+    "jevCalls": 1,
+    "apiMS": 269.7180509567261,
+    "inputTokens": 9108,
+    "requestBytes": 21116,
+    "binarySHA256": "2ad9222bbbcc908208c5cdaf125a7efb134ff713cb37fa2d17b90bb42701e5f6",
+    "fixtureSHA256": "69eaed1f3de9bd7bd110ccf8cc8398170a7b9b107fadb2e97d3ad9bf1fde4bef",
+    "queries": [],
+    "errors": [],
+    "events": [],
+    "exit": 2
+  },
+  {
+    "scenario": "large",
+    "mode": "query",
+    "observationSamples": [
+      {
+        "nodes": 160,
+        "truncated": true,
+        "coverage": "partial",
+        "collectionMS": 117.48206615447998,
+        "calls": 691,
+        "metrics": {
+          "actionCalls": 160,
+          "attributeCalls": 176,
+          "batchCalls": 160,
+          "childCountCalls": 161,
+          "childPageCalls": 11,
+          "collectionMS": 117.48206615447998,
+          "observerCalls": 23,
+          "observerHints": 0,
+          "textRangeCalls": 0
+        }
+      },
+      {
+        "nodes": 160,
+        "truncated": true,
+        "coverage": "partial",
+        "collectionMS": 109.33899879455566,
+        "calls": 692,
+        "metrics": {
+          "actionCalls": 160,
+          "attributeCalls": 176,
+          "batchCalls": 160,
+          "childCountCalls": 161,
+          "childPageCalls": 12,
+          "collectionMS": 109.33899879455566,
+          "observerCalls": 23,
+          "observerHints": 0,
+          "textRangeCalls": 0
+        }
+      },
+      {
+        "nodes": 160,
+        "truncated": true,
+        "coverage": "partial",
+        "collectionMS": 95.90601921081543,
+        "calls": 692,
+        "metrics": {
+          "actionCalls": 160,
+          "attributeCalls": 176,
+          "batchCalls": 160,
+          "childCountCalls": 161,
+          "childPageCalls": 12,
+          "collectionMS": 95.90601921081543,
+          "observerCalls": 23,
+          "observerHints": 0,
+          "textRangeCalls": 0
+        }
+      }
+    ],
+    "status": "uncertain",
+    "totalMS": 1236.5735839994159,
+    "steps": 2,
+    "jevCalls": 3,
+    "apiMS": 638.8329267501831,
+    "inputTokens": 6423,
+    "requestBytes": 14506,
+    "binarySHA256": "2ad9222bbbcc908208c5cdaf125a7efb134ff713cb37fa2d17b90bb42701e5f6",
+    "fixtureSHA256": "69eaed1f3de9bd7bd110ccf8cc8398170a7b9b107fadb2e97d3ad9bf1fde4bef",
+    "queries": [
+      {
+        "kind": "expand"
+      }
+    ],
+    "errors": [
+      "Uncertain selection: Choice confidence 0.41, progress probability 0.59. No identical-state retry."
+    ],
+    "events": [],
+    "exit": 2
+  },
+  {
+    "scenario": "long",
+    "mode": "legacy",
+    "observationSamples": [
+      {
+        "nodes": 16,
+        "truncated": false,
+        "coverage": "unreported",
+        "collectionMS": 101.9200086593628,
+        "calls": 220,
+        "metrics": {
+          "actionCalls": 16,
+          "attributeCalls": 204,
+          "batchCalls": 0,
+          "childCountCalls": 0,
+          "childPageCalls": 0,
+          "collectionMS": 101.9200086593628,
+          "observerCalls": 0,
+          "observerHints": 0,
+          "textRangeCalls": 0
+        }
+      },
+      {
+        "nodes": 16,
+        "truncated": false,
+        "coverage": "unreported",
+        "collectionMS": 84.69092845916748,
+        "calls": 220,
+        "metrics": {
+          "actionCalls": 16,
+          "attributeCalls": 204,
+          "batchCalls": 0,
+          "childCountCalls": 0,
+          "childPageCalls": 0,
+          "collectionMS": 84.69092845916748,
+          "observerCalls": 0,
+          "observerHints": 0,
+          "textRangeCalls": 0
+        }
+      },
+      {
+        "nodes": 17,
+        "truncated": false,
+        "coverage": "unreported",
+        "collectionMS": 95.39103507995605,
+        "calls": 233,
+        "metrics": {
+          "actionCalls": 17,
+          "attributeCalls": 216,
+          "batchCalls": 0,
+          "childCountCalls": 0,
+          "childPageCalls": 0,
+          "collectionMS": 95.39103507995605,
+          "observerCalls": 0,
+          "observerHints": 0,
+          "textRangeCalls": 0
+        }
+      }
+    ],
+    "status": "uncertain",
+    "totalMS": 892.7986670169048,
+    "steps": 1,
+    "jevCalls": 2,
+    "apiMS": 472.2120761871338,
+    "inputTokens": 3572,
+    "requestBytes": 9868,
+    "binarySHA256": "2ad9222bbbcc908208c5cdaf125a7efb134ff713cb37fa2d17b90bb42701e5f6",
+    "fixtureSHA256": "69eaed1f3de9bd7bd110ccf8cc8398170a7b9b107fadb2e97d3ad9bf1fde4bef",
+    "queries": [],
+    "errors": [
+      "Uncertain selection: Choice confidence 0.28, progress probability 0.74. No identical-state retry."
+    ],
+    "events": [],
+    "exit": 2
+  },
+  {
+    "scenario": "long",
+    "mode": "query",
+    "observationSamples": [
+      {
+        "nodes": 16,
+        "truncated": false,
+        "coverage": "complete",
+        "collectionMS": 98.60897064208984,
+        "calls": 114,
+        "metrics": {
+          "actionCalls": 16,
+          "attributeCalls": 36,
+          "batchCalls": 16,
+          "childCountCalls": 17,
+          "childPageCalls": 5,
+          "collectionMS": 98.60897064208984,
+          "observerCalls": 23,
+          "observerHints": 0,
+          "textRangeCalls": 1
+        }
+      },
+      {
+        "nodes": 16,
+        "truncated": false,
+        "coverage": "complete",
+        "collectionMS": 81.32708072662354,
+        "calls": 114,
+        "metrics": {
+          "actionCalls": 16,
+          "attributeCalls": 36,
+          "batchCalls": 16,
+          "childCountCalls": 17,
+          "childPageCalls": 5,
+          "collectionMS": 81.32708072662354,
+          "observerCalls": 23,
+          "observerHints": 0,
+          "textRangeCalls": 1
+        }
+      },
+      {
+        "nodes": 17,
+        "truncated": false,
+        "coverage": "complete",
+        "collectionMS": 91.62294864654541,
+        "calls": 119,
+        "metrics": {
+          "actionCalls": 17,
+          "attributeCalls": 37,
+          "batchCalls": 17,
+          "childCountCalls": 18,
+          "childPageCalls": 6,
+          "collectionMS": 91.62294864654541,
+          "observerCalls": 23,
+          "observerHints": 0,
+          "textRangeCalls": 1
+        }
+      }
+    ],
+    "status": "uncertain",
+    "totalMS": 831.7622090107761,
+    "steps": 1,
+    "jevCalls": 2,
+    "apiMS": 384.8099708557129,
+    "inputTokens": 2747,
+    "requestBytes": 6529,
+    "binarySHA256": "2ad9222bbbcc908208c5cdaf125a7efb134ff713cb37fa2d17b90bb42701e5f6",
+    "fixtureSHA256": "69eaed1f3de9bd7bd110ccf8cc8398170a7b9b107fadb2e97d3ad9bf1fde4bef",
+    "queries": [],
+    "errors": [
+      "Uncertain selection: Choice confidence 0.54, progress probability 0.75. No identical-state retry."
+    ],
+    "events": [],
+    "exit": 2
+  },
+  {
+    "scenario": "duplicates",
+    "mode": "legacy",
+    "observationSamples": [
+      {
+        "nodes": 13,
+        "truncated": false,
+        "coverage": "unreported",
+        "collectionMS": 83.88400077819824,
+        "calls": 180,
+        "metrics": {
+          "actionCalls": 13,
+          "attributeCalls": 167,
+          "batchCalls": 0,
+          "childCountCalls": 0,
+          "childPageCalls": 0,
+          "collectionMS": 83.88400077819824,
+          "observerCalls": 0,
+          "observerHints": 0,
+          "textRangeCalls": 0
+        }
+      },
+      {
+        "nodes": 13,
+        "truncated": false,
+        "coverage": "unreported",
+        "collectionMS": 72.76690006256104,
+        "calls": 180,
+        "metrics": {
+          "actionCalls": 13,
+          "attributeCalls": 167,
+          "batchCalls": 0,
+          "childCountCalls": 0,
+          "childPageCalls": 0,
+          "collectionMS": 72.76690006256104,
+          "observerCalls": 0,
+          "observerHints": 0,
+          "textRangeCalls": 0
+        }
+      },
+      {
+        "nodes": 14,
+        "truncated": false,
+        "coverage": "unreported",
+        "collectionMS": 74.84102249145508,
+        "calls": 193,
+        "metrics": {
+          "actionCalls": 14,
+          "attributeCalls": 179,
+          "batchCalls": 0,
+          "childCountCalls": 0,
+          "childPageCalls": 0,
+          "collectionMS": 74.84102249145508,
+          "observerCalls": 0,
+          "observerHints": 0,
+          "textRangeCalls": 0
+        }
+      }
+    ],
+    "status": "blocked",
+    "totalMS": 580.8156249986496,
+    "steps": 1,
+    "jevCalls": 1,
+    "apiMS": 233.6599826812744,
+    "inputTokens": 1191,
+    "requestBytes": 2878,
+    "binarySHA256": "2ad9222bbbcc908208c5cdaf125a7efb134ff713cb37fa2d17b90bb42701e5f6",
+    "fixtureSHA256": "69eaed1f3de9bd7bd110ccf8cc8398170a7b9b107fadb2e97d3ad9bf1fde4bef",
+    "queries": [],
+    "errors": [],
+    "events": [],
+    "exit": 2
+  },
+  {
+    "scenario": "duplicates",
+    "mode": "query",
+    "observationSamples": [
+      {
+        "nodes": 13,
+        "truncated": false,
+        "coverage": "complete",
+        "collectionMS": 102.32102870941162,
+        "calls": 96,
+        "metrics": {
+          "actionCalls": 13,
+          "attributeCalls": 30,
+          "batchCalls": 13,
+          "childCountCalls": 14,
+          "childPageCalls": 7,
+          "collectionMS": 102.32102870941162,
+          "observerCalls": 19,
+          "observerHints": 0,
+          "textRangeCalls": 0
+        }
+      },
+      {
+        "nodes": 13,
+        "truncated": false,
+        "coverage": "complete",
+        "collectionMS": 69.16296482086182,
+        "calls": 96,
+        "metrics": {
+          "actionCalls": 13,
+          "attributeCalls": 30,
+          "batchCalls": 13,
+          "childCountCalls": 14,
+          "childPageCalls": 7,
+          "collectionMS": 69.16296482086182,
+          "observerCalls": 19,
+          "observerHints": 0,
+          "textRangeCalls": 0
+        }
+      },
+      {
+        "nodes": 14,
+        "truncated": false,
+        "coverage": "complete",
+        "collectionMS": 77.01396942138672,
+        "calls": 101,
+        "metrics": {
+          "actionCalls": 14,
+          "attributeCalls": 31,
+          "batchCalls": 14,
+          "childCountCalls": 15,
+          "childPageCalls": 8,
+          "collectionMS": 77.01396942138672,
+          "observerCalls": 19,
+          "observerHints": 0,
+          "textRangeCalls": 0
+        }
+      }
+    ],
+    "status": "verified_complete",
+    "totalMS": 1091.6862500016578,
+    "steps": 1,
+    "jevCalls": 1,
+    "apiMS": 237.4340295791626,
+    "inputTokens": 1200,
+    "requestBytes": 2676,
+    "binarySHA256": "2ad9222bbbcc908208c5cdaf125a7efb134ff713cb37fa2d17b90bb42701e5f6",
+    "fixtureSHA256": "69eaed1f3de9bd7bd110ccf8cc8398170a7b9b107fadb2e97d3ad9bf1fde4bef",
+    "queries": [],
+    "errors": [],
+    "events": [
+      {
+        "result": "right",
+        "source": "native NSButton action",
+        "time": 1791600122.9930038
+      }
+    ],
+    "exit": 0
+  },
+  {
+    "scenario": "dialog",
+    "mode": "legacy",
+    "observationSamples": [
+      {
+        "nodes": 8,
+        "truncated": false,
+        "coverage": "unreported",
+        "collectionMS": 98.46711158752441,
+        "calls": 115,
+        "metrics": {
+          "actionCalls": 8,
+          "attributeCalls": 107,
+          "batchCalls": 0,
+          "childCountCalls": 0,
+          "childPageCalls": 0,
+          "collectionMS": 98.46711158752441,
+          "observerCalls": 0,
+          "observerHints": 0,
+          "textRangeCalls": 0
+        }
+      },
+      {
+        "nodes": 8,
+        "truncated": false,
+        "coverage": "unreported",
+        "collectionMS": 67.05796718597412,
+        "calls": 115,
+        "metrics": {
+          "actionCalls": 8,
+          "attributeCalls": 107,
+          "batchCalls": 0,
+          "childCountCalls": 0,
+          "childPageCalls": 0,
+          "collectionMS": 67.05796718597412,
+          "observerCalls": 0,
+          "observerHints": 0,
+          "textRangeCalls": 0
+        }
+      },
+      {
+        "nodes": 9,
+        "truncated": false,
+        "coverage": "unreported",
+        "collectionMS": 76.6829252243042,
+        "calls": 128,
+        "metrics": {
+          "actionCalls": 9,
+          "attributeCalls": 119,
+          "batchCalls": 0,
+          "childCountCalls": 0,
+          "childPageCalls": 0,
+          "collectionMS": 76.6829252243042,
+          "observerCalls": 0,
+          "observerHints": 0,
+          "textRangeCalls": 0
+        }
+      }
+    ],
+    "status": "verified_complete",
+    "totalMS": 2608.143541991012,
+    "steps": 3,
+    "jevCalls": 3,
+    "apiMS": 595.3819751739502,
+    "inputTokens": 3784,
+    "requestBytes": 9114,
+    "binarySHA256": "2ad9222bbbcc908208c5cdaf125a7efb134ff713cb37fa2d17b90bb42701e5f6",
+    "fixtureSHA256": "69eaed1f3de9bd7bd110ccf8cc8398170a7b9b107fadb2e97d3ad9bf1fde4bef",
+    "queries": [],
+    "errors": [],
+    "events": [
+      {
+        "source": "native NSButton action",
+        "result": "confirmed-dialog",
+        "time": 1791600126.5109391
+      }
+    ],
+    "exit": 0
+  },
+  {
+    "scenario": "dialog",
+    "mode": "query",
+    "observationSamples": [
+      {
+        "nodes": 8,
+        "truncated": false,
+        "coverage": "complete",
+        "collectionMS": 92.99492835998535,
+        "calls": 71,
+        "metrics": {
+          "actionCalls": 8,
+          "attributeCalls": 24,
+          "batchCalls": 8,
+          "childCountCalls": 9,
+          "childPageCalls": 3,
+          "collectionMS": 92.99492835998535,
+          "observerCalls": 19,
+          "observerHints": 0,
+          "textRangeCalls": 0
+        }
+      },
+      {
+        "nodes": 8,
+        "truncated": false,
+        "coverage": "complete",
+        "collectionMS": 74.2119550704956,
+        "calls": 71,
+        "metrics": {
+          "actionCalls": 8,
+          "attributeCalls": 24,
+          "batchCalls": 8,
+          "childCountCalls": 9,
+          "childPageCalls": 3,
+          "collectionMS": 74.2119550704956,
+          "observerCalls": 19,
+          "observerHints": 0,
+          "textRangeCalls": 0
+        }
+      },
+      {
+        "nodes": 9,
+        "truncated": false,
+        "coverage": "complete",
+        "collectionMS": 80.1020860671997,
+        "calls": 76,
+        "metrics": {
+          "actionCalls": 9,
+          "attributeCalls": 25,
+          "batchCalls": 9,
+          "childCountCalls": 10,
+          "childPageCalls": 4,
+          "collectionMS": 80.1020860671997,
+          "observerCalls": 19,
+          "observerHints": 0,
+          "textRangeCalls": 0
+        }
+      }
+    ],
+    "status": "verified_complete",
+    "totalMS": 2364.8717500036582,
+    "steps": 2,
+    "jevCalls": 2,
+    "apiMS": 467.22686290740967,
+    "inputTokens": 2339,
+    "requestBytes": 5219,
+    "binarySHA256": "2ad9222bbbcc908208c5cdaf125a7efb134ff713cb37fa2d17b90bb42701e5f6",
+    "fixtureSHA256": "69eaed1f3de9bd7bd110ccf8cc8398170a7b9b107fadb2e97d3ad9bf1fde4bef",
+    "queries": [],
+    "errors": [],
+    "events": [
+      {
+        "result": "confirmed-dialog",
+        "time": 1791600130.3296518,
+        "source": "native NSButton action"
+      }
+    ],
+    "exit": 0
+  }
+]

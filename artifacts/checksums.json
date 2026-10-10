@@ -1,12 +1,12 @@
 {
-  "file": "JevNative-0.3.0-arm64.zip",
-  "version": "0.3.0",
-  "build": "5",
+  "file": "JevNative-0.4.0-arm64.zip",
+  "version": "0.4.0",
+  "build": "6",
   "architecture": "arm64",
   "signing": "ad-hoc",
   "notarized": false,
-  "sha256": "e1a5fa64a1d761aad1aedcf380d5789a8a6aec9377781b29abf7cb30f9b18623",
-  "bytes": 404290,
-  "executableSHA256": "1a1c1e4ba20238e70f2bda220a9df75a740e5acf814fc9da931eb9ff268fe62f",
-  "executableUUID": "11548E24-D5B3-375B-B4A9-427C6317AC08"
+  "sha256": "ff7b7ec8e49a2580172bda460b45362b6736d9ca9d6aeba39c4746d6a6f2ed03",
+  "bytes": 542732,
+  "executableSHA256": "2ad9222bbbcc908208c5cdaf125a7efb134ff713cb37fa2d17b90bb42701e5f6",
+  "executableUUID": "D70DE322-EF2B-39D5-A845-00CC03BBAE9E"
 }

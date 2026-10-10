@@ -2,7 +2,7 @@
 
 A standalone SwiftPM native macOS controller. Apple AppKit, Accessibility, ScreenCaptureKit, CoreGraphics, Vision, URLSession and CryptoKit implement automation directly. No browser tool, Python/Node bridge, AppleScript or external automation binary is used. Codex CLI is the sole external runtime exception for original text and image interpretation.
 
-Current version: **0.3.0 (5)**. Build with Xcode command-line tools and Swift 6 on macOS. Runtime validation covers macOS 27.0.1 arm64; the macOS 14 deployment target is not a tested compatibility guarantee.
+Current version: **0.4.0 (6)**. Build with Xcode command-line tools and Swift 6 on macOS. Runtime validation covers macOS 27.0.1 arm64; the macOS 14 deployment target is not a tested compatibility guarantee.
 
 ```sh
 git clone https://github.com/oozoofrog/jev-native.git
@@ -135,3 +135,36 @@ Only one run can be active in the window. Run and editable inputs are disabled u
 Reports are saved under `~/Library/Application Support/JEV Native/Runs/<UUID>/`. Each run folder is created with mode 0700. Show Report reveals its `report.json` in Finder. Reports distinguish `jev_observed_complete`, uncertain/blocked results, cancellation and errors; GUI semantic completion is not a deterministic postcondition guarantee. CLI task JSON and `--expect-text`/`--expect-app` remain available for explicit postconditions. Raw reports, screenshots and app inventories can contain private data.
 
 Credentials use the existing environment/file resolver. If missing, the window offers Open Key Management and an explicit Import Key from Clipboard button. Key contents are never shown. The import preserves an existing key and uses the existing atomic 0600 writer. Opening the window does not read the clipboard, import a key or start automation.
+
+## Progressive AX query engine
+
+The runner now uses a local Swift AX store. Initial collection is bounded to 160 nodes. JEV receives compact structured values, ancestor context and bounded action/query criteria. It can select further regions, candidate pages and UTF-16 value ranges; Swift performs filtering, indexed acquisition and pagination. The complete catalogue remains reachable across pages instead of silently dropping controls after the Choice limit. Small UIs stay on the direct path. This changes the internal backend; the separate proposed UI mockup is not installed.
+
+`overview(scope)`, `find(scope,filter)`, `children(node,cursor)`, `read(node,fields,textRangeUTF16)` and `changes(sinceRevision)` are local store APIs. Scope is the selected process/window, plus that process's menus. Handles are opaque and revision-bound. Cursors bind to their operation/filter/parent/revision. Exact acquired attributes and native parent references stay local. Secure fields and descendants are excluded. Same-name controls retain ancestor context and enabled/selected/checked/focused state. Bridge nodes are compressed structurally rather than summarized with an LLM. All coverage statements refer only to *exposed* AX content; virtualized/unexposed controls still require real scrolling/opening/vision.
+
+Batched metadata reads use `AXUIElementCopyMultipleAttributeValues`; child collection uses `AXUIElementGetAttributeValueCount` and indexed `AXUIElementCopyAttributeValues`. Large text previews and subsequent reads use UTF-16 ranges; outbound bounds and continuation reflect the text actually transmitted. Every omitted value retains a bounded read route, including noneditable status values. A read-only batch can inspect the store without JEV:
+
+```sh
+jev-native ax-query --app com.example.app --requests queries.json --out query-results
+```
+
+```json
+[
+  {"kind":"overview"},
+  {"kind":"find","filter":{"role":"AXButton","nameContains":"Apply","enabled":true,"ancestorContains":"Right"},"limit":40},
+  {"kind":"expand","limit":160},
+  {"kind":"children","locator":"w","limit":32},
+  {"kind":"read","locator":"w.0","fields":["metadata"]},
+  {"kind":"changes"}
+]
+```
+
+Each request writes `query-N.json`, with `initial.json` and `final-overview.json`. `read` also accepts `value`/`selectedText` and `textRangeUTF16:{"location":0,"length":100}`. These are UTF-16 code units, not grapheme indices. `find` additionally accepts `action`, `selected`, `checked` and `focused`. A locator must already be collected; inspect preceding results rather than guessing a structural path. The `cursor` returned by `find`/`children` belongs to that exact session/query. `delayMS` (maximum 5000) is available for bounded notification diagnostics; it processes notification hints and refreshes before the next request.
+
+AXObserver events invalidate affected loaded subtrees when recognizable. Unknown/root hints force refresh and expire handles. Missing/unsupported notifications remain possible. Ordinary post-action observation refreshes the snapshot, and AX execution validates current role/name/frame, process/window ownership, secure/enabled/focused and observed selected/checked state, the *captured native AXParent*, retained traversal ancestor labels/roles/enabled/security and modal sheets. AXChildren and AXParent are not assumed to be inverse edges. Pointer input continues to compare fresh target images. Button actions do not reread/hash whole documents.
+
+`observation.axMetrics` records instrumented AX read/action/observer API invocations and collection time; these are not a trace of underlying Mach/XPC messages. `decision.requestBytes` is the actual serialized selection request length, and `usage.input_tokens` is returned by TypeSafe. Verification calls add their usage/API time. `JEV_AX_LEGACY=1` is a developer comparison path retaining eager traversal and the old candidate cap; it is not recommended for normal use. Read the [implementation and benchmark evidence](evidence/AX-QUERY.md) for coverage and known uncertainty limits.
+
+Explicit `expectText`/`expectApp` conditions are now authoritative completion predicates. A fresh observation must satisfy **all declared conditions**; pending supplied texts and required text/vision delegates must also be complete. The runner then reports `verified_complete` with `completionSource: explicit_postconditions` without asking JEV to rejudge a literal predicate. `expectText` retains substring matching against observed titles/values/window OCR; `expectApp` compares the selected target bundle. The caller must specify every required final condition: `expectApp` alone proves the selected target identity, not an arbitrary free-form goal. Runs without declared predicates still require JEV's semantic done decision and report `jev_observed_complete`. The legacy benchmark path preserves prior model-gated completion for comparison.
+
+In `ax-query` batches, `cursorFrom:N` uses the continuation returned by preceding `find`/`children` request N (zero-based). `targetFrom:N` and optional `targetIndex` select a node returned by that page. A missing continuation, out-of-range node, mismatched filter/parent or expired revision fails instead of restarting the page. These references allow find→read and paginated inspection without guessing handles.

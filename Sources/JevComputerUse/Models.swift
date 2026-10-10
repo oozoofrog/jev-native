@@ -7,11 +7,12 @@ func writeJSON<T: Encodable>(_ value: T, _ path: String) throws { try jsonData(v
 func emit<T: Encodable>(_ value: T) throws { print(String(decoding: try jsonData(value), as: UTF8.self)) }
 struct Rect: Codable, Equatable { var x: Double; var y: Double; var width: Double; var height: Double }
 struct AppInfo: Codable { var pid: Int32; var bundle: String; var name: String }
-struct Node: Codable, Equatable { var id: String; var role: String; var title: String; var value: String; var enabled: Bool; var actions: [String]; var frame: Rect?; var focused: Bool = false; var subrole: String = ""; var valueTruncated: Bool = false; var selectedText: String? = nil }
+struct Node: Codable, Equatable { var id: String; var role: String; var title: String; var value: String; var enabled: Bool; var actions: [String]; var frame: Rect?; var focused: Bool = false; var subrole: String = ""; var valueTruncated: Bool = false; var selectedText: String? = nil; var selected: Bool? = nil; var checked: Bool? = nil; var parent: String? = nil; var ancestors: [String]? = nil; var locator: String? = nil; var ownerPID: Int32? = nil; var ownerWindowID: UInt32? = nil; var textLengthUTF16: Int? = nil; var valueRangeUTF16: AXTextRange? = nil }
 struct WindowInfo: Codable, Equatable { var id: UInt32; var pid: Int32; var title: String; var frame: Rect; var onScreen: Bool }
 struct WindowCapture: Codable { var window: WindowInfo; var screenshot: String?; var pixelWidth: Int; var pixelHeight: Int; var ocr: [String]; var imageSHA256: String? = nil }
 struct DisplayInfo: Codable { var id: UInt32; var frame: Rect; var pixelWidth: Int; var pixelHeight: Int; var screenshot: String?; var ocr: [String] }
-struct Observation: Codable { var id: String; var timestamp: Date; var front: AppInfo?; var apps: [AppInfo]; var nodes: [Node]; var displays: [DisplayInfo]; var truncated: Bool; var axError: String?; var elapsedMS: Double; var target: AppInfo? = nil; var windows: [WindowInfo] = []; var selectedWindow: WindowInfo? = nil; var windowCapture: WindowCapture? = nil }
+struct AXModalStamp: Codable, Equatable { var role: String; var title: String; var frame: Rect? }
+struct Observation: Codable { var id: String; var timestamp: Date; var front: AppInfo?; var apps: [AppInfo]; var nodes: [Node]; var displays: [DisplayInfo]; var truncated: Bool; var axError: String?; var elapsedMS: Double; var target: AppInfo? = nil; var windows: [WindowInfo] = []; var selectedWindow: WindowInfo? = nil; var windowCapture: WindowCapture? = nil; var axOverview: AXOverview? = nil; var axMetrics: AXMetrics? = nil; var axReadHandle: String? = nil; var axModalStamps: [AXModalStamp]? = nil }
 struct Action: Codable, Equatable {
     var kind: String
     var target: String? = nil
@@ -49,21 +50,33 @@ struct TaskSpec: Codable {
     var expectText: String? = nil
     var expectApp: String? = nil
 }
-struct Candidate: Codable { var id: String; var description: String; var action: Action? }
-struct Decision: Codable { var choice: String; var confidence: Double; var apiMS: Double; var localMS: Double; var model: String; var usage: [String: Int]; var response: String; var progressProbability: Double? = nil; var verificationApiMS: Double? = nil }
-struct Step: Codable { var index: Int; var observation: String; var decision: Decision?; var action: Action?; var executionMS: Double?; var error: String?; var afterObservation: String? }
-struct RunReport: Codable { var status: String; var goal: String; var steps: [Step]; var finalObservation: String; var directory: String; var apps: [String]? = nil; var appSelection: AppResolution? = nil; var error: String? = nil }
+enum AXQueryKind: String, Codable { case expand, page, read, find }
+struct AXQuery: Codable { var kind: AXQueryKind; var handle: String? = nil; var page: Int? = nil; var filter: AXFilter? = nil; var rangeUTF16: AXTextRange? = nil; var localValue: Bool? = nil }
+struct Candidate: Codable { var id: String; var description: String; var action: Action?; var query: AXQuery? = nil }
+struct Decision: Codable { var choice: String; var confidence: Double; var apiMS: Double; var localMS: Double; var model: String; var usage: [String: Int]; var response: String; var progressProbability: Double? = nil; var verificationApiMS: Double? = nil; var requestBytes: Int? = nil; var verificationRequestBytes: Int? = nil }
+struct Step: Codable { var index: Int; var observation: String; var decision: Decision?; var action: Action?; var executionMS: Double?; var error: String?; var afterObservation: String?; var query: AXQuery? = nil; var queryLabel: String? = nil }
+struct RunReport: Codable { var status: String; var goal: String; var steps: [Step]; var finalObservation: String; var directory: String; var apps: [String]? = nil; var appSelection: AppResolution? = nil; var error: String? = nil; var completionSource: String? = nil }
+
+func explicitCompletion(_ spec:TaskSpec, observation:Observation, pendingTexts:[String], generated:Bool, inspected:Bool) -> Bool {
+    guard spec.expectText != nil || spec.expectApp != nil,
+          pendingTexts.isEmpty, (!spec.generateText || generated), (!spec.inspectImage || inspected) else { return false }
+    let appOK=spec.expectApp.map { observation.target?.bundle == $0 } ?? true
+    let evidence=observation.nodes.map { $0.title+"\n"+$0.value }.joined(separator:"\n")+"\n"+(observation.windowCapture?.ocr ?? []).joined(separator:"\n")
+    let textOK=spec.expectText.map { evidence.contains($0) } ?? true
+    return appOK && textOK
+}
 
 func stableTargetState(_ a: Observation, _ b: Observation, action: Action? = nil) -> Bool {
-    guard a.target?.pid == b.target?.pid, a.selectedWindow == b.selectedWindow else { return false }
+    guard a.target?.pid == b.target?.pid, a.selectedWindow == b.selectedWindow, a.axModalStamps == b.axModalStamps else { return false }
     func relevant(_ nodes: [Node]) -> [Node] {
         nodes.filter { node in
             if ["AXMenu", "AXMenuItem"].contains(node.role), (node.frame?.width ?? 0) <= 0 || (node.frame?.height ?? 0) <= 0 { return false }
-            if node.id == "m" || node.id.hasPrefix("m.") { return action?.target?.hasPrefix("m") == true && (node.frame?.width ?? 0) > 0 && (node.frame?.height ?? 0) > 0 }
+            if (node.locator ?? node.id) == "m" || (node.locator ?? node.id).hasPrefix("m.") { return a.nodes.first(where: { $0.id == action?.target }).map { ($0.locator ?? $0.id).hasPrefix("m") } == true && (node.frame?.width ?? 0) > 0 && (node.frame?.height ?? 0) > 0 }
             return node.role == "AXWindow" || !node.actions.isEmpty || !node.title.isEmpty || !node.value.isEmpty || node.focused
         }
     }
-    return relevant(a.nodes) == relevant(b.nodes)
+    func normalized(_ nodes: [Node]) -> [Node] { relevant(nodes).map { value in var node=value; node.id=node.locator ?? node.id; node.parent=nil; return node } }
+    return normalized(a.nodes) == normalized(b.nodes)
 }
 
 func credential(environment: [String: String] = ProcessInfo.processInfo.environment, home: String = NSHomeDirectory()) throws -> String {

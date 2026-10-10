@@ -8,6 +8,47 @@ import CryptoKit
 
 @MainActor final class Native {
     var elements: [String: AXUIElement] = [:]
+    var allowedApps: [String]?
+    let legacyAX = ProcessInfo.processInfo.environment["JEV_AX_LEGACY"] == "1"
+    var axStore: AXStore?
+    var axSource: LiveAXSource?
+    let axInvalidation = AXInvalidation()
+    var reuseAXOnce = false
+    var candidatePage = 0
+    private var axScope: String?
+    private var nativeAXMetrics = AXMetrics()
+    func applyQuery(_ query: AXQuery) throws -> AXOverview {
+        guard let axStore else { throw Failure("No AX query session") }
+        switch query.kind {
+        case .expand: _ = try axStore.expand(query.handle); candidatePage = 0
+        case .page: candidatePage = max(0, query.page ?? 0)
+        case .read:
+            guard let handle=query.handle else { throw Failure("Missing AX read handle") }
+            var actualRange=query.rangeUTF16
+            if query.localValue != true, var range=actualRange, let node=axStore.nodes.first(where:{$0.id==handle}), let total=node.textLengthUTF16 { range.length=min(total-range.location,range.length+2);actualRange=range }
+            let read=try axStore.read(handle,fields:[.value],textRangeUTF16:query.localValue == true ? nil : actualRange)
+            if let value=read.value {
+                if query.localValue == true, let range=query.rangeUTF16 {
+                    let units=Array(value.utf16);guard range.location <= units.count else { throw Failure("Local UTF-16 value range changed") }
+                    let end=min(units.count,range.location+range.length)
+                    let suffix=String(decoding:units[range.location..<min(units.count,end+2)],as:UTF16.self)
+                    let chunk=Jev.prefixUTF16(suffix,limit:range.length)
+                    queryReadValues[handle]=chunk;queryReadLengths[handle]=units.count
+                    queryReadRanges[handle]=AXTextRange(location:range.location,length:chunk.utf16.count)
+                } else { let chunk=Jev.prefixUTF16(value,limit:query.rangeUTF16?.length ?? 2000); queryReadValues[handle]=chunk;queryReadRanges[handle]=query.rangeUTF16.map { AXTextRange(location:$0.location,length:chunk.utf16.count) } }
+                lastAXReadHandle=handle
+            }
+        case .find: _ = try axStore.find(query.filter ?? AXFilter())
+        }
+        reuseAXOnce=true; return axStore.overview()
+    }
+    var queryReadValues: [String:String] = [:]
+    var queryReadRanges: [String:AXTextRange] = [:]
+    var queryReadLengths: [String:Int] = [:]
+    var lastAXReadHandle: String?
+    func observationNodes() -> [Node] {
+        (axStore?.nodes ?? []).map { value in var node=value; if let read=queryReadValues[node.id] { node.value=read; node.textLengthUTF16=queryReadLengths[node.id] ?? node.textLengthUTF16; node.valueRangeUTF16=queryReadRanges[node.id]; node.valueTruncated=node.valueRangeUTF16.map { $0.location+$0.length < (node.textLengthUTF16 ?? 0) } ?? false }; return node }
+    }
     var virtualPointer = VirtualPointer()
     var showVirtualPointer = false
     private var cursorPanel: NSPanel?
@@ -35,13 +76,29 @@ import CryptoKit
     }
     func pointer() -> Rect { let p = CGEvent(source: nil)?.location ?? .zero; return Rect(x: p.x, y: p.y, width: 0, height: 0) }
     func permissions() -> [String: Bool] { ["accessibility": AXIsProcessTrusted(), "screenRecording": CGPreflightScreenCaptureAccess(), "inputPosting": CGPreflightPostEventAccess()] }
-    func attr(_ e: AXUIElement, _ name: String) -> CFTypeRef? { var v: CFTypeRef?; AXUIElementCopyAttributeValue(e, name as CFString, &v); return v }
+    func attr(_ e: AXUIElement, _ name: String) -> CFTypeRef? { nativeAXMetrics.attributeCalls += 1; var v: CFTypeRef?; AXUIElementCopyAttributeValue(e, name as CFString, &v); return v }
     func str(_ e: AXUIElement, _ name: String) -> String { guard let v = attr(e, name) else { return "" }; return (v as? String) ?? ((v as? NSNumber)?.stringValue ?? "") }
     func frame(_ e: AXUIElement) -> Rect? {
         guard let p = attr(e, kAXPositionAttribute), CFGetTypeID(p) == AXValueGetTypeID(), let s = attr(e, kAXSizeAttribute), CFGetTypeID(s) == AXValueGetTypeID() else { return nil }
         var point = CGPoint.zero; var size = CGSize.zero
         guard AXValueGetValue(p as! AXValue, .cgPoint, &point), AXValueGetValue(s as! AXValue, .cgSize, &size) else { return nil }
         return Rect(x: point.x, y: point.y, width: size.width, height: size.height)
+    }
+    func modalStamps(_ window: AXUIElement) -> [AXModalStamp]? {
+        nativeAXMetrics.childCountCalls += 1
+        var count:CFIndex=0
+        let status=AXUIElementGetAttributeValueCount(window,kAXChildrenAttribute as CFString,&count)
+        if status == .attributeUnsupported || status == .noValue { return [] }
+        guard status == .success, count <= 4096 else { return nil }
+        if count == 0 { return [] }
+        nativeAXMetrics.childPageCalls += 1
+        var array:CFArray?
+        guard AXUIElementCopyAttributeValues(window,kAXChildrenAttribute as CFString,0,count,&array) == .success, let children=array as? [AXUIElement] else { return nil }
+        return children.compactMap { child in
+            let role=str(child,kAXRoleAttribute)
+            guard role == kAXSheetRole || role == "AXDialog" else { return nil }
+            return AXModalStamp(role:role,title:str(child,kAXTitleAttribute),frame:frame(child))
+        }
     }
     func windows(pid: Int32? = nil) -> [WindowInfo] {
         let list = CGWindowListCopyWindowInfo([.optionAll, .excludeDesktopElements], kCGNullWindowID) as? [[String: Any]] ?? []
@@ -51,7 +108,7 @@ import CryptoKit
         }
     }
     func observe(directory: String?, images: Bool = true, limit: Int = 600) async throws -> Observation {
-        let start = Date(); elements = [:]
+        let start = Date(); elements = [:]; nativeAXMetrics = AXMetrics()
         let front = NSWorkspace.shared.frontmostApplication
         let target = sessionApp.flatMap(app) ?? (sessionApp == nil ? front : nil)
         let appRoot = target.map { AXUIElementCreateApplication($0.processIdentifier) }
@@ -66,8 +123,44 @@ import CryptoKit
         let selected = sessionWindowID.map { wanted in targetWindows.first { $0.id == wanted } } ?? (focusedFrame.flatMap { f in targetWindows.first { $0.frame == f } } ?? targetWindows.first(where: \.onScreen) ?? targetWindows.first)
         if sessionApp != nil, sessionWindowID == nil { sessionWindowID = selected?.id }
         func info(_ app: NSRunningApplication) -> AppInfo { AppInfo(pid: app.processIdentifier, bundle: app.bundleIdentifier ?? "pid:\(app.processIdentifier)", name: app.localizedName ?? "") }
+        var modalSnapshot:[AXModalStamp]?
         var nodes: [Node] = []; var truncated = false; var axError: String?
-        if AXIsProcessTrusted(), target != nil {
+        if !legacyAX, AXIsProcessTrusted(), let target, let root=appRoot {
+            let scope="\(target.processIdentifier):\(selected?.id ?? 0)"
+            let axWindow=selected.flatMap { selected in availableAXWindows.first { frame($0) == selected.frame } }
+            var roots:[(AXUIElement,String)]=[]
+            if let axWindow { roots.append((axWindow,"w"));modalSnapshot=modalStamps(axWindow) }
+            else if sessionWindowID == nil || (availableAXWindows.isEmpty && target.bundleIdentifier == "com.apple.dock") { roots.append((root,"0")) }
+            else { axError="Selected window disappeared or AX mapping unavailable; choose an observed window explicitly" }
+            if let menu=attr(root,kAXMenuBarAttribute), CFGetTypeID(menu)==AXUIElementGetTypeID() { roots.append((menu as! AXUIElement,"m")) }
+            if let extras=attr(root,"AXExtrasMenuBar"), CFGetTypeID(extras)==AXUIElementGetTypeID() { roots.append((extras as! AXUIElement,"x")) }
+            let hints=axInvalidation.drain(); axSource?.metrics.observerHints += hints.count
+            var fullRefresh = !reuseAXOnce || axScope != scope || axStore == nil
+            if !fullRefresh, let store=axStore, let source=axSource {
+                var seenHints:Set<String>=[]
+                for (element,notification) in hints {
+                    let ref=source.register(element)
+                    if !seenHints.insert(ref).inserted { continue }
+                    if notification == kAXWindowCreatedNotification || store.nodes.first(where:{store.sourceRef($0.id)==ref})?.parent == nil { fullRefresh=true; break }
+                    store.invalidate(ref:ref)
+                }
+                if store.requiresRefresh { fullRefresh=true }
+                if !hints.isEmpty && !fullRefresh { _ = try store.expand(nil) }
+            }
+            if fullRefresh {
+                let source=LiveAXSource(pid:target.processIdentifier,windowID:selected?.id)
+                let store=AXStore(source:source)
+                store.begin(roots:roots.map { (source.register($0.0),$0.1) },budget:min(limit,160))
+                axSource=source; axStore=store; axScope=scope; candidatePage=0; queryReadValues=[:]; queryReadRanges=[:]; queryReadLengths=[:];lastAXReadHandle=nil
+                let valueElements=store.nodes.filter { !$0.value.isEmpty || $0.focused }.prefix(16).compactMap { store.sourceRef($0.id).flatMap(source.element) }
+                axInvalidation.start(pid:target.processIdentifier,roots:[root]+roots.map(\.0),values:valueElements)
+                source.metrics.observerCalls=axInvalidation.requestCalls;source.metrics.observerHints=hints.count
+            }
+            reuseAXOnce=false
+            nodes=observationNodes(); truncated=axStore?.overview().coverage != .complete
+            if let store=axStore, let source=axSource { for node in nodes { if let ref=store.sourceRef(node.id), let e=source.element(ref) { elements[node.id]=e } } }
+            if nodes.isEmpty && axError == nil { axError="AX tree unavailable for selected scope" }
+        } else if AXIsProcessTrusted(), target != nil {
             let root = appRoot!
             AXUIElementSetMessagingTimeout(root, 0.3)
             var visited: [AXUIElement] = []
@@ -76,7 +169,7 @@ import CryptoKit
                 if visited.contains(where: { CFEqual($0, e) }) { return }; visited.append(e)
                 let role = str(e, kAXRoleAttribute)
                 if str(e, kAXSubroleAttribute) == "AXSecureTextField" { return }
-                var names: CFArray?; AXUIElementCopyActionNames(e, &names)
+                var names: CFArray?; nativeAXMetrics.actionCalls += 1; AXUIElementCopyActionNames(e, &names)
                 let title = [str(e, kAXTitleAttribute), str(e, kAXDescriptionAttribute), str(e, kAXHelpAttribute)].filter { !$0.isEmpty }.joined(separator: " | ")
                 let value = str(e,kAXValueAttribute)
                 nodes.append(Node(id: id, role: role, title: String(title.prefix(300)), value: String(value.prefix(4000)), enabled: (attr(e, kAXEnabledAttribute) as? Bool) ?? true, actions: (names as? [String]) ?? [], frame: frame(e), focused: (attr(e, kAXFocusedAttribute) as? Bool) ?? false, subrole:str(e,kAXSubroleAttribute),valueTruncated:value.count>4000,selectedText:["AXTextArea","AXTextField"].contains(role) ? str(e,kAXSelectedTextAttribute) : nil))
@@ -94,6 +187,7 @@ import CryptoKit
             if let extras = attr(root, "AXExtrasMenuBar"), CFGetTypeID(extras) == AXUIElementGetTypeID() { walk(extras as! AXUIElement, "x", 0) }
             if nodes.count <= 1 { axError = "AX tree unavailable/empty for foreground app (app may not expose accessibility)" }
         } else { axError = AXIsProcessTrusted() ? "Target app is not running; launch it to obtain UI state" : "Accessibility permission missing" }
+        var observedAXMetrics=combinedAXMetrics(); observedAXMetrics.collectionMS=milliseconds(start)
         var displays: [DisplayInfo] = []; var windowCapture: WindowCapture?
         if images {
             guard CGPreflightScreenCaptureAccess() else { throw Failure("Screen Recording permission missing. Grant the invoking host/binary in System Settings > Privacy & Security > Screen & System Audio Recording, then relaunch it.") }
@@ -124,7 +218,10 @@ import CryptoKit
                 displays.append(DisplayInfo(id: display.displayID, frame: Rect(x: bounds.minX, y: bounds.minY, width: bounds.width, height: bounds.height), pixelWidth: img.width, pixelHeight: img.height, screenshot: path, ocr: ocr))
             }
         }
-        return Observation(id: UUID().uuidString, timestamp: Date(), front: front.map(info), apps: NSWorkspace.shared.runningApplications.filter { $0.activationPolicy == .regular }.map(info), nodes: nodes, displays: displays, truncated: truncated, axError: axError, elapsedMS: milliseconds(start), target: target.map(info), windows: targetWindows, selectedWindow: selected, windowCapture: windowCapture)
+        return Observation(id: UUID().uuidString, timestamp: Date(), front: front.map(info), apps: NSWorkspace.shared.runningApplications.filter { $0.activationPolicy == .regular && (allowedApps == nil || allowedApps!.contains($0.bundleIdentifier ?? "pid:\($0.processIdentifier)")) }.map(info), nodes: nodes, displays: displays, truncated: truncated, axError: axError, elapsedMS: milliseconds(start), target: target.map(info), windows: targetWindows, selectedWindow: selected, windowCapture: windowCapture, axOverview: legacyAX ? nil : axStore?.overview(), axMetrics: observedAXMetrics, axReadHandle:lastAXReadHandle, axModalStamps:modalSnapshot)
+    }
+    func combinedAXMetrics() -> AXMetrics {
+        var metrics = legacyAX ? AXMetrics() : (axSource?.metrics ?? AXMetrics()); metrics.attributeCalls += nativeAXMetrics.attributeCalls; metrics.actionCalls += nativeAXMetrics.actionCalls; metrics.childCountCalls += nativeAXMetrics.childCountCalls; metrics.childPageCalls += nativeAXMetrics.childPageCalls; return metrics
     }
     func saveImage(_ img: CGImage, _ path: String) throws { guard let dest = CGImageDestinationCreateWithURL(URL(fileURLWithPath: path) as CFURL, UTType.png.identifier as CFString, 1, nil) else { throw Failure("Cannot create screenshot") }; CGImageDestinationAddImage(dest,img,nil); guard CGImageDestinationFinalize(dest) else { throw Failure("Cannot save screenshot") } }
     func check(_ code: AXError, _ operation: String) throws { guard code == .success else { throw Failure("\(operation): AXError \(code.rawValue)") } }
@@ -158,15 +255,52 @@ import CryptoKit
         // Resolve again and compare the target immediately before mutation. Never trust retained AX handles alone.
         if let id = a.target {
             guard let old = observation.nodes.first(where: { $0.id == id }), let e = elements[id], str(e, kAXRoleAttribute) == old.role, frame(e) == old.frame else { throw Failure("Stale/missing AX target; reobserve") }
+            var owner: pid_t = 0
+            guard AXUIElementGetPid(e,&owner) == .success, owner == observedTarget.pid,
+                  str(e,kAXSubroleAttribute) != "AXSecureTextField",
+                  (attr(e,kAXEnabledAttribute) as? Bool) != false else { throw Failure("AX target owner/security/enabled state changed") }
+            let currentSelected=old.selected == nil ? nil : (attr(e,kAXSelectedAttribute) as? Bool)
+            let currentChecked=old.checked == nil ? nil : (attr(e,kAXValueAttribute) as? NSNumber).map { $0.intValue == 1 }
+            try validateAXDiscreteState(old,enabled:attr(e,kAXEnabledAttribute) as? Bool,selected:currentSelected,checked:currentChecked,focused:attr(e,kAXFocusedAttribute) as? Bool)
+            if let selected=observation.selectedWindow {
+                guard windows(pid:owner).contains(where: { $0.id == selected.id && $0.frame == selected.frame }) else { throw Failure("Selected window changed/disappeared") }
+                if !(old.locator ?? old.id).hasPrefix("m"), !(old.locator ?? old.id).hasPrefix("x") {
+                    let window = old.role == "AXWindow" ? e : (attr(e,kAXWindowAttribute).flatMap { CFGetTypeID($0) == AXUIElementGetTypeID() ? ($0 as! AXUIElement) : nil })
+                    guard let window, frame(window) == selected.frame else { throw Failure("AX target no longer belongs to selected window") }
+                }
+            }
             let title = [str(e, kAXTitleAttribute), str(e, kAXDescriptionAttribute), str(e, kAXHelpAttribute)].filter { !$0.isEmpty }.joined(separator: " | ")
             guard String(title.prefix(300)) == old.title else { throw Failure("AX target changed title; reobserve") }
+            var ancestorID=old.parent, inspectedAncestors:Set<String>=[]
+            while let id=ancestorID {
+                guard inspectedAncestors.insert(id).inserted, inspectedAncestors.count <= 64,
+                      let ancestor=observation.nodes.first(where:{$0.id==id}), let element=elements[id] else { throw Failure("Observed AX ancestor no longer available; reobserve") }
+                let label=[str(element,kAXTitleAttribute),str(element,kAXDescriptionAttribute),str(element,kAXHelpAttribute)].filter{ !$0.isEmpty }.joined(separator:" | ")
+                try validateAXContextLabel(ancestor,role:str(element,kAXRoleAttribute),title:label,subrole:str(element,kAXSubroleAttribute),enabled:attr(element,kAXEnabledAttribute) as? Bool)
+                ancestorID=ancestor.parent
+            }
+            if !legacyAX, observation.selectedWindow != nil {
+                guard let priorSheets=observation.axModalStamps, let rootNode=observation.nodes.first(where:{$0.locator=="w"}), let rootWindow=elements[rootNode.id] else { throw Failure("Selected window modal context unavailable; reobserve") }
+                guard let currentSheets=modalStamps(rootWindow), currentSheets==priorSheets else { throw Failure("Modal sheets changed during decision; reobserve") }
+            }
+            // AXChildren edges need not be inverse AXParent edges (AppKit can expose bridge nodes).
+            // Compare the native parent captured during collection with the same live attribute.
+            if let store=axStore, let parentRef=store.nativeParentSnapshot(id), let source=axSource, let expected=source.element(parentRef) {
+                guard let current=attr(e,kAXParentAttribute), CFGetTypeID(current)==AXUIElementGetTypeID(), CFEqual(current,expected) else { throw Failure("AX native parent changed; reobserve") }
+                try store.validateNativeParent(id,currentRef:source.register(current as! AXUIElement))
+                if let attrs=source.exactAttributes[parentRef] {
+                    let priorTitle=[kAXTitleAttribute,kAXDescriptionAttribute,kAXHelpAttribute].compactMap { attrs[$0] as? String }.filter { !$0.isEmpty }.joined(separator:" | ")
+                    let currentTitle=[str(expected,kAXTitleAttribute),str(expected,kAXDescriptionAttribute),str(expected,kAXHelpAttribute)].filter{ !$0.isEmpty }.joined(separator:" | ")
+                    guard String(currentTitle.prefix(300))==String(priorTitle.prefix(300)) else { throw Failure("AX native parent context changed; reobserve") }
+                }
+            }
             switch a.kind {
             case "press": if let f=old.frame { updateVirtualPointer(CGPoint(x:f.x+f.width/2,y:f.y+f.height/2),pid:front.processIdentifier) }; try check(AXUIElementPerformAction(e, kAXPressAction as CFString), "press")
             case "raise": try check(AXUIElementPerformAction(e, kAXRaiseAction as CFString), "raise")
             case "focus": try check(AXUIElementSetAttributeValue(e, kAXFocusedAttribute as CFString, kCFBooleanTrue), "focus")
             case "setValue": try check(AXUIElementSetAttributeValue(e, kAXValueAttribute as CFString, (a.text ?? "") as CFString), "setValue")
             case "secondary": guard old.actions.contains(a.axAction!) else { throw Failure("Secondary action not observed on target") }; try check(AXUIElementPerformAction(e, a.axAction! as CFString), "secondary")
-            case "selectText": let size = old.value.utf16.count; guard a.selectionStart! <= size, a.selectionLength! <= size-a.selectionStart! else { throw Failure("Selection exceeds observed UTF-16 value") }; var range = CFRange(location:a.selectionStart!,length:a.selectionLength!); try check(AXUIElementSetAttributeValue(e,kAXSelectedTextRangeAttribute as CFString,AXValueCreate(.cfRange,&range)!),"selectText")
+            case "selectText": let size = (attr(e,kAXNumberOfCharactersAttribute) as? NSNumber)?.intValue ?? old.value.utf16.count; guard a.selectionStart! <= size, a.selectionLength! <= size-a.selectionStart! else { throw Failure("Selection exceeds current UTF-16 value") }; var range = CFRange(location:a.selectionStart!,length:a.selectionLength!); try check(AXUIElementSetAttributeValue(e,kAXSelectedTextRangeAttribute as CFString,AXValueCreate(.cfRange,&range)!),"selectText")
             case "resize": var size = CGSize(width: a.toX!, height: a.toY!); try check(AXUIElementSetAttributeValue(e, kAXSizeAttribute as CFString, AXValueCreate(.cgSize, &size)!), "resize")
             case "moveWindow": var point = CGPoint(x:a.x!,y:a.y!); try check(AXUIElementSetAttributeValue(e,kAXPositionAttribute as CFString,AXValueCreate(.cgPoint,&point)!),"moveWindow")
             default: throw Failure("Target not applicable to \(a.kind)")
