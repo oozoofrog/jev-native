@@ -3,6 +3,51 @@ import XCTest
 @testable import JevComputerUse
 
 final class RunPresentationTests: XCTestCase {
+    func testRepeatedActionsRemainDistinctAndKeepCompleteEvidence() {
+        let id = UUID(); var state = RunPresentationState()
+        let full = String(repeating:"원문🙂",count:400)
+        let facts:[RunPresentationEvent.Fact] = [.request("owned"),.cycle(1),.observation("window"),.action("press"),.input("press"),.verification("unchanged"),.recovery("no AX change"),.cycle(2),.observation("window"),.action("press"),.input("press"),.source(full,"source"),.result("answer")]
+        for (index,fact) in facts.enumerated() { state.apply(.init(runID:id,sequence:index,fact:fact)) }
+        XCTAssertEqual(state.topology.filter { $0.kind == .decision }.map(\.cycle),[1,2])
+        XCTAssertEqual(state.topology.filter { $0.kind == .execution }.map(\.text),["press","press"])
+        XCTAssertEqual(Set(state.topology.map(\.id)).count,state.topology.count)
+        XCTAssertEqual(state.topology.first { $0.kind == .source }?.text,full)
+        let before = state.topology
+        state.apply(.init(runID:id,sequence:3,fact:.input("stale")))
+        XCTAssertEqual(state.topology,before); XCTAssertEqual(state.inputs,2)
+        state.apply(.init(runID:UUID(),sequence:0,fact:.request("new")))
+        XCTAssertEqual(state.topology.count,1); XCTAssertEqual(state.cycle,0)
+    }
+    func testTopologyLayoutContainsLongRunsWithoutOverlappingCards() {
+        for width:CGFloat in [280,390,620,716,1090] {
+            let frames = TopologyStageLayout.frames(count:80,viewport:CGSize(width:width,height:600))
+            for (index,frame) in frames.enumerated() {
+                XCTAssertGreaterThanOrEqual(frame.minX,0); XCTAssertLessThanOrEqual(frame.maxX,max(218,width))
+                for other in frames.dropFirst(index+1) { XCTAssertFalse(frame.intersects(other)) }
+            }
+            XCTAssertGreaterThan(frames.last!.maxY,1000)
+        }
+    }
+    @MainActor func testWorkflowEmitsTwoActualCyclesAndExplicitRecovery() async throws {
+        let path = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
+        defer { try? FileManager.default.removeItem(at:path) }
+        let control = RunControl(), workflow = Workflow(); var state = RunPresentationState(), inputs = 0
+        control.onPresentation = { state.apply($0) }; control.emit(.request("owned"))
+        let observation = Observation(id:"owned",timestamp:Date(),front:nil,apps:[],nodes:[],displays:[],truncated:false,axError:nil,elapsedMS:0,target:AppInfo(pid:1,bundle:"owned",name:"Owned"))
+        workflow.observeOverride = { _,_ in observation }
+        workflow.decideOverride = { _,_,choices,_,_ in
+            let choice = try XCTUnwrap(choices.first { $0.action?.kind == "key" && $0.action?.key == "return" })
+            return Decision(choice:choice.id,confidence:1,apiMS:0,localMS:0,model:"fixture",usage:[:],response:"")
+        }
+        workflow.performOverride = { _,_,_ in inputs += 1 }
+        var spec = TaskSpec(goal:"owned",apps:["owned"]); spec.maxSteps = 2; spec.maxRecovery = 2; spec.settleMS = 0
+        _ = try await workflow.run(spec:spec,directory:path.path,model:nil,control:control)
+        XCTAssertEqual(inputs,2); XCTAssertEqual(state.inputs,2); XCTAssertEqual(state.cycle,2)
+        XCTAssertEqual(state.topology.filter { $0.kind == .observation }.count,2)
+        XCTAssertEqual(state.topology.filter { $0.kind == .decision }.count,2)
+        XCTAssertEqual(state.topology.filter { $0.kind == .verification }.count,2)
+        XCTAssertEqual(state.topology.filter { $0.kind == .recovery }.count,2)
+    }
     func testStaleAndOutOfOrderEventsCannotReplaceCurrentContent() {
         let first = UUID(), second = UUID(); var state = RunPresentationState()
         state.apply(.init(runID:first,sequence:0,fact:.request("first")))
@@ -13,6 +58,18 @@ final class RunPresentationTests: XCTestCase {
         state.apply(.init(runID:first,sequence:3,fact:.result("stale")))
         state.apply(.init(runID:first,sequence:0,fact:.request("stale restart")))
         XCTAssertEqual(state.request,"second"); XCTAssertTrue(state.source.isEmpty); XCTAssertTrue(state.result.isEmpty)
+    }
+    func testPlanDoesNotReplaceSourceOrClaimAResultAndResetsForNewRequest() {
+        let first = UUID(); var state = RunPresentationState()
+        state.apply(.init(runID:first,sequence:0,fact:.request("owned request")))
+        state.apply(.init(runID:first,sequence:1,fact:.source("source evidence","owned")))
+        state.apply(.init(runID:first,sequence:2,fact:.plan("collect, compare, report")))
+        XCTAssertEqual(state.plan,"collect, compare, report"); XCTAssertEqual(state.source,"source evidence")
+        XCTAssertTrue(state.result.isEmpty); XCTAssertNil(state.outcome); XCTAssertEqual(state.inputs,0)
+        state.apply(.init(runID:UUID(),sequence:0,fact:.request("next request")))
+        XCTAssertTrue(state.plan.isEmpty)
+        state.apply(.init(runID:first,sequence:3,fact:.plan("stale plan")))
+        XCTAssertTrue(state.plan.isEmpty)
     }
     func testOnlyActualInputAndWholeDocumentProvenanceAreRecorded() {
         let id = UUID(); var state = RunPresentationState()
@@ -33,6 +90,18 @@ final class RunPresentationTests: XCTestCase {
         motion.frozen = false; motion.advance(0.016,reducedMotion:false)
         XCTAssertGreaterThan(motion.time,time); XCTAssertGreaterThan(motion.focus,focus)
         motion.advance(0.016,reducedMotion:true); XCTAssertEqual(motion.focus,1)
+    }
+    @MainActor func testComposerReturnSendsAndShiftReturnInsertsNewline() throws {
+        let editor = WrappingTextView(usingTextLayoutManager:false); editor.string = "request"; editor.setSelectedRange(NSRange(location:7,length:0))
+        var sends = 0; editor.onSubmit = { sends += 1 }
+        func enter(_ flags:NSEvent.ModifierFlags = []) throws -> NSEvent {
+            try XCTUnwrap(NSEvent.keyEvent(with:.keyDown,location:.zero,modifierFlags:flags,timestamp:0,windowNumber:0,context:nil,characters:"\r",charactersIgnoringModifiers:"\r",isARepeat:false,keyCode:36))
+        }
+        editor.keyDown(with:try enter()); XCTAssertEqual(sends,1); XCTAssertEqual(editor.string,"request")
+        editor.keyDown(with:try enter(.shift)); XCTAssertEqual(sends,1); XCTAssertEqual(editor.string,"request\n")
+        editor.setMarkedText("한",selectedRange:NSRange(location:1,length:0),replacementRange:NSRange(location:NSNotFound,length:0))
+        XCTAssertTrue(editor.hasMarkedText()); editor.keyDown(with:try enter()); XCTAssertEqual(sends,1)
+        editor.unmarkText()
     }
     @MainActor func testPaginationPreservesEntireUnicodeSourceAndResult() {
         let original = String(repeating:"원문 👨‍👩‍👧‍👦 e\u{301} 🐸\n",count:150)

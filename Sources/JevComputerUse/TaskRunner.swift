@@ -1,4 +1,5 @@
 import Foundation
+import Darwin
 
 @MainActor final class RunControl {
     private(set) var isCancelled = false
@@ -7,11 +8,42 @@ import Foundation
     private var pauseWaiter: CheckedContinuation<Void, Error>?
     private let runID = UUID()
     private var sequence = 0
+    private var cycleOffset = 0
+    private var highestCycle = 0
+    private var journal:FileHandle?
+    private var journalError:Error?
+    func recordEvents(in directory:String) throws {
+        let path=URL(fileURLWithPath:directory).appendingPathComponent("task-events.jsonl")
+        guard journal == nil else { throw Failure("한 작업의 단계 기록을 다른 폴더로 분리하지 않았습니다.") }
+        let descriptor=open(path.path,O_WRONLY|O_CREAT|O_EXCL|O_NOFOLLOW,0o600)
+        guard descriptor>=0 else { throw Failure("기존 작업 기록을 덮어쓰지 않았습니다. 새 기록 폴더의 쓰기 상태를 확인해 주세요.") }
+        journal=FileHandle(fileDescriptor:descriptor,closeOnDealloc:true)
+    }
+    deinit { try? journal?.close() }
     var onStatus: (String) -> Void = { _ in }
     var onPresentation: (RunPresentationEvent) -> Void = { _ in }
     var onPauseChange: () -> Void = {}
     func emit(_ fact: RunPresentationEvent.Fact) {
-        onPresentation(RunPresentationEvent(runID:runID,sequence:sequence,fact:fact)); sequence += 1
+        let translated:RunPresentationEvent.Fact
+        switch fact {
+        case .cycle(let cycle): let value = cycle+cycleOffset; highestCycle = max(highestCycle,value); translated = .cycle(value)
+        case .cycleEnd(let cycle): translated = .cycleEnd(cycle+cycleOffset)
+        default: translated = fact
+        }
+        let event=RunPresentationEvent(runID:runID,sequence:sequence,fact:translated)
+        if let journal {
+            do {
+                let object=try JSONSerialization.jsonObject(with:jsonData(event))
+                var data=try JSONSerialization.data(withJSONObject:EvidencePrivacy.json(object),options:[.sortedKeys]); data.append(10)
+                try journal.write(contentsOf:data)
+            } catch { journalError=Failure("작업 단계 기록을 저장하지 못했습니다. 추가 실행을 중단합니다.") }
+        }
+        onPresentation(event); sequence += 1
+    }
+    @discardableResult func beginCycle() -> Int { let cycle = highestCycle-cycleOffset+1; emit(.cycle(cycle)); return cycle }
+    func withAdditionalCycles<T>(_ operation:() async throws -> T) async rethrows -> T {
+        let previous = cycleOffset; cycleOffset = highestCycle
+        defer { cycleOffset = previous }; return try await operation()
     }
     func requestPause() { guard !isCancelled else { return }; pauseRequested = true; onPauseChange() }
     func resume() {
@@ -23,7 +55,7 @@ import Foundation
         let waiter = pauseWaiter; pauseWaiter = nil; waiter?.resume(throwing:CancellationError())
         onStatus("Stopping after current operation"); onPauseChange()
     }
-    func check() throws { if isCancelled || Task.isCancelled { throw CancellationError() } }
+    func check() throws { if isCancelled || Task.isCancelled { throw CancellationError() }; if let journalError { throw journalError } }
     func checkpoint() async throws {
         try check()
         guard pauseRequested else { return }
@@ -110,10 +142,11 @@ import Foundation
     private var task: Task<Void, Never>?
 
     @discardableResult func start(status: @escaping (String) -> Void,
-        presentation: @escaping (RunPresentationEvent) -> Void = { _ in }, request: String = "",
+        presentation: @escaping (RunPresentationEvent) -> Void = { _ in }, request: String = "", directory:String? = nil,
         operation: @escaping @MainActor (RunControl) async throws -> RunReport) throws -> Task<Void, Never> {
         guard !active else { throw Failure("A run is already active. Stop it or wait for completion.") }
         let control = RunControl(); control.onStatus = status; control.onPresentation = presentation
+        if let directory { try control.recordEvents(in:directory) }
         control.onPauseChange = { [weak self] in self?.onChange() }
         control.emit(.request(request))
         self.control = control; active = true; report = nil; error = nil; onChange()
@@ -124,7 +157,11 @@ import Foundation
                 if let response = report.response { control.emit(.result(response)) }
                 control.emit(.outcome(report.status))
             }
-            catch { self.error = String(describing: error); control.emit(.outcome(control.isCancelled ? "cancelled" : "error")) }
+            catch {
+                self.error = String(describing:error)
+                if !control.isCancelled && !(error is CancellationError) { control.emit(.failure(String(describing:error))) }
+                control.emit(.outcome(control.isCancelled || error is CancellationError ? "cancelled" : "error"))
+            }
         }
         self.task = task
         return task

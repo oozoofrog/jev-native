@@ -1,0 +1,9 @@
+{
+  "schema": 1,
+  "product": "JevNative",
+  "version": "0.9.0",
+  "build": "32",
+  "bundleIdentifier": "com.oozoofrog.JevComputerUse",
+  "executable": "jev-native",
+  "canonicalSource": "."
+}

@@ -1,6 +1,6 @@
 # Public export manifest
 
-This repository exports the JEV Native project (current source: 0.6.3 (11); published app archive: 0.5.0 (7)), including Swift native automation, JEV closed-loop decisions, Codex text/vision handoff, virtual cursor/preview, clipboard credential setup, Codex/Claude Code skill installers and startup crash mitigation.
+This repository exports the JEV Native project (current public source: 0.9.0 (32); historical published app archive: 0.5.0 (7)), including Swift native automation, JEV closed-loop decisions, Codex text/vision handoff, virtual cursor/preview, clipboard credential setup, Codex/Claude Code skill installers and startup crash mitigation.
 
 ## Included
 
@@ -70,3 +70,11 @@ Typed presentation events reject stale run/sequence updates. Cooperative pause f
 Final source verification: **98 Swift tests passed**, zero failures; public release and original debug builds passed without compiler warnings/errors. Readability verification includes **24 native checks**: 18 with synthetic documents rendered by the actual workspace source in light/dark appearances, and six in the development app. These cover full Unicode sheets, native pointer paging, focus movement, idle stability and 760×700 minimum-window bounds. Earlier workshop verification separately exercised a real source-to-summary delegate run. The readability update did not rerun natural-language generation or claim a general reliability improvement. Runtime evidence covers macOS 27.0.1 arm64.
 
 This commit publishes source, tests, icon assets and documentation. It does not update the tracked 0.5.0 app archive, checksum metadata, installed app, Git tags or GitHub Releases. Raw local observations, synthetic fixture captures and verification logs remain outside this public checkout.
+
+## Current source update
+
+The current update publishes production Swift source, tests, the portable product manifest/generator, a development-only bundle builder and documentation. Previously published evidence and archives remain historical. This update adds no app archive, private signing policy, certificate material, local installer/migration scripts, actual run records, conversations, AX captures, screenshots, backups or build caches. Test path fixtures use generic paths; credential strings in redaction tests are deliberately synthetic.
+
+The public manifest uses the containing checkout instead of a developer's absolute source path. Build32 distinguishes this portable identity from the previously deployed build31. The development builder creates a new bundle and never signs, installs, changes command links or modifies a running app. The original machine's source, signed installation and deployment configuration were preserved separately.
+
+Current portable source validation: **216 Swift XCTest tests passed, zero failures**, plus **8 Python product-contract fixture tests passed**. The release executable and fresh bundle were built, and build inputs matched before/after. This validates compilation, tests and bundle metadata; no public build32 GUI, signing, installation or TCC-retention claim is made. Raw local logs are excluded.

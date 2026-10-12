@@ -224,9 +224,10 @@ struct AXChanges: Codable { var since: String; var revision: String; var coverag
             if attrs[kAXFocusedAttribute] as? Bool == true { selectedText = self.selectedText(ref) }
         } else { let raw=one(e,kAXValueAttribute); attrs[kAXValueAttribute]=raw; value=string(raw) }
         if let parent=attrs[kAXParentAttribute], CFGetTypeID(parent as CFTypeRef)==AXUIElementGetTypeID() { nativeParents[ref]=(parent as! AXUIElement) }
+        let applicationURL = role == "AXDockItem" && subrole == "AXApplicationDockItem" ? (one(e,kAXURLAttribute) as? URL)?.absoluteString : nil
         exactAttributes[ref] = attrs
         let checked: Bool? = ["AXCheckBox","AXRadioButton"].contains(role) ? ((attrs[kAXValueAttribute] as? NSNumber)?.intValue == 1) : nil
-        return Node(id:ref,role:role,title:String(title.prefix(300)),value:String(value.prefix(2000)),enabled:attrs[kAXEnabledAttribute] as? Bool ?? true,actions:actions as? [String] ?? [],frame:rect,focused:attrs[kAXFocusedAttribute] as? Bool ?? false,subrole:subrole,valueTruncated:truncated || value.count>2000,selectedText:selectedText,selected:attrs[kAXSelectedAttribute] as? Bool,checked:checked,ownerPID:pid,ownerWindowID:windowID,textLengthUTF16:textLength)
+        return Node(id:ref,role:role,title:String(title.prefix(300)),value:String(value.prefix(2000)),enabled:attrs[kAXEnabledAttribute] as? Bool ?? true,actions:actions as? [String] ?? [],frame:rect,focused:attrs[kAXFocusedAttribute] as? Bool ?? false,subrole:subrole,valueTruncated:truncated || value.count>2000,selectedText:selectedText,selected:attrs[kAXSelectedAttribute] as? Bool,checked:checked,ownerPID:pid,ownerWindowID:windowID,textLengthUTF16:textLength,applicationURL:applicationURL)
     }
     private func string(_ raw: Any?) -> String { (raw as? String) ?? (raw as? NSNumber)?.stringValue ?? "" }
     func childCount(_ ref: String) -> Int? { guard let e=refs[ref] else { return nil }; metrics.childCountCalls += 1; var count: CFIndex=0; let status=AXUIElementGetAttributeValueCount(e,kAXChildrenAttribute as CFString,&count); if status == .attributeUnsupported || status == .noValue { return 0 }; return status == .success ? count : nil }

@@ -1,6 +1,7 @@
 import AppKit
 
 @MainActor final class ConnectionWindow: NSWindowController {
+    var onChange:() -> Void = {}
     private let message = NSTextField(wrappingLabelWithString:"")
     private let connect = NSButton(title:"복사한 연결 키로 연결",target:nil,action:nil)
     init() {
@@ -20,7 +21,7 @@ import AppKit
     func show() { refresh(); showWindow(nil); window?.makeKeyAndOrderFront(nil) }
     private func refresh() { let ready = (try? credential()) != nil; message.stringValue = ready ? "연결 키가 설정되어 있어요" : "연결 키를 복사한 뒤 아래 버튼을 누르세요."; connect.isEnabled = !ready }
     @objc private func importKey() {
-        do { _ = try setupCredential(importPasteboard:true); refresh() }
+        do { _ = try setupCredential(importPasteboard:true); refresh(); onChange() }
         catch { message.stringValue = "연결하지 못했어요. 연결 키를 확인해 주세요. 기존 키가 있으면 직접 확인해야 합니다." }
     }
     @objc private func openKeys() { if !CredentialSetupIO.native().openKeys() { message.stringValue = "연결 관리 페이지를 열지 못했어요." } }

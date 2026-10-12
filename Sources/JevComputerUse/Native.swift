@@ -123,7 +123,7 @@ import CryptoKit
         let focusedFrame = appRoot.flatMap { attr($0,kAXFocusedWindowAttribute) }.flatMap { CFGetTypeID($0) == AXUIElementGetTypeID() ? frame($0 as! AXUIElement) : nil }
         let selected = sessionWindowID.map { wanted in targetWindows.first { $0.id == wanted } } ?? (focusedFrame.flatMap { f in targetWindows.first { $0.frame == f } } ?? targetWindows.first(where: \.onScreen) ?? targetWindows.first)
         if sessionApp != nil, sessionWindowID == nil { sessionWindowID = selected?.id }
-        func info(_ app: NSRunningApplication) -> AppInfo { AppInfo(pid: app.processIdentifier, bundle: app.bundleIdentifier ?? "pid:\(app.processIdentifier)", name: app.localizedName ?? "") }
+        func info(_ app: NSRunningApplication) -> AppInfo { AppInfo(pid: app.processIdentifier, bundle: app.bundleIdentifier ?? "pid:\(app.processIdentifier)", name: app.localizedName ?? "", processLaunchDate: app.launchDate) }
         var modalSnapshot:[AXModalStamp]?
         var nodes: [Node] = []; var truncated = false; var axError: String?
         if !legacyAX, AXIsProcessTrusted(), let target, let root=appRoot {
@@ -243,7 +243,18 @@ import CryptoKit
         }
         try validateProtectedSourceAction(a,observedWindow:observation.selectedWindow?.id,protectedWindow:protectedWindowID)
         guard AXIsProcessTrusted() else { throw Failure("Accessibility permission missing for invoking host/binary") }
-        guard let observedTarget = observation.target ?? observation.front, allowedApps.contains(observedTarget.bundle), let front = NSRunningApplication(processIdentifier: observedTarget.pid), !front.isTerminated else { throw Failure("Target app changed or outside allowlist; reobserve") }
+        let observedTarget: AppInfo, front: NSRunningApplication
+        switch TargetProcessGuard.resolve(target: observation.target, front: observation.front, allowedApps: allowedApps,
+            lookup: { NSRunningApplication(processIdentifier: $0) },
+            state: { app in
+                let terminated = app.isTerminated
+                return TargetProcessGuard.State(pid: app.processIdentifier, bundle: app.bundleIdentifier, launchDate: app.launchDate, terminated: terminated)
+            }) {
+        case .rejected(let diagnostic): throw Failure(diagnostic.failureMessage)
+        case .allowed(let target, let process, let diagnostic):
+            observedTarget = target; front = process
+            if let notice = diagnostic.notice { fputs(notice + "\n", stderr) }
+        }
         if a.kind == "selectWindow" {
             guard let window = observation.windows.first(where: { $0.id == a.windowID }) else { throw Failure("Window not owned by observed target") }
             sessionWindowID = a.windowID
@@ -264,9 +275,24 @@ import CryptoKit
             let currentSelected=old.selected == nil ? nil : (attr(e,kAXSelectedAttribute) as? Bool)
             let currentChecked=old.checked == nil ? nil : (attr(e,kAXValueAttribute) as? NSNumber).map { $0.intValue == 1 }
             try validateAXDiscreteState(old,enabled:attr(e,kAXEnabledAttribute) as? Bool,selected:currentSelected,checked:currentChecked,focused:attr(e,kAXFocusedAttribute) as? Bool)
+            let dockApplicationPress = !legacyAX && observedTarget.bundle == "com.apple.dock" && old.role == "AXDockItem" && a.kind == "press"
+            if dockApplicationPress {
+                try validateDockApplicationTarget(old,observation:observation,action:a,currentBundle:front.bundleIdentifier,currentSubrole:str(e,kAXSubroleAttribute),currentURL:(attr(e,kAXURLAttribute) as? URL)?.absoluteString)
+                guard let parentID=old.parent, let parent=elements[parentID],
+                      let rootID=observation.nodes.first(where:{$0.id==parentID})?.parent, let root=elements[rootID],
+                      let liveParent=attr(e,kAXParentAttribute), CFGetTypeID(liveParent)==AXUIElementGetTypeID(), CFEqual(liveParent,parent),
+                      let liveRoot=attr(parent,kAXParentAttribute), CFGetTypeID(liveRoot)==AXUIElementGetTypeID(), CFEqual(liveRoot,root),
+                      CFEqual(root,AXUIElementCreateApplication(owner)), str(parent,kAXRoleAttribute)=="AXList" else { throw Failure("Dock native application hierarchy changed; reobserve") }
+                var listOwner:pid_t=0, rootOwner:pid_t=0
+                guard AXUIElementGetPid(parent,&listOwner) == .success, listOwner==owner,
+                      AXUIElementGetPid(root,&rootOwner) == .success, rootOwner==owner else { throw Failure("Dock ancestor owner changed; reobserve") }
+                var liveWindows:CFTypeRef?
+                let status=AXUIElementCopyAttributeValue(root,kAXWindowsAttribute as CFString,&liveWindows)
+                guard status == .attributeUnsupported || status == .noValue || (status == .success && (liveWindows as? [AXUIElement])?.isEmpty == true) else { throw Failure("Dock AX window context changed; reobserve") }
+            }
             if let selected=observation.selectedWindow {
                 guard windows(pid:owner).contains(where: { $0.id == selected.id && $0.frame == selected.frame }) else { throw Failure("Selected window changed/disappeared") }
-                if !(old.locator ?? old.id).hasPrefix("m"), !(old.locator ?? old.id).hasPrefix("x") {
+                if !dockApplicationPress, !(old.locator ?? old.id).hasPrefix("m"), !(old.locator ?? old.id).hasPrefix("x") {
                     let window = old.role == "AXWindow" ? e : (attr(e,kAXWindowAttribute).flatMap { CFGetTypeID($0) == AXUIElementGetTypeID() ? ($0 as! AXUIElement) : nil })
                     guard let window, frame(window) == selected.frame else { throw Failure("AX target no longer belongs to selected window") }
                 }
@@ -281,7 +307,7 @@ import CryptoKit
                 try validateAXContextLabel(ancestor,role:str(element,kAXRoleAttribute),title:label,subrole:str(element,kAXSubroleAttribute),enabled:attr(element,kAXEnabledAttribute) as? Bool)
                 ancestorID=ancestor.parent
             }
-            if !legacyAX, observation.selectedWindow != nil {
+            if !legacyAX, !dockApplicationPress, observation.selectedWindow != nil {
                 guard let priorSheets=observation.axModalStamps, let rootNode=observation.nodes.first(where:{$0.locator=="w"}), let rootWindow=elements[rootNode.id] else { throw Failure("Selected window modal context unavailable; reobserve") }
                 guard let currentSheets=modalStamps(rootWindow), currentSheets==priorSheets else { throw Failure("Modal sheets changed during decision; reobserve") }
             }
@@ -297,7 +323,7 @@ import CryptoKit
                 }
             }
             switch a.kind {
-            case "press": if let f=old.frame { updateVirtualPointer(CGPoint(x:f.x+f.width/2,y:f.y+f.height/2),pid:front.processIdentifier) }; try check(AXUIElementPerformAction(e, kAXPressAction as CFString), "press")
+            case "press": if dockApplicationPress { guard (attr(e,kAXURLAttribute) as? URL)?.absoluteString == old.applicationURL else { throw Failure("Dock application URL changed before press; reobserve") } }; if let f=old.frame { updateVirtualPointer(CGPoint(x:f.x+f.width/2,y:f.y+f.height/2),pid:front.processIdentifier) }; try check(AXUIElementPerformAction(e, kAXPressAction as CFString), "press")
             case "raise": try check(AXUIElementPerformAction(e, kAXRaiseAction as CFString), "raise")
             case "focus": try check(AXUIElementSetAttributeValue(e, kAXFocusedAttribute as CFString, kCFBooleanTrue), "focus")
             case "setValue": try check(AXUIElementSetAttributeValue(e, kAXValueAttribute as CFString, (a.text ?? "") as CFString), "setValue")

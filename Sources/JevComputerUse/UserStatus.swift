@@ -18,13 +18,17 @@ enum UserStatus {
             if phase.hasPrefix("Running") || phase.hasPrefix("Executing") { return "앱에서 작업을 진행하고 있어요" }
             if phase == "Codex writing" || phase.contains("delegateText") { return "요청한 글을 작성하고 있어요" }
             if phase == "Codex inspecting image" || phase.contains("delegateVision") { return "선택한 화면을 살펴보고 있어요" }
-            return "다음 작업을 확인하고 있어요"
+            return phase
         }
     }
     static func result(_ status: String) -> String {
         switch status {
         case "verified_complete": return "지정한 완료 조건을 확인했어요"
         case "jev_observed_complete": return "관찰한 상태를 기준으로 작업을 마쳤어요. 결과를 확인해 주세요."
+        case "research_partial": return "확인한 조사 결과와 미확인 항목을 정리했어요"
+        case "local_complete": return "로컬 명령과 요청한 결과를 확인했어요"
+        case "local_partial": return "로컬 작업 결과와 미확인 항목을 정리했어요"
+        case "local_failed": return "로컬 작업에서 멈췄어요. 명령 출력과 실행 기록을 확인해 주세요."
         case "content_delivered": return "요청한 결과가 준비됐어요"
         case "cancelled", "request_cancelled": return "작업을 중지했어요"
         case "request_visual_destination_unresolved": return "화면 설명을 다른 앱에 쓰는 경로는 아직 지원하지 않아요. 작업 창에 설명해 달라고 요청해 주세요."

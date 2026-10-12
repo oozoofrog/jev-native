@@ -16,7 +16,7 @@ private final class SpatialAccessibilityElement: NSAccessibilityElement {
     var value:String
     var color:NSColor
     var font:NSFont
-    let textSize:CGSize
+    var textSize:CGSize
     let baseSize:CGFloat
     let weight:NSFont.Weight
     let body:Bool
@@ -28,6 +28,12 @@ private final class SpatialAccessibilityElement: NSAccessibilityElement {
         plane.position = SCNVector3(size.width/2,size.height/2,0); addChildNode(plane); redraw()
     }
     required init?(coder:NSCoder) { fatalError("init(coder:) is unavailable") }
+    func resize(_ size:CGSize) {
+        guard textSize != size else { return }; textSize = size
+        if let plane = childNodes.first?.geometry as? SCNPlane { plane.width = size.width; plane.height = size.height; childNodes.first?.position = SCNVector3(size.width/2,size.height/2,0) }
+        for child in childNodes.dropFirst() { if let plane = child.geometry as? SCNPlane { plane.width = size.width; plane.height = size.height; child.position = SCNVector3(size.width/2,size.height/2,-0.5) } }
+        redraw()
+    }
     func redraw() {
         let scale:CGFloat = 3
         guard let bitmap = NSBitmapImageRep(bitmapDataPlanes:nil,pixelsWide:Int(ceil(textSize.width*scale)),pixelsHigh:Int(ceil(textSize.height*scale)),bitsPerSample:8,samplesPerPixel:4,hasAlpha:true,isPlanar:false,colorSpaceName:.deviceRGB,bytesPerRow:0,bitsPerPixel:0), let context = NSGraphicsContext(bitmapImageRep:bitmap) else { return }
@@ -49,6 +55,8 @@ private final class SpatialAccessibilityElement: NSAccessibilityElement {
 
 /// AppKit owns the editor; everything above it shares this native 3D scene and one motion clock.
 @MainActor final class SpatialWorkspace: SCNView {
+    var onDetails:(String) -> Bool = { _ in false }
+    private var simpleControls = false
     var onCommand: (String) -> Void = { _ in }
     private let world = SCNNode(), cameraNode = SCNNode(), core = SCNNode(), orbits = SCNNode()
     private var modules: [String:SCNNode] = [:]
@@ -59,6 +67,9 @@ private final class SpatialAccessibilityElement: NSAccessibilityElement {
     private var linked = false
     private var orbitTime = 0.0
     private var textNodes: [String:SpatialTextNode] = [:]
+    private var panelWidth:CGFloat = 334
+    private var readingWidth:CGFloat { panelWidth-39 }
+    private var sceneHalfWidth:CGFloat { panelWidth+155 }
     private var readingFont = NSFont.systemFont(ofSize:19,weight:.medium)
     private var targets: [(String,SCNNode,CGSize,SpatialAccessibilityElement)] = []
     private var state = RunPresentationState()
@@ -140,7 +151,7 @@ private final class SpatialAccessibilityElement: NSAccessibilityElement {
     private func module(_ key:String, rect:CGRect, depth:CGFloat, keys:[String], stack:Bool = false, output:Bool = false) {
         let group = SCNNode(); world.addChildNode(group); modules[key] = group
         func slab(_ r:CGRect,_ z:CGFloat,_ thickness:CGFloat,_ role:String) -> SCNNode {
-            let box = SCNBox(width:r.width,height:r.height,length:thickness,chamferRadius:3)
+            let box = SCNBox(width:r.width,height:r.height,length:thickness,chamferRadius:8)
             let node = SCNNode(geometry:box); node.position = SCNVector3(r.midX,r.midY,z)
             group.addChildNode(node); surfaces.append((node,role)); return node
         }
@@ -149,7 +160,7 @@ private final class SpatialAccessibilityElement: NSAccessibilityElement {
             _ = slab(rect.offsetBy(dx:-5,dy:-6),depth-10,4,"paper")
         }
         _ = slab(rect.offsetBy(dx:7,dy:-9),depth-9,4,"shadow")
-        let border = slab(rect.insetBy(dx:-2.4,dy:-2.4),depth-1,6,"border")
+        let border = slab(rect.insetBy(dx:-1.0,dy:-1.0),depth-1,6,"border")
         borders[key] = border
         _ = slab(rect,depth,6,"panel")
         // Cap and footer delimiters remain part of the plate as it lifts.
@@ -163,7 +174,7 @@ private final class SpatialAccessibilityElement: NSAccessibilityElement {
     private func makeWorld() {
         text("brand","JEV",at:SCNVector3(-440,270,0),width:100,size:25,color:accent,command:"home")
         text("target","맡길 일을 입력해 주세요",at:SCNVector3(-300,272,-12),width:620,size:13,color:secondary)
-        text("sourceRole","SOURCE · 원문 / 읽기 전용",at:SCNVector3(-440,201,-28),width:295,height:28,size:13)
+        text("sourceRole","01  출처 · 읽기 전용",at:SCNVector3(-440,201,-28),width:295,height:28,size:13)
         text("sourceTitle","원문",at:SCNVector3(-440,151,-28),width:295,height:44,size:17,color:accent,command:"source")
         text("source","원문이 필요한 요청이면\n확인한 문서가 여기에 나타납니다.",at:SCNVector3(-440,-48,-28),width:295,height:195,size:15)
         text("sourcePage","",at:SCNVector3(-440,-91,-28),width:190,height:28,size:13,color:secondary)
@@ -171,11 +182,11 @@ private final class SpatialAccessibilityElement: NSAccessibilityElement {
         text("sourceFull","원문 전문",at:SCNVector3(-440,-121,-28),width:120,height:28,size:13,color:accent,command:"sourceFull")
         module("source",rect:CGRect(x:-456,y:-139,width:334,height:377),depth:-32,keys:["sourceRole","sourceTitle","source","sourcePage","sourceNext","sourceFull"],stack:true)
 
-        text("requestTitle","COMMAND · 요청",at:SCNVector3(-90,210,-61),width:205,height:28,size:13,color:secondary,command:"request")
-        text("request","목표와 작업 범위",at:SCNVector3(-90,132,-61),width:205,height:73,size:14,color:secondary,command:"requestFull")
-        module("request",rect:CGRect(x:-106,y:121,width:237,height:117),depth:-65,keys:["requestTitle","request"])
+        text("requestTitle","02  실행 계획",at:SCNVector3(-90,238,-61),width:205,height:28,size:13,color:secondary,command:"request")
+        text("request","요청 확인 → 계획 확인\n승인한 작업 실행\n결과와 출처 검토",at:SCNVector3(-90,137,-61),width:205,height:96,size:14,color:secondary,command:"requestFull")
+        module("request",rect:CGRect(x:-106,y:121,width:237,height:150),depth:-65,keys:["requestTitle","request"])
 
-        text("resultRole","OUTPUT · 결과 / 응답 대기",at:SCNVector3(171,201,32),width:295,height:28,size:13)
+        text("resultRole","03  결과",at:SCNVector3(171,201,32),width:295,height:28,size:13)
         text("resultTitle","결과",at:SCNVector3(171,151,32),width:295,height:44,size:17,color:accent,command:"result")
         text("result","실행한 작업의 결과를\n이 공간에서 확인할 수 있습니다.",at:SCNVector3(171,-48,32),width:295,height:195,size:15)
         text("resultPage","",at:SCNVector3(171,-91,32),width:190,height:28,size:13,color:secondary)
@@ -198,21 +209,21 @@ private final class SpatialAccessibilityElement: NSAccessibilityElement {
             ring.eulerAngles = SCNVector3(Double.pi/2,Double(index)*Double.pi/4,index == 3 ? Double.pi/2 : 0)
             orbits.addChildNode(ring); surfaces.append((ring,"energy"))
         }
-        text("coreTitle","JEV · 실행 코어",at:SCNVector3(-43,-43,72),width:155,height:28,size:13,color:accent,command:"core")
-        text("coreLabel","요청을 기다리는 중",at:SCNVector3(-65,-67,72),width:190,height:28,size:13,color:secondary)
-        text("provenance","",at:SCNVector3(-65,-140,72),width:190,height:64,size:13,color:secondary,command:"trace")
+        text("coreTitle","진행 상태",at:SCNVector3(-43,-43,72),width:155,height:28,size:13,color:accent,command:"core")
+        text("coreLabel","요청을 기다리는 중",at:SCNVector3(-65,-89,72),width:190,height:50,size:13,color:secondary)
+        text("provenance","",at:SCNVector3(-65,-147,72),width:190,height:54,size:13,color:secondary,command:"trace")
         for key in ["coreTitle","coreLabel","provenance"] { coreGroup.addChildNode(textNodes[key]!) }
         let keyLight = SCNNode(); keyLight.light = SCNLight(); keyLight.light!.type = .omni; keyLight.light!.intensity = 900
         keyLight.position = SCNVector3(-160,280,450); scene!.rootNode.addChildNode(keyLight)
         let fill = SCNNode(); fill.light = SCNLight(); fill.light!.type = .ambient; fill.light!.intensity = 250; scene!.rootNode.addChildNode(fill)
 
-        text("historyRole","TRACE · 실행 기록",at:SCNVector3(-340,-204,-61),width:255,height:28,size:13)
+        text("historyRole","04  실행 기록",at:SCNVector3(-340,-204,-61),width:255,height:28,size:13)
         for i in 0..<4 {
-            text("event\(i)","",at:SCNVector3(-340+CGFloat(i)*174,-238,-61),width:162,height:32,size:13,command:"event:\(i)")
+            text("event\(i)","",at:SCNVector3(-340+CGFloat(i)*174,-263,-61),width:162,height:52,size:13,command:"event:\(i)")
         }
         text("history","실행한 동작이 여기에 쌓입니다",at:SCNVector3(-65,-204,-61),width:405,height:28,size:13,color:secondary,command:"history")
-        module("history",rect:CGRect(x:-358,y:-246,width:720,height:76),depth:-65,keys:["historyRole","history","event0","event1","event2","event3"])
-        text("status","요청을 기다리고 있어요",at:SCNVector3(-440,-268,12),width:610,height:30,size:13)
+        module("history",rect:CGRect(x:-358,y:-276,width:720,height:106),depth:-65,keys:["historyRole","history","event0","event1","event2","event3"])
+        text("status","요청 대기",at:SCNVector3(-440,-268,12),width:610,height:30,size:13)
         text("run","요청하기 ⌘↵",at:SCNVector3(288,-268,32),width:180,height:30,size:15,color:accent,command:"run")
         text("pause","일시정지",at:SCNVector3(-440,-305,12),width:120,height:32,size:13,color:accent,command:"pause")
         text("stop","중지",at:SCNVector3(-290,-305,12),width:80,height:32,size:13,color:accent,command:"stop")
@@ -237,15 +248,15 @@ private final class SpatialAccessibilityElement: NSAccessibilityElement {
             secondary = dark ? NSColor(red:0.70,green:0.82,blue:0.82,alpha:1) : NSColor(red:0.29,green:0.39,blue:0.40,alpha:1)
             outline = dark ? NSColor(red:0.43,green:0.68,blue:0.69,alpha:1) : NSColor(red:0.10,green:0.23,blue:0.25,alpha:1)
             accent = dark ? NSColor(red:0.28,green:0.84,blue:0.89,alpha:1) : NSColor(red:0.02,green:0.45,blue:0.52,alpha:1)
-            backgroundColor = dark ? NSColor(red:0.035,green:0.066,blue:0.083,alpha:1) : NSColor(red:0.94,green:0.95,blue:0.91,alpha:1)
+            backgroundColor = dark ? NSColor(red:0.035,green:0.066,blue:0.083,alpha:1) : NSColor(red:0.94,green:0.96,blue:0.96,alpha:1)
             for (node,role) in surfaces {
                 let color:NSColor
                 switch role {
-                case "panel": color = dark ? NSColor(red:0.07,green:0.12,blue:0.15,alpha:1) : NSColor(red:1.0,green:0.99,blue:0.95,alpha:1)
+                case "panel": color = dark ? NSColor(red:0.07,green:0.12,blue:0.15,alpha:1) : NSColor(red:0.995,green:1,blue:1,alpha:1)
                 case "paper": color = dark ? NSColor(red:0.10,green:0.17,blue:0.20,alpha:1) : NSColor(red:0.78,green:0.86,blue:0.80,alpha:1)
                 case "shell": color = dark ? NSColor(red:0.08,green:0.25,blue:0.29,alpha:1) : NSColor(red:0.43,green:0.83,blue:0.79,alpha:1)
                 case "energy", "nucleus": color = accent
-                case "shadow": color = dark ? NSColor(red:0.01,green:0.035,blue:0.05,alpha:1) : NSColor(red:0.67,green:0.75,blue:0.70,alpha:1)
+                case "shadow": color = dark ? NSColor(red:0.01,green:0.035,blue:0.05,alpha:1) : NSColor(red:0.76,green:0.83,blue:0.82,alpha:1)
                 case "outline", "border": color = outline
                 case "grid": color = outline.withAlphaComponent(0.06)
                 default: color = outline.withAlphaComponent(0.5)
@@ -300,7 +311,7 @@ private final class SpatialAccessibilityElement: NSAccessibilityElement {
     private func updateTypography() {
         guard bounds.height > 0 else { return }
         let aspect = max(0.4,bounds.width/bounds.height)
-        let z = max(960,590/tan(21 * Double.pi/180)/aspect)
+        let z = max(850,(sceneHalfWidth+55)/tan(21 * Double.pi/180)/aspect)
         // Reserve the far plane, focus travel and maximum supported yaw.
         let projection = bounds.height/2/tan(21 * Double.pi/180)/(z+160)*cos(0.24)
         let sourceOffset = sourcePages.prefix(sourcePage).reduce(0) { $0+$1.count }
@@ -315,7 +326,7 @@ private final class SpatialAccessibilityElement: NSAccessibilityElement {
             }
         }
         if repaginate {
-            sourcePages = Self.pages(state.source,font:readingFont); resultPages = Self.pages(state.result,font:readingFont)
+            sourcePages = Self.pages(state.source,width:readingWidth,font:readingFont); resultPages = Self.pages(state.result,width:readingWidth,font:readingFont)
             func page(at offset:Int,in pages:[String]) -> Int {
                 var start = 0
                 for (i,page) in pages.enumerated() { if start+page.count > offset { return i }; start += page.count }
@@ -337,9 +348,9 @@ private final class SpatialAccessibilityElement: NSAccessibilityElement {
         let resultChanged = next.result != state.result && !next.result.isEmpty
         if next.history.count > state.history.count { historyPage = max(0,next.history.count-1) }
         state = next
-        if sourceChanged { sourcePages = Self.pages(next.source,font:readingFont); sourcePage = 0; transfer(String(next.source.prefix(42)),reverse:false,source:true) }
+        if sourceChanged { sourcePages = Self.pages(next.source,width:readingWidth,font:readingFont); sourcePage = 0; transfer(String(next.source.prefix(42)),reverse:false,source:true) }
         if resultChanged {
-            resultPages = Self.pages(next.result,font:readingFont); resultPage = 0
+            resultPages = Self.pages(next.result,width:readingWidth,font:readingFont); resultPage = 0
             resultRevealAt = NSWorkspace.shared.accessibilityDisplayShouldReduceMotion ? nil : motion.time+1.5
             transfer(String(next.result.prefix(42)),reverse:false,source:false)
         }
@@ -355,26 +366,32 @@ private final class SpatialAccessibilityElement: NSAccessibilityElement {
         }
         motion.frozen = frozen
         renderControls()
-        set("coreLabel",pendingPause ? "일시 정지" : active ? "실행 중" : state.outcome == nil ? "요청 대기" : "실행 종료 · 기록 보존")
+        set("coreLabel",pendingPause ? "일시정지" : active ? state.phase : state.outcome == nil ? "요청 대기" : state.phase)
+    }
+    func useDetailedDashboard() {
+        simpleControls = true
+        for key in ["brand","run","pause","stop","report","left","right","home","status"] { textNodes[key]?.isHidden = true }
+        set("sourceRole","01  출처 · 원문"); set("resultTitle","작업 결과")
+        sceneDirty = true
     }
     func message(_ text:String) { set("status",text) }
     private func renderState() {
-        set("target",state.target.isEmpty ? "맡길 일을 입력해 주세요" : targetTitle(state.target))
-        set("request",state.request.isEmpty ? "목표와 작업 범위" : state.request)
-        set("resultRole",state.result.isEmpty ? "OUTPUT · 결과 / 응답 대기" : "OUTPUT · 결과 / 응답 도착")
+        set("target",state.target.isEmpty ? "확인한 정보로 실행하고, 결과를 기록합니다" : "작업 대상  ·  "+targetTitle(state.target))
+        set("request",state.plan.isEmpty ? (state.request.isEmpty ? "요청 확인 → 계획 확인\n승인한 작업 실행\n결과와 출처 검토" : "요청을 확인하고 있습니다") : state.plan)
+        set("resultRole",state.result.isEmpty ? "03  결과 · 대기" : "03  결과 · 수신")
         for i in 0..<4 {
             let start = max(0,state.history.count-4), index = start+i
             set("event\(i)",index < state.history.count ? "\(index+1) · " + state.history[index] : "")
         }
         set("sourceTitle",state.sourceTitle.isEmpty ? "원문" : state.sourceTitle)
-        set("source",sourcePages.isEmpty ? "원문이 필요한 요청이면\n확인한 문서가 여기에 나타납니다." : sourcePages[min(sourcePage,sourcePages.count-1)])
-        set("result",resultRevealAt != nil ? "결과를 이 공간으로 옮기고 있어요" : (resultPages.isEmpty ? (state.outcome == nil ? "실행 결과를 기다리고 있습니다." : state.phase) : resultPages[min(resultPage,resultPages.count-1)]))
-        set("sourcePage",sourcePages.isEmpty ? "" : "\(sourcePage+1) / \(sourcePages.count) · 원문 전체 보존")
+        set("source",sourcePages.isEmpty ? "웹 출처나 앱의 원문을\n실제로 읽은 뒤 표시합니다.\n\n아래 예시를 선택하거나\n원하는 작업을 요청하세요." : sourcePages[min(sourcePage,sourcePages.count-1)])
+        set("result",resultRevealAt != nil ? "결과를 이 공간으로 옮기고 있어요" : (resultPages.isEmpty ? (state.outcome == nil ? "계획은 실행 전에 확인합니다.\n\n작업이 끝나면 결과와 근거를\n여기에서 검토할 수 있습니다." : state.phase) : resultPages[min(resultPage,resultPages.count-1)]))
+        set("sourcePage",sourcePages.isEmpty ? "" : "\(sourcePage+1) / \(sourcePages.count) · " + (state.sourceTitle.hasPrefix("웹") ? "수집한 본문" : "원문 전체 보존"))
         set("resultPage",resultPages.isEmpty ? "" : "\(resultPage+1) / \(resultPages.count)")
-        set("provenance",state.hasDocumentProvenance ? "문서 전체 ↔ 결과\n눌러서 연결 따라가기" : "")
+        set("provenance",state.hasDocumentProvenance ? (state.sourceTitle.hasPrefix("웹") ? "수집한 출처 ↔ 결과\n눌러서 연결 따라가기" : "문서 전체 ↔ 결과\n눌러서 연결 따라가기") : "")
         if !state.history.isEmpty { set("history",state.history[min(historyPage,state.history.count-1)] + "  ·  \(min(historyPage+1,state.history.count))/\(state.history.count)") }
-        else { set("history","실행한 동작이 여기에 쌓입니다") }
-        set("coreLabel",pendingPause ? "일시 정지" : state.outcome == nil ? (active ? "실행 중" : "요청 대기") : "실행 종료 · 기록 보존")
+        else { set("history","실제 실행 기록 · 선택하면 근거를 확인합니다") }
+        set("coreLabel",pendingPause ? "일시정지" : active ? state.phase : state.outcome == nil ? "요청 대기" : state.phase)
         renderControls()
     }
     private func targetTitle(_ value:String) -> String {
@@ -393,6 +410,10 @@ private final class SpatialAccessibilityElement: NSAccessibilityElement {
         set("pause",pendingPause ? "계속하기" : "일시정지")
         for key in ["pause","stop"] { textNodes[key]?.opacity = active ? 1 : 0.82; targets.first { $0.0 == key }?.3.setAccessibilityEnabled(active) }
         targets.first { $0.0 == "run" }?.3.setAccessibilityEnabled(!active)
+        textNodes["sourceFull"]?.isHidden = state.source.isEmpty
+        textNodes["resultFull"]?.isHidden = state.result.isEmpty
+        textNodes["sourceNext"]?.isHidden = sourcePages.count < 2
+        textNodes["resultNext"]?.isHidden = resultPages.count < 2
         targets.first { $0.0 == "sourceFull" }?.3.setAccessibilityEnabled(!state.source.isEmpty)
         targets.first { $0.0 == "resultFull" }?.3.setAccessibilityEnabled(!state.result.isEmpty)
         for (key,enabled) in [("sourceFull",!state.source.isEmpty),("resultFull",!state.result.isEmpty),("sourceNext",sourcePages.count>1),("resultNext",resultPages.count>1),("report",state.outcome != nil)] {
@@ -430,7 +451,7 @@ private final class SpatialAccessibilityElement: NSAccessibilityElement {
         orbits.eulerAngles = SCNVector3(reduced ? 0 : sin(orbitTime*0.35)*0.15,reduced ? 0 : orbitTime*0.22,0)
         world.eulerAngles = SCNVector3(pitch,yaw,0)
         let aspect = max(0.4,Double(bounds.width/max(1,bounds.height)))
-        let z = max(960,590 / tan(21 * Double.pi/180) / aspect)
+        let z = max(850,Double(sceneHalfWidth+55) / tan(21 * Double.pi/180) / aspect)
         cameraNode.position = SCNVector3(motion.focus*55,-12,z+abs(motion.focus)*70)
         for (key,node) in modules {
             let goal:CGFloat = key == selected || linked && ["source","result"].contains(key) ? 22 : 0
@@ -484,17 +505,49 @@ private final class SpatialAccessibilityElement: NSAccessibilityElement {
         }
         return SCNVector3(Double(a.x)+Double(b.x-a.x)*u,Double(a.y)+Double(b.y-a.y)*u+sin(u*Double.pi)*(key == "source" || key == "result" ? 12 : 0),Double(a.z)+Double(b.z-a.z)*u)
     }
-    override func layout() { super.layout(); updateTypography(); sceneDirty = true; updateAXFrames() }
+    private func layoutDashboard() {
+        guard simpleControls, bounds.height > 0 else { return }
+        let width = min(550,max(334,(bounds.width/bounds.height*650-280)/2))
+        guard abs(width-panelWidth) > 0.5 else { return }
+        let delta = width-panelWidth; panelWidth = width
+        for key in ["source","result"] {
+            guard let module = modules[key] else { continue }
+            let direction:CGFloat = key == "source" ? -1 : 1
+            for node in module.childNodes where node.geometry is SCNBox {
+                let box = node.geometry as! SCNBox
+                if box.width > 300 { box.width += delta; node.position.x += direction*delta/2 }
+                else if key == "source" { node.position.x -= delta }
+            }
+            for key in key == "source" ? ["sourceRole","sourceTitle","source","sourcePage","sourceFull"] : ["resultRole","resultTitle","result","resultPage","resultFull"] {
+                guard let node = textNodes[key] else { continue }
+                if direction < 0 { node.position.x -= delta }
+                if ["sourceRole","sourceTitle","source","resultRole","resultTitle","result"].contains(key) { node.resize(CGSize(width:readingWidth,height:node.textSize.height)) }
+            }
+            if key == "result" { textNodes["resultNext"]?.position.x += delta }
+        }
+        let total = panelWidth*2+80, start = -panelWidth-16
+        if let rail = modules["history"] {
+            for node in rail.childNodes where node.geometry is SCNBox { (node.geometry as! SCNBox).width += delta*2 }
+        }
+        textNodes["historyRole"]?.position.x = start
+        textNodes["history"]?.position.x = start+250
+        textNodes["history"]?.resize(CGSize(width:total-280,height:28))
+        for i in 0..<4 { textNodes["event\(i)"]?.position.x = start+CGFloat(i)*total/4; textNodes["event\(i)"]?.resize(CGSize(width:total/4-18,height:52)) }
+        sourcePages = Self.pages(state.source,width:readingWidth,font:readingFont); resultPages = Self.pages(state.result,width:readingWidth,font:readingFont)
+        sourcePage = min(sourcePage,max(0,sourcePages.count-1)); resultPage = min(resultPage,max(0,resultPages.count-1)); renderState()
+    }
+    override func layout() { super.layout(); layoutDashboard(); updateTypography(); sceneDirty = true; updateAXFrames() }
     private func updateAXFrames() {
         guard let window else { return }
         for (_,node,size,ax) in targets {
-            let corners = [SCNVector3Zero,SCNVector3(size.width,0,0),SCNVector3(0,size.height,0),SCNVector3(size.width,size.height,0)].map { projectPoint(node.convertPosition($0,to:nil)) }
+            let measured = (node as? SpatialTextNode)?.textSize ?? size
+            let corners = [SCNVector3Zero,SCNVector3(measured.width,0,0),SCNVector3(0,measured.height,0),SCNVector3(measured.width,measured.height,0)].map { projectPoint(node.convertPosition($0,to:nil)) }
             let xs = corners.map { CGFloat($0.x) }, ys = corners.map { CGFloat($0.y) }
             let rect = CGRect(x:xs.min()!,y:ys.min()!,width:xs.max()!-xs.min()!,height:ys.max()!-ys.min()!)
             ax.setAccessibilityFrame(window.convertToScreen(convert(rect,to:nil)))
         }
     }
-    override func accessibilityChildren() -> [Any]? { targets.filter { ($0.1 as? SpatialTextNode)?.value.isEmpty == false }.map { $0.3 } }
+    override func accessibilityChildren() -> [Any]? { targets.filter { !$0.1.isHidden && ($0.1 as? SpatialTextNode)?.value.isEmpty == false }.map { $0.3 } }
     private func command(_ name:String) {
         switch name {
         case "source": if !motion.frozen { selected = "source"; linked = false; motion.target = -1 }
@@ -518,9 +571,9 @@ private final class SpatialAccessibilityElement: NSAccessibilityElement {
                 transfer(state.result,reverse:true,source:false)
                 transfer(state.source,reverse:true,source:true,delay:1.5)
             }
-        case "sourceFull": if !state.source.isEmpty { document(state.sourceTitle,text:state.source) }
-        case "resultFull": if !state.result.isEmpty { document("작업 결과",text:state.result) }
-        case "requestFull": if !state.request.isEmpty { document("작업 요청",text:state.request) }
+        case "sourceFull": if onDetails("source") { return }; if !state.source.isEmpty { document(state.sourceTitle,text:state.source) }
+        case "resultFull": if onDetails("result") { return }; if !state.result.isEmpty { document("작업 결과",text:state.result) }
+        case "requestFull": if !state.plan.isEmpty { document("실행 계획",text:state.plan+"\n\n요청\n"+state.request) }
         default:
             if name.hasPrefix("event:"),let slot = Int(name.dropFirst(6)), !motion.frozen {
                 let index = max(0,state.history.count-4)+slot

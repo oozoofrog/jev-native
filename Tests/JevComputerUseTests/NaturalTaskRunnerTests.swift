@@ -40,6 +40,21 @@ import XCTest
         let result = try await natural.run(request:original,directory:dir.path,model:nil,control:RunControl(),followUp:nil)
         XCTAssertEqual(result.status,"content_delivered"); XCTAssertEqual(result.response,"요약"); XCTAssertEqual(result.requestResolution?.target?.id,9)
     }
+    func testUnattendedMissingFieldReturnsDiagnosticWithoutQuestionOrInput() async throws {
+        let dir = try directory(); defer { try? FileManager.default.removeItem(at:dir) }
+        var intentCalls = 0
+        let runner = TaskRunner(resolve:{_,_,_,_,_,_ in XCTFail("Unresolved scope must not select apps"); return AppResolution(source:"test",status:"error") },execute:{_,dir,_,_,_,_ in XCTFail("Unresolved scope must not execute"); return RunReport(status:"error",goal:"",steps:[],finalObservation:"",directory:dir) },requireCredential:{})
+        let natural = NaturalTaskRunner(runner:runner,intent:{ request,_,_,_ in
+            intentCalls += 1; var result = self.outcome(request); result.status = "needs_input"
+            result.question = RequestQuestion(field:.app,prompt:"대상 앱이 확정되지 않았습니다.")
+            return result
+        },context:{self.context})
+        let result = try await natural.run(request:"작업 실행",directory:dir.path,model:nil,control:RunControl(),followUp:nil)
+        XCTAssertEqual(intentCalls,1); XCTAssertEqual(result.status,"request_needs_input")
+        XCTAssertTrue(result.response?.contains("대상 앱이 확정되지 않았습니다.") == true)
+        XCTAssertTrue(result.requestResolution?.answers.isEmpty == true)
+        XCTAssertFalse(FileManager.default.fileExists(atPath:dir.appendingPathComponent("followup-0.json").path))
+    }
     func testAppFollowUpFillsOnlyAppAndRetainsOriginalConstraints() async throws {
         let dir = try directory(); defer { try? FileManager.default.removeItem(at:dir) }
         let original = "문구를 입력해줘. 다른 문서는 바꾸지 마."

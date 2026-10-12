@@ -9,3 +9,12 @@ jev-run-*/
 *.p12
 *.p8
 *.pem
+
+# Local build, signing, installation and profiling records.
+artifacts/build-runs/
+artifacts/signing-staging/
+artifacts/signing-backups/
+__pycache__/
+*.pyc
+*.profraw
+*.key

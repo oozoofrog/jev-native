@@ -80,7 +80,7 @@ import Foundation
                     if try await respond(question) { continue }
                 }
                 guard resolution.status == "resolved" else {
-                    return try finish(RunReport(status:"request_" + resolution.status,goal:original,steps:[],finalObservation:"",directory:directory))
+                    return try finish(RunReport(status:"request_" + resolution.status,goal:original,steps:[],finalObservation:"",directory:directory,response:"요청을 실행할 필수 정보를 확정하지 못했습니다. 실행한 앱 작업은 없습니다.\n"+(resolution.question?.prompt ?? "판단 근거는 작업 기록에 보존했습니다.")))
                 }
                 var source: DocumentSource?
                 if resolution.content == .transform {

@@ -13,16 +13,42 @@ import Foundation
             canonical.path.withCString { _ = execv($0,pointers) }
             fputs("jev-native: self-exec failed\n",stderr); exit(1)
         }
-        let args = Array(CommandLine.arguments.dropFirst())
         do {
+            let execution = StartupExecutionIdentity.current()
+            if let execution {
+                try ProductIdentity.validateBundle(executablePath: execution.canonicalExecutable)
+            }
+            let rawArguments=Array(CommandLine.arguments.dropFirst())
+            let environment=GUIActivation.consumeLaunchEnvironment()
+            let guiEntry=GUIActivation.entry(rawArguments,bundled:execution?.bundleIdentifier == CompiledProduct.bundleIdentifier,environment:environment)
+            if guiEntry == .activateApplication {
+                try GUIContext.current().requireAvailable()
+                guard let execution else { throw Failure("Loaded GUI executable path unavailable") }
+                let options=try GUIActivation.activationOptions(arguments:rawArguments,workingDirectory:FileManager.default.currentDirectoryPath)
+                try emit(await GUIActivation.activate(execution:execution,options:options))
+                return
+            }
+            // GUI startup uses a stable system cwd. Caller folder context is only consulted
+            // when a user starts local work, never by startup/authentication Process setup.
+            if guiEntry == .applicationHost {
+                guard chdir("/")==0 else { throw Failure("Cannot establish GUI startup directory") }
+            }
+            if guiEntry == .applicationHost, let execution, try GUIActivation.ownerPID(execution:execution) != nil {
+                try GUIContext.current().requireAvailable()
+                try emit(await GUIActivation.activate(execution:execution,options:GUIOptions(arguments:["--gui"])))
+                return
+            }
+            let args = startupArguments(rawArguments, inApplicationBundle: execution?.bundleIdentifier == CompiledProduct.bundleIdentifier)
             let mode = startupMode(args)
             if mode != .cli { try GUIContext.current().requireAvailable() }
-            if mode == .application { try runApplication(args) }
+            // AX/SC/NSWorkspace commands do not construct NSApplication. Registering a helper
+            // with the GUI bundle can steal a LaunchServices reopen intended for the workshop.
+            if mode == .application { try runApplication(args,guiOptions:guiEntry == .applicationHost ? GUIActivation.hostOptions(environment:environment) : nil) }
             else { try await command(args) }
         } catch { fputs("jev-native: \(error)\n", stderr); exit(1) }
     }
-    @MainActor private static func runApplication(_ args: [String]) throws {
-        let guiOptions = args.first == "--gui" ? try GUIOptions(arguments: args) : nil
+    @MainActor private static func runApplication(_ args: [String],guiOptions launchOptions:GUIOptions? = nil) throws {
+        let guiOptions = try launchOptions ?? (args.first == "--gui" ? try GUIOptions(arguments: args) : nil)
         let app = NSApplication.shared; let delegate = AppDelegate(); app.delegate = delegate; app.setActivationPolicy(.accessory)
         if let guiOptions {
             let goal = GoalWindowController(options: guiOptions); AppDelegate.goal = goal; goal.show()
@@ -44,6 +70,15 @@ import Foundation
             return native
         }
         switch args.first ?? "help" {
+        case "--version", "version":
+            let value = try ProductIdentity.report()
+            print("\(value.product) \(value.version) (build \(value.build); schema \(value.schema))")
+        case "--version-json":
+            try emit(ProductIdentity.report())
+        case "startup-check":
+            try emit(GUIContext.current().diagnostic)
+        case "research", "calendar-list", "calendar-commit", "calendar-inspect", "calendar-test-reset":
+            try await ResearchCLI.run(args)
         case "install-skill":
             let install = try SkillInstallOptions(arguments: Array(args.dropFirst()))
             let results = try SkillInstallation.local().install(hosts: install.hosts, scope: install.scope, project: install.project, skillsDirectory: install.skillsDirectory)
@@ -89,13 +124,23 @@ import Foundation
             if report.status == "error" { throw Failure(report.error ?? "Run failed; see report.json") }
             if let diagnostic = report.error ?? report.appSelection?.diagnostic { fputs(diagnostic + "\n", stderr) }
             if !["verified_complete", "jev_observed_complete"].contains(report.status), !(args.contains("--keep-open") && AppDelegate.preview != nil) { exit(2) }
+        case "local":
+            let report = try await LocalCLI.run(Array(args.dropFirst()))
+            try emit(report)
+            if report.status != "local_complete" { exit(report.status == "cancelled" ? 130 : 2) }
         case "delegate":
             let dir = try directory(); let start = Date(); let result = try await Codex().invoke(goal: require("--prompt"), image: option("--image"), directory: dir, model: option("--codex-model")); try writeJSON(result, dir + "/handoff.json"); try emit(result); fputs("codex_total_ms=\(milliseconds(start))\n", stderr)
         default:
             print("""
             jev-native — native macOS computer use (Swift / Apple frameworks)
-              --gui [--goal TEXT] [--simple] [--no-preview] [--codex-model MODEL]
+              --gui [--goal TEXT] [--directory DIR] [--simple] [--no-preview] [--codex-model MODEL]
               doctor
+              --version | --version-json
+              startup-check
+              local --goal TEXT [--directory DIR] [--out DIR] [--plan JSON] [--codex-model MODEL]
+              research --goal TEXT [--calendar] [--source URL ...] [--out DIR] [--codex-model MODEL]
+              calendar-list [--request-access] [--create-calendar "JEV Native Test NAME"]
+              calendar-commit --plan FILE --approve SHA256 --calendar-id ID [--out DIR]
               setup [--import-pasteboard | --open-keys]
               install-skill --host codex|claude|both [--scope user|project]
                   [--project PATH] [--skills-dir PATH (one host only)]

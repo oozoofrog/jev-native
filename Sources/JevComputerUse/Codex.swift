@@ -5,7 +5,7 @@ final class Codex {
     let executable: String
     init(executable override: String? = nil) throws {
         let env = ProcessInfo.processInfo.environment
-        let paths = env["PATH", default: ""].split(separator: ":").map { String($0) + "/codex" } + [NSHomeDirectory() + "/.local/bin/codex"]
+        let paths = env["PATH", default: ""].split(separator: ":").map { String($0) + "/codex" } + [NSHomeDirectory() + "/.local/bin/codex", NSHomeDirectory() + "/Library/Application Support/JEV Native/Runtime/codex", "/Applications/Codex.app/Contents/Resources/codex"]
         guard let path = override ?? env["JEV_CODEX_PATH"] ?? paths.first(where: { FileManager.default.isExecutableFile(atPath: $0) }), FileManager.default.isExecutableFile(atPath: path) else { throw Failure("Codex executable unavailable. Set JEV_CODEX_PATH") }; executable = path
     }
     @MainActor func invoke(goal: String, image: String?, directory: String, model: String?, control: RunControl? = nil) async throws -> Handoff {

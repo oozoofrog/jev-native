@@ -90,6 +90,8 @@ import Foundation
         for index in 0..<spec.maxSteps {
             if cancelled() { status = "cancelled"; break }
             try await control?.checkpoint()
+            control?.emit(.cycle(index + 1))
+            defer { control?.emit(.cycleEnd(index + 1)) }
             let stepDir = directory + "/step-\(index)"; try FileManager.default.createDirectory(atPath: stepDir, withIntermediateDirectories: true)
             let obs = try await observe(directory: stepDir); let obsPath = stepDir + "/observation.json"; try writeJSON(obs, obsPath); finalPath = obsPath
             if cancelled() { status = "cancelled"; break }
@@ -105,6 +107,10 @@ import Foundation
                 phase("JEV deciding · step \(index + 1)")
                 var decision = try await decide(goal: spec.goal, observation: decisionObservation, candidates: choices, history: history,advisory:advisory); step.decision = decision
                 try writeJSON(decision, stepDir + "/decision.json")
+                let selectedLabel = choices.first(where: { $0.id == decision.choice }).map { candidate in
+                    candidate.action?.presentationLabel(observation:obs) ?? (decision.choice == "delegateText" ? "Codex 텍스트 작성" : decision.choice == "delegateVision" ? "Codex 화면 해석" : decision.choice == "done" ? "완료 조건 확인" : candidate.description)
+                } ?? decision.choice
+                control?.emit(.action(selectedLabel))
                 try await control?.checkpoint()
                 if cancelled() { status = "cancelled"; history.append(step); break }
                 if decision.choice == "blocked" { status = "blocked"; history.append(step); break }
@@ -124,6 +130,7 @@ import Foundation
                     step.query=query; step.queryLabel=choices.first(where: { $0.id == decision.choice })?.description
                     let start=Date(); let overview=try native.applyQuery(query); step.executionMS=milliseconds(start)
                     try writeJSON(overview,stepDir+"/query-result.json")
+                    control?.emit(.execution("접근성 정보 조회 · "+(step.queryLabel ?? decision.choice)))
                     history.append(step); try writeJSON(history,directory+"/steps.json"); continue
                 }
                 if decision.choice == "done" {
@@ -158,13 +165,14 @@ import Foundation
                     if cancelled() { status = "cancelled"; history.append(step); break }
                     if decision.choice == "delegateText" { guard !handoff.text.isEmpty else { throw Failure("Content delegate returned no requested text") }; texts.append(handoff.text); responseText=handoff.text; generated = true }
                     else { responseText=handoff.observation; inspected = true; for action in handoff.actions { try validateAction(action, apps: spec.apps) }; extra = handoff.actions; visionSnapshot=obs; advisory=["text":handoff.observation,"sourceObservation":obs.id,"imageSHA256":obs.windowCapture?.imageSHA256 ?? "desktop capture"] }
+                    control?.emit(.execution(decision.choice == "delegateText" ? "Codex 텍스트 응답 수신" : "Codex 화면 해석 수신"))
                     if let responseText { control?.emit(.result(responseText)) }
                     // Delegate observations are advisory. Reobserve before JEV selects any proposal.
                 } else {
                     guard let selected = choices.first(where: { $0.id == decision.choice }), var action = selected.action else { throw Failure("Missing selected action") }; action.label = selected.description; step.action = action
                     // A pause is a safe boundary. Always obtain fresh preconditions AFTER resuming.
                     try await control?.checkpoint()
-                    control?.emit(.action(action.presentationLabel(observation:obs)))
+
                     // Reobserve immediately before execution. Input coordinate proposals expire on UI changes.
                     if action.target == nil && !["launch", "activate", "openFile", "selectWindow", "wait"].contains(action.kind) {
                         let pointerAction=["click","doubleClick","rightClick","move","drag","scroll"].contains(action.kind)
@@ -180,6 +188,7 @@ import Foundation
                     phase("Executing \(action.kind) · step \(index + 1)")
                     let start = Date(); try await perform(action, observation: obs, allowedApps: spec.apps); step.executionMS = milliseconds(start)
                     if action.kind != "wait" { control?.emit(.input(action.presentationLabel(observation:obs))) }
+                    else { control?.emit(.execution("화면 응답 대기 완료")) }
                     if action.kind == "type" { texts.removeAll { $0 == action.text } }
                     extra = [] // never retain screenshot-coordinate proposals after an action
                 }
@@ -188,6 +197,7 @@ import Foundation
                 let afterDir = stepDir + "/after"; try FileManager.default.createDirectory(atPath: afterDir, withIntermediateDirectories: true)
                 let after = try await observe(directory: afterDir); let afterPath = afterDir + "/observation.json"; try writeJSON(after, afterPath); step.afterObservation = afterPath; finalPath = afterPath
                 if cancelled() { status="cancelled";history.append(step);break }
+                control?.emit(.verification(after.selectedWindow?.title ?? after.target?.bundle ?? "대상 화면 재관찰"))
                 if let previous=visionSnapshot, !stableTargetState(previous,after) || previous.windowCapture?.imageSHA256 != after.windowCapture?.imageSHA256 { inspected=false; extra=[]; advisory=nil; visionSnapshot=nil }
                 if !native.legacyAX, explicitCompletion(spec,observation:after,pendingTexts:texts,generated:generated,inspected:inspected) { status="verified_complete";history.append(step);break }
                 if !["wait", "selectWindow"].contains(step.action?.kind ?? ""), step.action != nil, after.target?.pid == obs.target?.pid, stableTargetState(obs,after,action:step.action) { recovery += 1; step.error = "No AX change observed; result is not proven (screenshot may differ)" } else { recovery = 0 }
@@ -195,6 +205,7 @@ import Foundation
                 if cancelled() || error is CancellationError { status = "cancelled"; history.append(step); break }
                 recovery += 1; step.error = String(describing: error)
             }
+            if let error = step.error { control?.emit(.recovery(error)) }
             history.append(step); try writeJSON(history, directory + "/steps.json")
             if recovery > spec.maxRecovery { status = "recovery_exhausted"; break }
         }

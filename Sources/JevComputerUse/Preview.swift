@@ -82,7 +82,7 @@ import ScreenCaptureKit
     }
     func applicationShouldTerminate(_ sender: NSApplication) -> NSApplication.TerminateReply {
         if Self.goal?.session.active == true { Self.terminationPending = true; Self.goal?.requestStop(); return .terminateLater }
-        return .terminateNow
+        Self.goal?.prepareToTerminate(); return .terminateNow
     }
     func applicationShouldHandleReopen(_ sender: NSApplication, hasVisibleWindows flag: Bool) -> Bool { if let goal = Self.goal { goal.show() } else { Self.preview?.dockReopen() }; return false }
     func applicationShouldTerminateAfterLastWindowClosed(_ sender: NSApplication) -> Bool { false }

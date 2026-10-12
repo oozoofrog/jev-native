@@ -1,20 +1,20 @@
 # JEV Native Computer Use
 
-A standalone SwiftPM native macOS controller. Apple AppKit, Accessibility, ScreenCaptureKit, CoreGraphics, Vision, URLSession and CryptoKit implement automation directly. No browser tool, Python/Node bridge, AppleScript or external automation binary is used. Codex CLI is the sole external runtime exception for original text and image interpretation.
+A standalone SwiftPM native macOS controller. Apple AppKit, Accessibility, ScreenCaptureKit, CoreGraphics, Vision, URLSession and CryptoKit implement automation directly. The native observation/input path uses no browser automation or AppleScript bridge. Codex CLI supplies original text/image interpretation. The local-workflow path can execute supported programs through explicit working-directory, executable and argument policies.
 
-Current version: **0.6.3 (11)**. Build with Xcode command-line tools and Swift 6 on macOS. Runtime validation covers macOS 27.0.1 arm64; the macOS 14 deployment target is not a tested compatibility guarantee.
+Current public source version: **0.9.0 (32)**. Build with Xcode command-line tools, Swift 6 and Python 3.9+ on Apple Silicon macOS. Build32 records the portable public manifest; it is separate from any previously installed app. Runtime validation covers macOS 27.0.1 arm64; the macOS 14 deployment target is not a tested compatibility guarantee.
 
 ```sh
 git clone https://github.com/oozoofrog/jev-native.git
 cd jev-native
-./Scripts/build.sh
+./Scripts/build.sh --verify-tests
 mkdir -p "$HOME/.local/bin"
 # Choose an unused command path; do not overwrite an existing installation.
-ln -s "$PWD/dist/JevNative.app/Contents/MacOS/jev-native" "$HOME/.local/bin/jev-native"
+ln -s "/absolute/path/printed/by/build.sh" "$HOME/.local/bin/jev-native"
 export PATH="$HOME/.local/bin:$PATH"
 ```
 
-The build creates an ad-hoc signed `dist/JevNative.app`. The CLI re-execs its canonical app path for AppKit bundle and Dock identity. Keep the checkout/app at the installed path. Run `doctor` and grant macOS Accessibility/Screen Recording permissions for your launch context when needed. The CLI reports consent status; it cannot grant it.
+The build creates a fresh `dist/development-<UUID>/JevNative.app` and prints its executable path. It does not sign the bundle, install it, replace an existing app, or update a CLI link. Swift may apply a linker signature to the raw executable. Local code-signing and installation require a separately reviewed developer policy; this build has no certificate or ad-hoc fallback. The CLI re-execs its canonical app path for AppKit bundle and Dock identity. Keep the checkout/app at the installed path. Run `doctor` and grant macOS Accessibility/Screen Recording permissions for your launch context when needed. The CLI reports consent status; it cannot grant it.
 
 JEV decisions require a TypeSafe API credential and network access. Original text and screenshot interpretation additionally require an installed, authenticated Codex CLI. The native observation/input commands do not require a JEV key. See the [verification evidence](evidence/README.md), [publication manifest](PUBLICATION.md), and [provenance notice](NOTICE.md).
 
@@ -138,13 +138,23 @@ Typed JEV judgments identify ordinary actions, exact supplied text, new writing,
 
 New writing uses the actual Codex CLI delegate automatically. Ordinary AX actions do not request text or vision delegates. Visual interpretation requires a concrete selected window and uses its screenshot. A summary, translation or visual explanation without an explicit app write destination appears in the task window. Selecting a source is read permission, not permission to replace it. Text app writes continue through JEV-selected native actions and fresh target checks. Natural requests to write authored visual content into an app stop before input because the visual source and destination do not yet have separate scopes; ask for the description in the task window. Vision-assisted native actions retain their existing execution path.
 
-Document transformation requires one exposed text area, complete bounded AX coverage, an observed length of at most 12,000 UTF-16 units, two equal live reads and verified source-window identity. Missing, partial, ambiguous or oversized sources require supplied source text or stop before writing. Unexposed and virtualized document content is not certified complete. Image generation, video generation, web research and arbitrary shell execution are outside this backend.
+Document transformation requires one exposed text area, complete bounded AX coverage, an observed length of at most 12,000 UTF-16 units, two equal live reads and verified source-window identity. Missing, partial, ambiguous or oversized sources require supplied source text or stop before writing. Unexposed and virtualized document content is not certified complete. Image and video generation and arbitrary shell execution are outside this backend. Public-source research and supported local tool execution have separate typed workflows described below.
 
 The main window contains the goal editor, spatial source/result workspace, run/pause/stop controls, actual event history and report access. Connection settings and preview controls live in the app menu. API-key availability is reported as configuration, not successful authentication. Key import is an explicit clipboard action using the existing atomic 0600 writer; it never replaces an existing key. Opening the window does not import a key or start a task.
 
 Only one run is active at a time. Stop checks cancellation across intent, follow-up, source reading, delegate execution and native actions. A running Codex child is terminated on cancellation. Closing the task window requests a stop; reopening restores the window. The separate target preview can be hidden and reopened.
 
 Reports under `~/Library/Application Support/JEV Native/Runs/<UUID>/` retain the original request, field answers, intent calls, resolution events, source evidence, delegate usage/output and native action evidence. `content_delivered` means the delegate result is displayed; `jev_observed_complete` is JEV's semantic assessment. Neither invents exact postconditions. CLI `expectText`/`expectApp` remain explicit. Codex events do not always report the actual model ID; absent IDs remain unknown. Raw local records can contain private data. See [natural-language UI evidence](evidence/NATURAL-LANGUAGE-UI.md).
+
+## Research and actual task details
+
+The GUI routes public-source research and local work separately from native app actions. Research records the actual query, search results, source ordering response, source fetch attempts, comparison and citation identifiers. Only low confidence in source ordering keeps the received search order. HTTP/access/schema/network failures and cancellation still stop the workflow. A rejected selection response is saved with redaction, HTTP status, response hashes and the actual failure category; workflow and connection decisions never use the source-order fallback.
+
+The Metal task graph opens natural-language stage cards showing actual event times, summaries, command/result metadata, evidence links and failure/partial states. **기록** opens recent task summaries and details. Selecting a result keeps its full natural-language answer in the detail view. Raw output is secondary. Private reasoning events and recognized secrets are excluded from previews; ambiguous sensitive mixed output is withheld. Evidence paths are bounded to the selected run directory. Legacy tasks show only saved facts and explicitly identify missing diagnostics or timestamps.
+
+Research completion means a response was provided, not that every external fact, nationality, cause or source was independently established. Source conflicts and unresolved questions remain visible. Calendar writes require their separate approval path. The CLI `research --goal TEXT --out DIRECTORY` prepares a research plan; it does not silently install an app or write calendar events. Supported local commands remain bound to the selected workspace and validated arguments; process exit success alone does not prove the user's whole goal.
+
+The app and CLI use the same executable target. `Product.json` supplies version/build and a checkout-relative canonical source marker; `Scripts/product_contract.py generate` derives the compiled identity and bundle metadata. Native automation freshness, ownership, secure-field and pointer-routing guards remain in place. Repeated `--gui` requests reuse the running app through guarded activation. Public source compilation does not establish launch consent or preserve another installation's TCC grants.
 
 ## Progressive AX query engine
 
